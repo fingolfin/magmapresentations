@@ -1,0 +1,70 @@
+// See file Documentation for details of intrinsics 
+// to use these intrinsics need to attach spec file 
+
+AttachSpec ("presentation.spec");
+
+// various test functions 
+
+SLPToFP := function (Q, R) 
+   F := FreeGroup (Ngens (Q));
+   tau := hom <Q-> F | [F.i: i in [1..Ngens (F)]]>;
+   Q := quo <F | tau (R)>;
+   return Q;
+end function;
+
+load "test.m";
+
+// optional arguments for ClassicalStandardPresentation
+// Projective = true: presentation for group modulo its centre -- default false
+// PresentationGenerators = false: presentation on ClassicalStandardGenerators -- default 
+// PresentationGenerators = true: presentation on PresentationGenerators 
+// PresentationGenerators is also optional argument for ClassicalStandardGenerators to set up generators used to define presentation
+
+// set up presentation -- evaluate these on appropriate generators 
+
+/* 
+Q, R := ClassicalStandardPresentation ("SL", 4, 5: PresentationGenerators := true);
+X := ClassicalStandardGenerators ("SL", 4, 5: PresentationGenerators := true);
+#Set (Evaluate (R, X));
+F := SLPToFP (Q, R);
+
+Q, R := ClassicalStandardPresentation ("Omega+", 8, 5: PresentationGenerators := true, 
+                                                       Projective:=true);
+X := ClassicalStandardGenerators ("Omega+", 8, 5: PresentationGenerators := true);
+#Set (Evaluate (R, X));
+F := SLPToFP (Q, R);
+
+Q, R := ClassicalStandardPresentation ("Omega-", 6, 8: PresentationGenerators := true);
+X := ClassicalStandardGenerators ("Omega-", 6, 8: PresentationGenerators := true);
+#Set (Evaluate (R, X));
+F := SLPToFP (Q, R);
+
+Q, R := ClassicalStandardPresentation ("Sp", 10, 9);
+X := ClassicalStandardGenerators ("Sp", 10, 9);
+#Set (Evaluate (R, X));
+F := SLPToFP (Q, R);
+
+Q, R := ClassicalStandardPresentation ("SU", 7, 4);
+X := ClassicalStandardGenerators ("SU", 7, 4);
+#Set (Evaluate (R, X));
+F := SLPToFP (Q, R);
+
+Q, R := ClassicalStandardPresentation ("SU", 6, 27: PresentationGenerators := true);
+X := ClassicalStandardGenerators ("SU", 6, 27: PresentationGenerators := true);
+#Set (Evaluate (R, X));
+F := SLPToFP (Q, R);
+
+*/
+
+/* 
+
+// some test involving coset enumeration over subgroups 
+// supply dimension range, field range 
+TestSL ([3..7], [2,3,4,5]);
+TestSp ([6..10 by 2], [2,3,4]);
+TestSU ([4, 5], [2,3,4,5]);
+TestPlus ([6..10 by 2], [2,3,4,5]);
+TestMinus ([4..8 by 2], [2,3,4,5]);
+TestOmega ([3..7 by 2], [3,7,9]);
+
+*/

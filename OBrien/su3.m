@@ -1,0 +1,648 @@
+// Explicit version of presentation for SU(3, q) 
+// Last revised Ocotober 2018 
+
+// to get paper version V (alpha, beta)
+// call V(alpha, beta - psi * alpha^(1+q)) 
+
+VMatrix := function (q, alpha, gamma)
+   F := GF (q^2);
+   w := PrimitiveElement (F);
+   if IsEven (q) then
+      psi := Trace(w, GF(q))^(-1) * w;
+      assert psi eq 1 / (1 + w^(q - 1));
+   else
+      psi := F!(-1/2);
+   end if;
+   beta := psi * alpha^(1 + q) + gamma;
+   MA := MatrixAlgebra (F, 3); 
+   v := MA![1, alpha, beta, 0, 1, -alpha^q, 0, 0, 1];
+   return GL(3, F) ! v;
+end function;
+
+DeltaMatrix := function (q, alpha)
+   delta := DiagonalMatrix ([alpha, alpha^(q - 1), alpha^-q]);
+   return GL(3, q^2) ! delta;
+end function;
+
+TauMatrix := function (q, gamma)
+   F := GF (q^2);
+   MA := MatrixAlgebra (F, 3); 
+   tau := MA![1, 0, gamma, 0, 1, 0, 0, 0, 1];
+   return GL(3, F) ! tau;
+end function;
+
+TMatrix := function (q)
+   MA := MatrixAlgebra (GF (q^2), 3);
+   t := Zero (MA);
+   t[1][3] := 1; t[2][2] := -1; t[3][1] := 1;
+   return t;
+end function;
+
+BorelGenerators := function (q)
+   F := GF (q^2);
+   w := PrimitiveElement (F);
+
+   v := VMatrix (q, 1, 0);
+   beta := v[1,3]; alpha := v[1,2];
+   assert Trace (beta, GF(q)) eq -alpha^(q + 1);
+   if IsEven (q) then
+      tau := TauMatrix (q, 1);
+   else 
+      tau := TauMatrix (q, w^((q+1) div 2));
+   end if;
+
+   delta := DeltaMatrix (q, w);
+
+   return [GL(3, q^2) | v, tau, delta];
+end function;
+
+SU32Generators := function ()
+   q := 2;
+   F := GF (q^2);
+   w := PrimitiveElement (F);
+   w0 := w^(q + 1);
+   beta0 := w^(1 + (q^2 + q) div 2);
+   V := VectorSpace (F, 2);
+   v := VMatrix (q, 1, 0);
+   v1 := VMatrix (q, w^2, 0);
+   Delta := DeltaMatrix (q, w);
+   t := TMatrix (q);
+   return [GL(3, 4) | v, v1, Delta, t];
+end function;
+
+SU3Generators := function (q)
+   if q eq 2 then return SU32Generators (); end if;
+   return BorelGenerators (q) cat [GL(3, q^2) | TMatrix (q)];
+end function;
+
+/* g is upper-triangular matrix with just one non-zero entry in top right corner;
+   write as word in Borel subgroup generators */
+
+SpecialSLPForElement := function (g, q, W)
+   if g eq g^0 then return Identity (W), g; end if;
+   assert g[1,1] eq 1 and g[1,2] eq 0 and g[2,3] eq 0;
+
+   v := W.1; tau := W.2; delta := W.3;
+
+   F := GF (q^2);
+   w := PrimitiveElement (F);
+
+   Gens := SU3Generators (q);
+   V := Gens[1]; Tau := Gens[2]; Delta := Gens[3]; 
+   entry := Tau[1,3];
+
+   I := Integers ();
+   z := g[1][3];
+   if z ne 0 then
+      theta := w^-(q + 1);
+      R := sub< F | theta>;
+      c := Eltseq (R!(entry^-1 * z));
+      c := [I!x: x in c];
+      word := &*[(tau^(delta^(i-1)))^c[i]: i in [1..#c]];
+      matrix := &*[(Tau^(Delta^(i-1)))^c[i]: i in [1..#c]];
+      g := matrix^-1 * g;
+      assert g[1][3] eq 0; 
+   end if;
+
+   return word, g;
+end function;
+
+// find solutions x and y to Lemma 4.1
+
+FindSolutions := function (q)
+   F := GF (q^2);
+   w := PrimitiveElement (F);
+
+   n := q + 1; m := q - 2;
+
+   w0 := w^(q + 1);
+   if IsEven (q) then 
+      x := -(q + 1) mod (q^2 - 1);
+
+      E := GF (q); 
+      c := Log (E!w0, E!(1 - w0));
+      y := -c * (q + 1) mod (q^2 - 1);
+
+      assert w^(x*m) + w^(y*m) eq 1 and w^(-x*n) + w^(-y*n) eq 1;
+      assert #sub<GF(q^2) | w^(x* m)> eq q and #sub<GF(q^2) | w^(x*n)> eq q;
+      return x, y;
+   end if;
+
+   psi := w^((q + 1) div 2);
+   for t in F do
+      if t^2 eq psi^2 then continue; end if;
+      c := t * (t^2 + 3 * psi^2) * (t + psi) * (t^2 - psi^2)^-2;
+      d := (c - c^(q - 1)); 
+      if c eq 0 or d eq 0 then continue; end if;
+      x := -Log (c) mod (q^2 - 1); 
+      y := -Log (d) mod (q^2 - 1); 
+      if w^(x*m) + w^(y*m) eq 1 and w^(-x*n) + w^(-y*n) eq 1 then 
+         found := #sub<GF(q^2) | w^(x* m)> eq q^2 and #sub<GF(q^2) | w^(x*n)> eq q;
+         if found then return x, y; end if;
+      end if;
+   end for;
+   error "Failed to find x and y";
+end function;
+
+// find two polynomials g, h of degree Degree (F) - 1 which satisfy 
+//    w^(2*q - 4) = g(r) + w^(q - 2) * h(r) 
+// where r  = w^(x * (q - 2))
+
+TwoPolynomials := function (E, F, p, q, w, x)
+   e := Degree (F);
+   P<l> := PolynomialRing (GF(p));
+   r := w^(x * (q - 2));
+   W := sub<E | r>;
+   one := w^((q + 1) * (q - 2));
+   two := (w^(2*q - 4) - one) * w^-(q - 2);
+   if one in W and two in W then 
+      g := P! Eltseq (W!one);
+      h := P! Eltseq (W!two);
+      if w^(2*q - 4) eq Evaluate (g, r) + w^(q - 2) * Evaluate (h, r) then
+         return g, h; 
+      end if;
+   end if;
+
+   // possibly solution is wrong: if so, must search over q^2 elements
+   assert exists(pair){<z, u>: z in F, u in F | z + w^(q - 2) * u eq w^(2*q - 4)};
+   one := pair[1]; two := pair[2];
+   g := P! Eltseq (W!one);
+   h := P! Eltseq (W!two);
+   assert w^(2*q - 4) eq Evaluate (g, r) + w^(q - 2) * Evaluate (h, r);
+   return g, h;
+end function;
+   
+// Presentation for Borel subgroup 
+// power relation needed in Borel presentation only
+// if used to set up SU(3, q) then AddPower = false;
+
+BorelPresentation := function (q: AddPower := false)
+   W := SLPGroup (3);
+   v := W.1; tau := W.2; delta := W.3; 
+
+   I := Integers ();
+   E := GF (q^2);
+   F := GF (q);
+   e := Degree (F);
+   p := Characteristic (E);
+   f := Degree (F);
+   w := PrimitiveElement (E);
+   w0 := w^(q + 1);
+   theta := w^(q - 2);
+
+   Gens := BorelGenerators (q);
+   V := Gens[1]; Tau := Gens[2]; Delta := Gens[3]; 
+
+   x, y := FindSolutions (q);
+   A := (Delta^+1)^x;
+   B := (Delta^+1)^y;
+
+   Rels := [];
+   // R1 
+   a := (delta^+1)^x;
+   b := (delta^+1)^y;
+
+   // this relation can be omitted for SU(3, q)
+   if AddPower then Append (~Rels, delta^(q^2 - 1) = 1); end if;
+   if IsEven (q) then
+      Append (~Rels, v^2 = tau);
+   else
+      Append (~Rels, v^p = 1);
+   end if;
+   
+   Append (~Rels, tau^p = 1);
+
+   // R2 
+   Append (~Rels, tau = tau^(a) * tau^(b));
+   if IsOdd (p) then Append (~Rels, tau = tau^(b) * tau^(a)); end if;
+
+   if e gt 1 then 
+      m1 := MinimalPolynomial (w0^-x);
+      b1 := Coefficients (m1);
+      b1 := [I!x: x in b1];
+      Append (~Rels, &*[(tau^(a^(i-1)))^b1[i]: i in [1..#b1]] = 1);
+   end if;
+
+   if e eq 1 or Gcd (x, q^2 - 1) gt 1 then 
+      K := sub< F | w0^-x>;
+      b2 := Eltseq (K!(w0^-1));
+      b2 := [I!x: x in b2];
+      Append (~Rels, &*[(tau^(a^(i-1)))^b2[i]: i in [1..#b2]] = tau^(delta));
+   end if;
+
+   // R3 
+   // (i) 
+   lhs := v;
+   rhs := v^a * v^b * SpecialSLPForElement ((V^A * V^B)^-1 * V, q, W);
+   Append (~Rels, lhs = rhs);
+
+   if IsOdd (p) then 
+      lhs := v;
+      rhs := v^b * v^a * SpecialSLPForElement ((V^B * V^A)^-1 * V, q, W);
+      Append (~Rels, lhs = rhs);
+   end if;
+
+   // (ii) 
+   Append (~Rels, (v^a, tau) = 1);
+   Append (~Rels, (v^b, tau) = 1);
+
+   // (iii) 
+   lhs := (v, v^a);
+   rhs := SpecialSLPForElement ((V, V^A), q, W);
+   Append (~Rels, lhs = rhs);
+
+   // (iv) 
+   if IsEven (q) and e gt 1 then
+      lhs := (v^delta, v^a);
+      rhs := SpecialSLPForElement ((V^Delta, V^A), q, W);
+      Append (~Rels, lhs = rhs);
+      lhs := (v^delta, v^b);
+      rhs := SpecialSLPForElement ((V^Delta, V^B), q, W);
+      Append (~Rels, lhs = rhs);
+   end if;
+
+   // (v)
+   m2 := MinimalPolynomial (w^(x*(q - 2)));
+   b := Coefficients (m2);
+   b := [I!x: x in b];
+   lhs := &*[(v^(a^(i-1)))^b[i]: i in [1..#b]];
+   matrix := &*[(V^(A^(i-1)))^b[i]: i in [1..#b]];
+   rhs := SpecialSLPForElement (matrix, q, W);
+   Append (~Rels, lhs = rhs);
+     
+   // (vi) 
+   if IsOdd (q) and Gcd (x, q^2 - 1) gt 1 then 
+      K := sub< E | w^(x * (q - 2))>;
+      b := Eltseq (K!(w^(q - 2)));
+      b := [I!x: x in b];
+
+      L := V^(Delta);
+      R := &*[(V^(A^(i-1)))^b[i]: i in [1..#b]];
+      matrix :=  R^-1 * L;
+      word := SpecialSLPForElement (matrix, q, W);
+
+      lhs := v^delta;
+      rhs := &*[(v^(a^+(i-1)))^b[i]: i in [1..#b]] * word;
+      Append (~Rels, lhs = rhs);
+   elif IsEven (q) then  
+      m3, m4 := TwoPolynomials (E, F, p, q, w, x);
+
+      b3 := Coefficients (m3);
+      b3 := [I!x: x in b3];
+
+      b4 := Coefficients (m4);
+      b4 := [I!x: x in b4];
+
+      L := V^(Delta^2);
+      R := &*[(V^(A^+(i-1)))^b3[i]: i in [1..#b3]] * 
+           &*[(V^(Delta*A^+(i-1)))^b4[i]: i in [1..#b4]]; 
+      matrix := R^-1 * L;
+      word := SpecialSLPForElement (matrix, q, W);
+
+      lhs := v^(delta^2);
+      rhs := &*[(v^(a^+(i-1)))^b3[i]: i in [1..#b3]] * 
+             &*[(v^(delta*a^+(i-1)))^b4[i]: i in [1..#b4]] * word; 
+      Append (~Rels, lhs = rhs);
+   end if;
+   
+   Rels := [LHS (r) * RHS (r)^-1: r in Rels];
+   return W, Rels;
+end function;
+
+ChooseGamma := function (q, beta, eta, w, zeta)
+   assert Trace (eta, GF (q)) ne 0;
+   assert Trace (beta, GF (q)) ne 0;
+   t := Trace (beta, GF(q)) * Trace (eta, GF(q))^-1;
+   gamma := t * eta - beta;
+   assert Trace (gamma, GF (q)) eq 0;
+   x := (w * zeta^-1) * (beta + gamma);
+   assert x in GF(q) and x ne 0;
+   return gamma;
+end function;
+
+// definition of U0 
+
+DefineU0 := function (q)
+   F := GF(q^2);
+   w := PrimitiveElement (F);
+   w0 := w^(q + 1);
+   beta0 := w^(1 + (q^2 + q) div 2);
+   t := Trace (beta0, GF (q));
+   n := Log (GF(q)!w0, GF(q)!-t);
+   alpha := w^n;
+   assert alpha^(q + 1) eq -t;
+
+   if q mod 3 ne 2 then 
+      Alpha := [alpha];
+   else
+      Alpha := [alpha, alpha * w^(q - 1), alpha * w^(2 * (q - 1))];
+      assert forall{a: a in Alpha | a^(q + 1) eq -t}
+         and IsPower (w^(q - 1), 3) eq false
+         and IsPower (w^(2 * (q - 1)), 3) eq false;
+   end if;
+   zeta := -w^((q^2 + q) div 2);
+   assert zeta^2 eq w0;
+   eta := w^-1 * zeta;
+   gamma0 := ChooseGamma (q, beta0, eta, w, zeta);
+   return Alpha, gamma0;
+end function;
+
+MatrixToTuple := function (A)
+   if Type (A) eq AlgMatElt or Type (A) eq GrpMatElt then A := A[1]; end if;
+   F := BaseRing (Parent (A));
+   q := Isqrt (#F);
+   w := PrimitiveElement (F);
+   alpha := A[2];
+   beta := A[3];
+   if IsEven (q) then
+      psi := Trace(w, GF(q))^(-1) * w;
+   else
+      psi := -1/2;
+   end if;
+   beta := A[3] - psi * (alpha^(1 + q));
+   return [alpha, beta];
+end function;
+
+TupleToMatrix := function (q, v)
+   return VMatrix (q, v[1], v[2]);
+end function;
+
+ComputeRight := function (q, U)
+   V := Parent (U[1]);
+   r := V!Reverse (Eltseq (U[1]));
+   s := Normalise (r);
+   s[2] := -s[2];
+   t := MatrixToTuple (s); 
+   m := TupleToMatrix (q, t);
+   assert MatrixToTuple (m) eq t;
+   return  m, t;
+end function;
+
+ProcessRelation := function (G, v)
+   q := Isqrt (#BaseRing (G));
+   t := TMatrix (q);
+   U := TupleToMatrix (q, v);
+   right, rv := ComputeRight (q, U);
+   rest := t^-1 * U * t * right^-1 * t^-1;
+   d := DiagonalMatrix (BaseRing (G), [rest[i][i] : i in [1..Nrows (rest)]]); 
+   left := rest * d^-1;
+   assert IsUpperTriangular (left);
+   lv := MatrixToTuple (left);
+   assert t^-1 * U * t eq left * d * t * right;
+   return lv, rv, left, d, t, right;
+end function;
+
+/* construct v-matrix whose 1, 2 entry is w^power, as word
+   in delta = Delta (w) and v = VMatrix(1, 0), 
+   where w is primitive element for GF(q^2) */
+
+ConstructVMatrix := function (q, delta, v, power)
+   z, n, m := ExtendedGreatestCommonDivisor (q - 2, q^2 - 1);
+   F := GF (q^2);
+   w := PrimitiveElement (F);
+   nu := w^z;
+   E := sub <F | nu>;
+   A := Eltseq (E!power); 
+   I := Integers ();
+   A := [I!a: a in A];
+   return &*[(v^(delta^(n * i)))^A[i + 1]: i in [0..#A - 1]];
+end function;
+
+/* construct tau-matrix whose 1, 3 entry is power, as word in 
+   tau = TauMatrix (a) where a = w^((q+ 1) div 2) or 1 and 
+   delta = Delta (w), where w is primitive element for GF(q^2) */
+
+ConstructTauMatrix := function (q, delta, tau, power)
+   F := GF (q^2);
+   I := Integers ();
+   w := PrimitiveElement (F);
+   w0 := w^(q + 1);
+   E := sub <F | w0>;
+   if IsOdd (q) then 
+      gamma := power / w^((q + 1) div 2);
+   else 
+      gamma := power; 
+   end if;
+   assert gamma in E;
+   A := Eltseq (E!gamma); 
+   A := [I!a: a in A];
+   return &*[(tau^(delta^(-i)))^A[i + 1]: i in [0..#A - 1]];
+end function;
+
+// write matrix mat as word in Borel subgroup generators delta, v, tau 
+
+SLPForElement := function (q, delta, v, tau, mat_v, mat, wdelta, wv, wtau) 
+   a := mat_v[1];
+   if a ne 0 then 
+      A := ConstructVMatrix (q, delta, v, a);
+      wA := ConstructVMatrix (q, wdelta, wv, a);
+   else
+      A := v^0;
+      wA := wv^0;
+   end if;
+
+   m := A * mat^-1;
+   b := m[1][3];
+   B := ConstructTauMatrix (q, delta, tau, m[1][3]);
+   wB := ConstructTauMatrix (q, wdelta, wtau, m[1][3]);
+
+   assert mat eq A * B^-1;
+   return wA, wB^-1, A, B^-1;
+end function;
+
+R2Relations := function (q)
+   F := GF (q^2);
+   w := PrimitiveElement (F);
+   w0 := w^(q + 1);
+   beta0 := w^(1 + (q^2 + q) div 2);
+   V := VectorSpace (F, 2);
+
+   G := SU (3, q);
+   L := SU3Generators (q);
+   v := L[1]; tau := L[2]; delta := L[3]; t := L[4]; 
+
+   W := SLPGroup (4);
+   wv := W.1; wtau := W.2; wdelta := W.3; wt := W.4;
+
+   Alpha, gamma0 := DefineU0 (q);
+
+   if IsEven (q) then
+      psi := Trace(w, GF(q))^(-1) * w;
+   else
+      psi := -1/2;
+   end if;
+
+   tau0 := VMatrix (q, 0, gamma0);
+   mats := [];
+   for i in [1..#Alpha] do 
+       e := beta0 - psi * Alpha[i]^(q+1); 
+       Append (~mats, VMatrix (q, Alpha[i], e));
+   end for;
+   mats cat:= [m * tau0: m in mats];
+   Append (~mats, tau0);
+   U := {@ V | MatrixToTuple (m): m in mats @};
+  
+   // determine relation u^t = u_L * Delta^pow * t * u_r
+   R := [];
+   for u in U do 
+      lv, rv, left, d, t, right := ProcessRelation (G, u);
+      pow := Log (d[1][1]);
+      m := TupleToMatrix (q, u);
+      a, b, a1, b1 := SLPForElement (q, delta, v, tau, u, m, wdelta, wv, wtau);
+      x, y, x1, y1 := SLPForElement (q, delta, v, tau, lv, left, wdelta, wv, wtau);
+      z, w, z1, w1 := SLPForElement (q, delta, v, tau, rv, right, wdelta, wv, wtau);
+      lhs := t^-1 * a1 * b1 * t;
+      rhs := (x1 * y1) * delta^pow * t * z1 * w1;
+      assert lhs eq rhs;
+      wlhs := wt^-1 * a * b * wt;
+      wrhs := (x * y) * wdelta^pow * wt * z * w;
+      Append (~R, wlhs = wrhs);
+   end for;
+   return W, R;
+end function;
+
+/* presentation for SU(3, 2) on its standard generators */
+
+SU32Presentation := function ( : Projective := false)
+   F := FreeGroup (7);
+   Q := quo <F |
+    F.1^2 = Id(F),
+    F.2 = Id(F),
+    F.3^2 = Id(F),
+    F.4^-1 * F.3 * F.4^-1 = Id(F),
+    F.6^-1 * F.3 * F.6^-1 = Id(F),
+    F.4^-1 * F.6^-1 * F.4 * F.6^-1 = Id(F),
+    F.5 = Id (F),
+    (F.3 * F.1)^3 = Id(F),
+    F.1 * F.4 * F.1 * F.4^-1 * F.1 * F.6^-1 * F.1 * F.6 = Id(F),
+    F.1 * F.6^-1 * F.1 * F.4^-1 * F.1 * F.4 * F.6^-1 * F.7 = Id(F)>;
+   W := SLPGroup (7);
+   R := Relations (Q);
+   Rels := [LHS (r) * RHS (r)^-1: r in R];
+   phi := hom<Q -> W | [W.i: i in [1..7]]>;
+   Rels := [phi (r): r in Rels];
+   if Projective then Append (~Rels, W.7^2); end if;
+   return W, Rels;
+end function;
+
+// presentation for SU(3, q) for q = 2, 3, 5 on presentation generators 
+ExceptionalCase := function (q)
+   if q eq 2 then 
+      F<v, v1, Gamma, t> := SLPGroup (4);
+      a := (v, t); b := (a^2)^v;
+      T := [a = (v, t), b = (a^2)^v, a^3 = 1, b^3 = 1, Gamma^3 = 1, 
+      (a, Gamma) = 1, (b, Gamma) = 1, 
+      (a, b) = Gamma^-1,
+      a^v = b^-1, 
+      b^v = a * Gamma^1, 
+      a^v1 = a * b * a,
+      b^v1 = a * b * Gamma^1,
+      v^2 = v1^2, v1^2 = (v, v1), t = v^2 * a^2 * b];
+   elif q eq 3 then 
+      F<v, tau, Gamma, t> := SLPGroup (4);
+      T := [
+         F.1^3 = Id(F),
+         F.4^2 = Id(F),
+         F.3^-1 * F.1^-1 * F.3^-1 * F.2^-1 * F.1 * F.3^2 * F.1^-1 = Id(F),
+         F.3^-1 * F.1 * F.3^-1 * F.2^-1 * F.1^-1 * F.3^2 * F.1 = Id(F),
+         F.2 * F.4 * F.3^-2 * F.2 * F.4 * F.2 * F.4 = Id(F),
+         F.3 * F.2^-1 * F.1^-1 * F.4 * F.3 * F.2^-1 * F.1 * F.3 * F.4 * F.1 * F.2^-1  * F.4 = Id(F) ];
+   elif q eq 5 then 
+      F := SLPGroup (4);
+      T := [
+         F.1^5 = Id(F),
+         F.3^1 * F.2^2 * F.3^-1 * F.2 = Id(F),
+         F.3^2 * F.1^2 * F.3^-2 * F.1^-1 = Id(F),
+         F.3^5 * F.4 * F.3 * F.4 = Id(F),
+         F.3^-1 * F.1 * F.4 * F.1^-2 * F.4 * F.1 * F.3 * F.4 = Id(F),
+         F.3 * F.1 * F.3^-1 * F.2^-1 * F.1^-1 * F.3 * F.1^-1 * F.3^-1 * F.1 = Id(F),
+         F.1^-1 * F.4 * F.2^-1 * F.1^-1 * F.4 * F.3^-1 * F.1^2 * F.4 * F.3 * F.1^-1 *
+    F.4 * F.3 * F.2^-1 = Id(F) ];
+   end if;
+   R := [LHS (x) * RHS (x)^-1: x in T];
+   return F, R;
+end function;
+
+SU3Presentation := function (q)
+   if q in {2, 3, 5} then Q, R := ExceptionalCase (q); return Q, R; end if;
+
+   W := SLPGroup (4);
+   v := W.1; tau := W.2; delta := W.3; t := W.4;
+
+   /* relations of type R1 */
+   Q, R1 := BorelPresentation (q);
+   phi := hom<Q -> W | [W.i: i in [1..3]]>;
+   Rels := [phi (r) = 1: r in R1];
+   
+   /* relations of type R2 */
+   Q, R2 := R2Relations (q);
+   phi := hom<Q -> W | [W.i: i in [1..4]]>;
+   Rels cat:= [phi (r): r in R2];
+ 
+   Append (~Rels, t^2 = 1);
+   Append (~Rels, delta^t = delta^-q);
+
+   Rels := [LHS (r) * RHS (r)^-1: r in Rels];
+   return W, Rels;
+end function;
+
+/* 
+for q in [3..1000] do
+if IsOdd(q) and  IsPrimePower (q) then
+q;
+Q, R := OddBorelPresentation (q);
+X := SU3Generators (q);
+S := Evaluate (R, X); assert #Set (S) eq 1;
+end if;
+end for;
+
+for q in [7..1000] do
+if  IsPrimePower (q) then
+q;
+Q, R := BorelPresentation (q);
+X := SU3Generators (q);
+S := Evaluate (R, X); assert #Set (S) eq 1;
+end if;
+end for;
+
+for q in [2..1000] do
+if IsPrimePower (q) then
+q;
+Q, R := BorelPresentation (q);
+X := BorelGenerators (q);
+S := Evaluate (R, X); assert #Set (S) eq 1;
+end if;
+end for;
+
+for q in [2..100000] do
+if IsPrimePower (q) then
+q;
+time Q, R := SU3Presentation (q);
+X := SU3Generators (q);
+S := Evaluate (R, X); assert #Set (S) eq 1;
+end if;
+end for;
+
+for e in [2..20] do 
+e;
+q := 2^e;
+G, R := SU3Presentation (q);
+X := SU3Generators (q);
+S := Evaluate (R, X); assert #Set (S) eq 1;
+end for;
+
+SetGlobalTCParameters (:Hard, CosetLimit:=10^8, Print:=10^5);
+for q in [2..1000] do
+if IsPrimePower (q) then 
+q;
+Q, R := SU3Presentation (q);
+X := SU3Generators (q);
+S := Evaluate (R, X); assert #Set (S) eq 1;
+F := SLPToFP (Q, R);
+H := sub<F | F.1, F.2, F.3>;
+I := CosetImage (F, H);
+RandomSchreier (I);
+"Comp factors", CompositionFactors (I);
+end if;
+end for;
+*/

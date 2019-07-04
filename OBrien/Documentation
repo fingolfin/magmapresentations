@@ -1,0 +1,50 @@
+// These are the high-level intrinsic functions
+
+> ClassicalStandardGenerators;
+Intrinsic 'ClassicalStandardGenerators'
+
+Signatures:
+
+    (type::MonStgElt, d::RngIntElt, F::FldFin) -> SeqEnum
+    [
+        SpecialGroup,
+        PresentationGenerators
+    ]
+    (type::MonStgElt, d::RngIntElt, q::RngIntElt) -> SeqEnum
+    [
+        SpecialGroup,
+        PresentationGenerators
+    ]
+
+        return the Leedham-Green and O'Brien standard generators for the 
+        quasisimple classical group of specified type in dimension d and 
+        defining field F; the string type is one of SL, Sp, SU, Omega, Omega+, 
+        Omega-
+
+
+> ClassicalStandardPresentation;
+Intrinsic 'ClassicalStandardPresentation'
+
+Signatures:
+
+    (type::MonStgElt, d::RngIntElt, F::FldFin) -> GrpSLP, SeqEnum
+    [
+        Projective,
+        PresentationGenerators
+    ]
+    (type::MonStgElt, d::RngIntElt, q::RngIntElt) -> GrpSLP, SeqEnum
+    [
+        Projective,
+        PresentationGenerators
+    ]
+
+        return the Leedham-Green and O'Brien presentation on standard generators
+        for the quasisimple classical group of specified type in dimension d 
+        over field of size q; the string type is one of SL, Sp, SU, Omega+, 
+        Omega-, Omega. If Projective is true, then return the presentation for 
+        the corresponding projective group. If PresentationGenerators is true, 
+        then return the presentation on the presentation generators, otherwise 
+        on standard generators. An SLP group on the generators and the relations
+        as SLPs in this group are returned.
+
+
