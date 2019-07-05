@@ -4,19 +4,18 @@
 #  Global Variables used: Append, ClassicalStandardGenerators, DiagonalMatrix,
 #  Factorial, GF, GL, Identity, InsertBlock, IsEven, IsOdd, IsPrimePower, LHS,
 #  Log, MatrixAlgebra, Odd_SU_PresentationForN, PrimitiveElement, RHS,
-#  SLPGroup, Trace, Zero, phi, tau
+#  FreeGroup, Trace, Zero, phi, tau
 
 #  Defines: OddSUGenerators, OddSUPresentation, Odd_SU_PresentationForN,
 #  Order_Odd_SU_N
 
 OddSUGenerators:=function(d,q)
-local F,Gamma,MA,S,U,V,alpha,gamma,i,phi,psi,sigma,t,tau,v,w,x;
+local F,lvarGamma,S,U,V,alpha,gamma,i,phi,psi,sigma,t,tau,v,w,x;
   Assert(1,IsOddInt(d));
-  MA:=MatrixAlgebra(GF(q^2),d);
   F:=GF(q^2);
   w:=PrimitiveElement(F);
   #   define tau
-  tau:=Identity(MA);
+  tau:=IdentityMat(d, F);
   # rewritten select statement
   if IsEvenInt(q) then
     psi:=1;
@@ -28,7 +27,7 @@ local F,Gamma,MA,S,U,V,alpha,gamma,i,phi,psi,sigma,t,tau,v,w,x;
   lvarGamma:=Concatenation([w^-1,w^q],List([3..d-1],i->1),[w^(1-q)]);
   lvarGamma:=DiagonalMat(lvarGamma);
   #   define t
-  t:=Zero(MA);
+  t:=NullMat(d,d,F);
   t[1][2]:=1;
   t[2][1]:=1;
   t[d][d]:=-1;
@@ -38,13 +37,14 @@ local F,Gamma,MA,S,U,V,alpha,gamma,i,phi,psi,sigma,t,tau,v,w,x;
   #   define v
   alpha:=1;
   if IsEvenInt(q) then
+    ## TODO Don't know how to implement Trace
     phi:=Trace(w,GF(q))^(-1)*w;
     Assert(1,phi=w/(w+w^q));
   else
     phi:=-1/2;
   fi;
   gamma:=phi*alpha^(1+q);
-  v:=Zero(MA);
+  v:=NullMat(d,d,F);;
   v[1][1]:=1;
   v[1][2]:=gamma;
   v[1][d]:=alpha;
@@ -58,49 +58,48 @@ local F,Gamma,MA,S,U,V,alpha,gamma,i,phi,psi,sigma,t,tau,v,w,x;
   V:=S[2];
   S:=ClassicalStandardGenerators("SU",d-1,q);
   x:=S[6]^(S[2]^2);
-  sigma:=Zero(MA);
+  sigma:=NullMat(d,d,F);
+  ## TODO What does InsertBlock do?
+  ## TILDE just means change sigma in situ
   InsertBlock(TILDEsigma,x,1,1);
   sigma[d][d]:=1;
   return [lvarGamma,t,U,V,sigma,tau,v];
 end;
 
 Odd_SU_PresentationForN:=function(n,q)
-local F,Gamma,OMIT,R,Rels,S,U,V,t,tau;
-  F:=SLPGroup(4);
+local F,lvarGamma,OMIT,R,Rels,S,U,V,t,tau;
+  F:=FreeGroup(4);
   lvarGamma:=F.1;
   t:=F.2;
   U:=F.3;
   V:=F.4;
   Rels:=[];
-  # =v= MULTIASSIGN =v=
   R:=PresentationForSn(n);
-  S:=R.val1;
-  R:=R.val2;
-  # =^= MULTIASSIGN =^=
+  S:=FreeGroupOfFpGroup(R);
+  R:=RelatorsOfFpGroup(R);
   tau:=GroupHomomorphismByImages(S,F,
     GeneratorsOfGroup(S),
     [U,V]);
-  R:=List(R,r->tau(r));
+  R:=List(R,r->Image(tau,r));
   OMIT:=true;
   if not OMIT then
-    Add(Rels,lvarGamma^(q^2-1)=1);
-    Add(Rels,t^2=1);
-    Add(Rels,lvarGamma^t=lvarGamma^-q);
+    Add(Rels,lvarGamma^(q^2-1));
+    Add(Rels,t^2);
+    Add(Rels,lvarGamma^t/lvarGamma^-q);
   fi;
   if n > 2 then
-    Add(Rels,Comm(lvarGamma,U^V)=1);
-    Add(Rels,Comm(t,U^V)=1);
+    Add(Rels,Comm(lvarGamma,U^V));
+    Add(Rels,Comm(t,U^V));
   fi;
   if n > 3 then
-    Add(Rels,Comm(lvarGamma,V*U)=1);
-    Add(Rels,Comm(t,V*U)=1);
+    Add(Rels,Comm(lvarGamma,V*U));
+    Add(Rels,Comm(t,V*U));
   fi;
-  Add(Rels,Comm(lvarGamma,lvarGamma^U)=1);
-  Add(Rels,Comm(t,t^U)=1);
-  Add(Rels,Comm(lvarGamma,t^U)=1);
-  Rels:=Concatenation(List(Rels,r->LHS(r)*RHS(r)^-1),R);
-  return rec(val1:=F,
-    val2:=Rels);
+  Add(Rels,Comm(lvarGamma,lvarGamma^U));
+  Add(Rels,Comm(t,t^U));
+  Add(Rels,Comm(lvarGamma,t^U));
+  Rels:=Concatenation(Rels,R);
+  return F/Rels;
 end;
 
 Order_Odd_SU_N:=function(n,q)
@@ -110,8 +109,8 @@ local a;
 end;
 
 OddSUPresentation:=function(d,q)
-local 
-   Delta,varE,F,Gamma,K,OMIT,Projective,Q,R,R3,R4,R_N,R_SL2,R_SU3,Rels,U,V,W,
+local
+   lvarDelta,varE,F,lvarGamma,K,OMIT,Projective,Q,R,R3,R4,lvarR_N,R_SL2,R_SU3,Rels,U,V,W,
    varZ,a,e,f,m,n,p,phi,r,rhs,sigma,t,tau,v,w,w0;
   Projective:=ValueOption("Projective");
   if Projective=fail then
@@ -126,15 +125,17 @@ local
       return SU3Presentation(q);
     fi;
   fi;
-  # =v= MULTIASSIGN =v=
-  e:=IsPrimePower(q);
-  f:=e.val1;
-  p:=e.val2;
-  e:=e.val3;
-  # =^= MULTIASSIGN =^=
+  e := Factors(q);
+  if Size(DuplicateFreeList(e)) > 1 then
+      f := false;
+  else
+      f := true;
+      p := e[1];
+      e := Size(e);
+  fi;
   K:=GF(q^2);
   w:=PrimitiveElement(K);
-  F:=SLPGroup(7);
+  F:=FreeGroup(7);
   lvarGamma:=F.1;
   t:=F.2;
   U:=F.3;
@@ -146,25 +147,26 @@ local
   R:=[];
   #   centraliser of v
   if n > 2 then
-    Add(R,Comm(U^V,v)=1);
+    Add(R,Comm(U^V,v));
   fi;
   if n > 3 then
-    Add(R,Comm(V*U,v)=1);
+    Add(R,Comm(V*U,v));
   fi;
   if IsEvenInt(q) then
-    Add(R,Comm(t^U,v)=1);
+    Add(R,Comm(t^U,v));
   else
     m:=QuoInt((q^2-1),2);
-    Add(R,Comm(t^U*lvarDelta^m,v)=1);
+    Add(R,Comm(t^U*lvarDelta^m,v));
   fi;
   if n=2 and q mod 3=1 then
-    Add(R,Comm(lvarGamma^(q-1)*(lvarGamma^U)^3*Tuple([t,lvarGamma^-1)
-     ^U,v])=1);
+    # TODO What is <Tuple>?
+    # TODO Why is this an error?
+    Add(R,Comm(lvarGamma^(q-1)*(lvarGamma^U)^3*Tuple([t,lvarGamma^-1)^U,v]));
   else
-    Add(R,Comm(lvarGamma^(q-1)*(lvarGamma^U)^3,v)=1);
+    Add(R,Comm(lvarGamma^(q-1)*(lvarGamma^U)^3,v));
   fi;
   if n > 2 then
-    Add(R,Comm(lvarGamma^U*(lvarGamma^-1)^(V^2),v)=1);
+    Add(R,Comm(lvarGamma^U*(lvarGamma^-1)^(V^2),v));
   fi;
   if IsEvenInt(q) then
     varZ:=t;
@@ -175,37 +177,33 @@ local
   OMIT:=true;
   if not OMIT then
     if n > 3 then
-      Add(R,Comm(U^(V^2),sigma)=1);
+      Add(R,Comm(U^(V^2),sigma));
     fi;
     if n > 4 then
-      Add(R,Comm(V*U*U^V,sigma)=1);
+      Add(R,Comm(V*U*U^V,sigma));
     fi;
     if n > 2 then
-      Add(R,Comm(lvarGamma^(V^2),sigma)=1);
-      Add(R,Comm(t^(V^2),sigma)=1);
+      Add(R,Comm(lvarGamma^(V^2),sigma));
+      Add(R,Comm(t^(V^2),sigma));
     fi;
   fi;
   if IsEvenInt(q) then
-    Add(R,Comm(U^t,sigma)=1);
+    Add(R,Comm(U^t,sigma));
   else
-    Add(R,Comm(U^t*varZ^2,sigma)=1);
+    Add(R,Comm(U^t*varZ^2,sigma));
   fi;
-  Add(R,Comm(lvarGamma*lvarGamma^U,sigma)=1);
-  # =v= MULTIASSIGN =v=
+  Add(R,Comm(lvarGamma*lvarGamma^U,sigma));
   lvarR_N:=Odd_SU_PresentationForN(n,q);
-  Q:=lvarR_N.val1;
-  lvarR_N:=lvarR_N.val2;
-  # =^= MULTIASSIGN =^=
+  Q:=FreeGroupOfFpGroup(lvarR_N);
+  lvarR_N:= RelatorsOfFpGroup(lvarR_N);
   phi:=GroupHomomorphismByImages(Q,F,
     GeneratorsOfGroup(Q),
     [lvarGamma,t,U,V]);
-  lvarR_N:=List(lvarR_N,r->phi(r));
+  lvarR_N:=List(lvarR_N,r->Image(phi,r));
   #   tau = tau^-1 in char 2
-  # =v= MULTIASSIGN =v=
   R_SU3:=SU3Presentation(q);
-  Q:=R_SU3.val1;
-  R_SU3:=R_SU3.val2;
-  # =^= MULTIASSIGN =^=
+  Q:=FreeGroupOfFpGroup(R_SU3);
+  R_SU3:=RelatorsOfFpGroup(R_SU3);
   if q=2 then
     phi:=GroupHomomorphismByImages(Q,F,
       GeneratorsOfGroup(Q),
@@ -215,12 +213,10 @@ local
       GeneratorsOfGroup(Q),
       [v,tau^-1,lvarGamma^-1,t]);
   fi;
-  R_SU3:=List(R_SU3,r->phi(r));
-  # =v= MULTIASSIGN =v=
+  R_SU3:=List(R_SU3,r->Image(phi,r));
   R_SL2:=PresentationForSL2(p,2*e);
-  Q:=R_SL2.val1;
-  R_SL2:=R_SL2.val2;
-  # =^= MULTIASSIGN =^=
+  Q:=FreeGroupOfFpGroup(R_SL2);
+  R_SL2:=RelatorsOfFpGroup(R_SL2);
   # rewritten select statement
   if IsEvenInt(q) then
     W:=U;
@@ -230,40 +226,42 @@ local
   phi:=GroupHomomorphismByImages(Q,F,
     GeneratorsOfGroup(Q),
     [lvarDelta,sigma,W]);
-  R_SL2:=List(R_SL2,r->phi(r));
+  R_SL2:=List(R_SL2,r->Image(phi,r));
   #   Steinberg relations
   R4:=[];
-  Add(R4,Comm(v,v^U)=(sigma^-1)^(t^U));
+  Add(R4,Comm(v,v^U)/(sigma^-1)^(t^U));
   if q=4 then
-    Add(R4,Comm(v,v^(lvarGamma*U))=sigma^(lvarGamma^7*t^U));
-    Add(R4,Comm(v^lvarGamma,sigma)=1);
+    Add(R4,Comm(v,v^(lvarGamma*U))/sigma^(lvarGamma^7*t^U));
+    Add(R4,Comm(v^lvarGamma,sigma));
   fi;
-  Add(R4,Comm(v,sigma)=1);
+  Add(R4,Comm(v,sigma));
   if IsOddInt(q) then
     a:=(w^(QuoInt(-(q+1),2)))/2;
+    ## TODO How do we do log?
     r:=Log(a);
     rhs:=sigma^(lvarGamma^r*varZ^U)*(v^-1)^U;
   else
     a:=w^q/(w+w^q);
+    ## TODO How do we do log?
     r:=Log(a);
     rhs:=sigma^(lvarGamma^r*varZ^U)*(v^U);
   fi;
-  Add(R4,Comm(v,sigma^U)=rhs);
+  Add(R4,Comm(v,sigma^U)/rhs);
   if q=2 then
-    Add(R4,Comm(v,sigma^(lvarGamma*U))=sigma^(lvarGamma*varZ^U)
-     *v^(U^(lvarGamma^-1)));
+    Add(R4,Comm(v,sigma^(lvarGamma*U))/(sigma^(lvarGamma*varZ^U)
+     *v^(U^(lvarGamma^-1))));
   fi;
   if n > 2 then
-    Add(R4,Comm(v,sigma^V)=1);
+    Add(R4,Comm(v,sigma^V));
   fi;
-  Add(R4,Comm(v,tau^U)=1);
+  Add(R4,Comm(v,tau^U));
   #   Steinberg relations for SU(2n, q)
   R3:=[];
-  Add(R3,Comm(sigma,tau)=1);
+  Add(R3,Comm(sigma,tau));
   if IsEvenInt(q) then
-    Add(R3,Comm(sigma,sigma^varZ)=1);
+    Add(R3,Comm(sigma,sigma^varZ));
   else
-    Add(R3,Comm(sigma,sigma^varZ)=(tau^2)^(varZ*U));
+    Add(R3,Comm(sigma,sigma^varZ)/(tau^2)^(varZ*U));
   fi;
   if (q<>3) then
     varE:=GF(q^2);
@@ -271,36 +269,33 @@ local
     w:=varE.1;
     w0:=w^(q+1);
     a:=w^(2*q)+w^2;
+    ## TODO How do we do log?
     m:=Log(w0,a);
-    Add(R3,Comm(sigma^lvarDelta,sigma^varZ)=tau^(varZ*U*lvarDelta^m))
+    Add(R3,Comm(sigma^lvarDelta,sigma^varZ)/tau^(varZ*U*lvarDelta^m))
      ;
   else
-    Add(R3,Comm(sigma^lvarDelta,sigma^varZ)=1);
+    Add(R3,Comm(sigma^lvarDelta,sigma^varZ));
   fi;
-  Add(R3,Comm(sigma,tau^varZ)=sigma^varZ*(tau^-1)^(varZ*U));
+  Add(R3,Comm(sigma,tau^varZ)/(sigma^varZ*(tau^-1)^(varZ*U)));
   #   additional relation needed for SU(6, 2) -- probably only #2 required
   if (n=3 and q=2) then
-    Add(R3,Comm(sigma,sigma^(U^V*lvarDelta))=1);
-    Add(R3,Comm(sigma,sigma^(V*lvarDelta))=sigma^(V*U*lvarDelta^-1))
+    Add(R3,Comm(sigma,sigma^(U^V*lvarDelta)));
+    Add(R3,Comm(sigma,sigma^(V*lvarDelta))/sigma^(V*U*lvarDelta^-1))
      ;
   fi;
   if n > 2 then
-    Add(R3,Comm(sigma,sigma^(U^V))=1);
-    Add(R3,Comm(sigma,sigma^V)=sigma^(V*U));
+    Add(R3,Comm(sigma,sigma^(U^V)));
+    Add(R3,Comm(sigma,sigma^V)/sigma^(V*U));
   fi;
   if n < 4 then
-    Add(R3,Comm(tau,tau^U)=1);
+    Add(R3,Comm(tau,tau^U));
   fi;
   if n=3 then
-    Add(R3,Comm(tau,sigma^V)=1);
+    Add(R3,Comm(tau,sigma^V));
   fi;
   if n > 3 then
-    Add(R3,Comm(sigma,sigma^(V^2))=1);
+    Add(R3,Comm(sigma,sigma^(V^2)));
   fi;
-  Rels:=Concatenation(List(Concatenation(R,R3,R4),r->LHS(r)*RHS(r)^-1)
-   ,R_SU3,R_SL2,lvarR_N);
-  return rec(val1:=F,
-    val2:=Rels);
+  Rels:=Concatenation(R,R3,R4,R_SU3,R_SL2,lvarR_N);
+  return F/Rels;
 end;
-
-
