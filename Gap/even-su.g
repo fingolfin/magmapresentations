@@ -3,14 +3,14 @@
 
 #  Global Variables used: Append, ClassicalStandardGenerators, Factorial, GF,
 #  Integers, IsEven, IsOdd, IsPrimePower, LHS, Log, PrimitiveElement, RHS,
-#  SLPGroup, SU_PresentationForN, Thm71, Thm72, eta, phi, tau
+#  FreeGroup, SU_PresentationForN, Thm71, Thm72, eta, phi, tau
 
 #  Defines: EvenSUGenerators, EvenSUPresentation, OrderSU_N, OrderThm71,
 #  OrderThm72, SU_PresentationForN, Thm71, Thm72
 
 #   this agrees with paper definition of psi
 EvenSUGenerators:=function(d,q)
-local Delta,S,T,U,V,varZ,delta,sigma,tau;
+local lvarDelta,S,T,U,V,varZ,delta,sigma,tau;
   Assert(1,IsEvenInt(d));
   S:=ClassicalStandardGenerators("SU",d,q);
   varZ:=S[1];
@@ -30,46 +30,43 @@ local Delta,S,T,U,V,varZ,delta,sigma,tau;
 end;
 
 Thm71:=function(n,q)
-local Delta,F,OMIT,R,Rels,S,U,V,tau;
+local lvarDelta,F,OMIT,R,Rels,S,U,V,tau;
   Rels:=[];
   if n=2 then
-    F:=SLPGroup(2);
+    F:=FreeGroup(2);
     lvarDelta:=F.1;
     U:=F.2;
     R:=[];
-    Add(Rels,U^2=1);
+    Add(Rels,U^2);
   else
-    F:=SLPGroup(3);
+    F:=FreeGroup(3);
     lvarDelta:=F.1;
     U:=F.2;
     V:=F.3;
-    # =v= MULTIASSIGN =v=
     R:=PresentationForSn(n);
-    S:=R.val1;
-    R:=R.val2;
-    # =^= MULTIASSIGN =^=
+    S:=FreeGroupOfFpGroup(R);
+    R:=RelatorsOfFpGroup(R);
     tau:=GroupHomomorphismByImages(S,F,
       GeneratorsOfGroup(S),
       [U,V]);
-    R:=List(R,r->tau(r));
+    R:=List(R,r->Image(tau,r));
     if n > 3 then
-      Add(Rels,Comm(lvarDelta,U^(V^2))=1);
-      Add(Rels,Comm(lvarDelta,lvarDelta^(V^2))=1);
+      Add(Rels,Comm(lvarDelta,U^(V^2)));
+      Add(Rels,Comm(lvarDelta,lvarDelta^(V^2)));
     fi;
     if n > 4 then
-      Add(Rels,Comm(lvarDelta,V*U*U^V)=1);
+      Add(Rels,Comm(lvarDelta,V*U*U^V));
     fi;
     Add(Rels,lvarDelta*lvarDelta^V=lvarDelta^(V*U));
-    Add(Rels,Comm(lvarDelta,lvarDelta^V)=1);
+    Add(Rels,Comm(lvarDelta,lvarDelta^V));
   fi;
   OMIT:=true;
   if not OMIT then
     Add(Rels,lvarDelta^U=lvarDelta^-1);
-    Add(Rels,lvarDelta^(q^2-1)=1);
+    Add(Rels,lvarDelta^(q^2-1));
   fi;
-  Rels:=Concatenation(List(Rels,r->LHS(r)*RHS(r)^-1),R);
-  return rec(val1:=F,
-    val2:=Rels);
+  Rels:=Concatenation(Rels,R);
+  return F/Rels;
 end;
 
 OrderThm71:=function(n,q)
@@ -77,20 +74,18 @@ return (q^2-1)^(n-1)*Factorial(n);
 end;
 
 Thm72:=function(n,q)
-local Delta,F,OMIT,R,Rels,S,U,V,delta,tau;
-  F:=SLPGroup(4);
+local lvarDelta,F,OMIT,R,Rels,S,U,V,delta,tau;
+  F:=FreeGroup(4);
   lvarDelta:=F.1;
   U:=F.2;
   V:=F.3;
   delta:=F.4;
   Rels:=[];
-  # =v= MULTIASSIGN =v=
   R:=Thm71(n,q);
-  S:=R.val1;
-  R:=R.val2;
-  # =^= MULTIASSIGN =^=
+  S:=FreeGroupOfFpGroup(R);
+  R:=RelatorsOfFpGroup(R);
   if n=2 then
-    Add(Rels,U=V);
+    Add(Rels,U/V);
     tau:=GroupHomomorphismByImages(S,F,
       GeneratorsOfGroup(S),
       [lvarDelta,U]);
@@ -99,23 +94,22 @@ local Delta,F,OMIT,R,Rels,S,U,V,delta,tau;
       GeneratorsOfGroup(S),
       [lvarDelta,U,V]);
   fi;
-  R:=List(R,r->tau(r));
+  R:=List(R,r->Image(tau,r));
   OMIT:=true;
   if not OMIT then
-    Add(Rels,delta^(q-1)=1);
+    Add(Rels,delta^(q-1));
   fi;
   if n > 2 then
-    Add(Rels,Comm(delta,U^V)=1);
-    Add(Rels,Comm(delta,lvarDelta^V)=1);
+    Add(Rels,Comm(delta,U^V));
+    Add(Rels,Comm(delta,lvarDelta^V));
   fi;
-  Add(Rels,Comm(delta,lvarDelta)=1);
+  Add(Rels,Comm(delta,lvarDelta));
   if n > 3 then
-    Add(Rels,Comm(delta,V*U)=1);
+    Add(Rels,Comm(delta,V*U));
   fi;
-  Add(Rels,lvarDelta^(q+1)=delta*(delta^-1)^U);
-  Rels:=Concatenation(List(Rels,r->LHS(r)*RHS(r)^-1),R);
-  return rec(val1:=F,
-    val2:=Rels);
+  Add(Rels,lvarDelta^(q+1)/(delta*(delta^-1)^U));
+  Rels:=Concatenation(Rels,R);
+  return F/Rels;
 end;
 
 OrderThm72:=function(n,q)
@@ -123,47 +117,44 @@ return (q-1)*(q^2-1)^(n-1)*Factorial(n);
 end;
 
 SU_PresentationForN:=function(n,q)
-local Delta,F,OMIT,R,Rels,S,U,V,varZ,delta,tau;
-  F:=SLPGroup(5);
+local lvarDelta,F,OMIT,R,Rels,S,U,V,varZ,delta,tau;
+  F:=FreeGroup(5);
   lvarDelta:=F.1;
   U:=F.2;
   V:=F.3;
   delta:=F.4;
   varZ:=F.5;
-  # =v= MULTIASSIGN =v=
   R:=Thm72(n,q);
-  S:=R.val1;
-  R:=R.val2;
-  # =^= MULTIASSIGN =^=
+  S:=FreeGroupOfFpGroup(R);
+  R:=RelatorsOfFpGroup(R);
   tau:=GroupHomomorphismByImages(S,F,
     GeneratorsOfGroup(S),
     [lvarDelta,U,V,delta]);
-  R:=List(R,r->tau(r));
+  R:=List(R,r->Image(tau,r));
   Rels:=[];
   OMIT:=true;
   if not OMIT then
     if IsOddInt(q) then
-      Add(Rels,varZ^2=delta^(QuoInt((q-1),2)));
+      Add(Rels,varZ^2/(delta^(QuoInt((q-1),2))));
     else
-      Add(Rels,varZ^2=1);
+      Add(Rels,varZ^2);
     fi;
-    Add(Rels,delta^varZ=delta^-1);
+    Add(Rels,delta^varZ*delta);
   fi;
   if n > 2 then
-    Add(Rels,Comm(varZ,U^V)=1);
-    Add(Rels,Comm(varZ,lvarDelta^V)=1);
+    Add(Rels,Comm(varZ,U^V));
+    Add(Rels,Comm(varZ,lvarDelta^V));
   fi;
   if n > 3 then
-    Add(Rels,Comm(varZ,V*U)=1);
+    Add(Rels,Comm(varZ,V*U));
   fi;
-  Add(Rels,Comm(varZ,varZ^U)=1);
-  Add(Rels,delta=Comm(lvarDelta^-1,varZ));
+  Add(Rels,Comm(varZ,varZ^U));
+  Add(Rels,delta/Comm(lvarDelta^-1,varZ));
   if n=2 then
-    Add(Rels,Comm(delta,varZ^U)=1);
+    Add(Rels,Comm(delta,varZ^U));
   fi;
-  Rels:=Concatenation(List(Rels,r->LHS(r)*RHS(r)^-1),R);
-  return rec(val1:=F,
-    val2:=Rels);
+  Rels:=Concatenation(Rels,R);
+  return F/Rels;
 end;
 
 OrderSU_N:=function(n,q)
@@ -171,19 +162,21 @@ return 2^n*(q-1)*(q^2-1)^(n-1)*Factorial(n);
 end;
 
 EvenSUPresentation:=function(d,q)
-local 
-   Delta,varE,F,I,OMIT,R,R1,R2,R3,R4,Rels,S,U,V,W,varZ,a,delta,e,eta,f,m,n,p,
+local
+   lvarDelta,varE,F,I,OMIT,R,R1,R2,R3,R4,Rels,S,U,V,W,varZ,a,delta,e,eta,f,m,n,p,
    phi,sigma,tau,w,w0,x,y;
-  Assert(1,IsPrimePower(q));
+  Assert(1,Size(DuplicateFreeList(q)) = 1);
   Assert(1,IsEvenInt(d) and d > 2);
   n:=QuoInt(d,2);
-  # =v= MULTIASSIGN =v=
-  e:=IsPrimePower(q);
-  f:=e.val1;
-  p:=e.val2;
-  e:=e.val3;
-  # =^= MULTIASSIGN =^=
-  F:=SLPGroup(7);
+  e := Factors(q);
+  if Size(DuplicateFreeList(e)) > 1 then
+      f := false;
+  else
+      f := true;
+      p := e[1];
+      e := Size(e);
+  fi;
+  F:=FreeGroup(7);
   varZ:=F.1;
   V:=F.2;
   tau:=F.3;
@@ -192,141 +185,133 @@ local
   sigma:=F.6;
   lvarDelta:=F.7;
   R:=[];
-  # =v= MULTIASSIGN =v=
   R4:=SU_PresentationForN(n,q);
-  S:=R4.val1;
-  R4:=R4.val2;
-  # =^= MULTIASSIGN =^=
+  S:=FreeGroupOfFpGroup(R4);
+  R4:=RelatorsOfFpGroup(R4);
   eta:=GroupHomomorphismByImages(S,F,
     GeneratorsOfGroup(S),
     [lvarDelta,U,V,delta,varZ]);
-  R4:=List(R4,r->eta(r));
+  R4:=List(R4,r->Image(eta,r));
   #   centraliser of sigma
   if n > 3 then
-    Add(R,Comm(U^(V^2),sigma)=1);
+    Add(R,Comm(U^(V^2),sigma));
   fi;
   if n > 4 then
-    Add(R,Comm(V*U*U^V,sigma)=1);
+    Add(R,Comm(V*U*U^V,sigma));
   fi;
   if n > 3 and IsOddInt(q) then
-    Add(R,Comm(lvarDelta^(V^2),sigma)=1);
+    Add(R,Comm(lvarDelta^(V^2),sigma));
   fi;
   if n=3 and IsOddInt(q) then
-    Add(R,Comm(delta^(V^2),sigma)=1);
+    Add(R,Comm(delta^(V^2),sigma));
   fi;
   if n > 2 then
-    Add(R,Comm(varZ^(V^2),sigma)=1);
-    Add(R,Comm(lvarDelta*(lvarDelta^2)^V,sigma)=1);
+    Add(R,Comm(varZ^(V^2),sigma));
+    Add(R,Comm(lvarDelta*(lvarDelta^2)^V,sigma));
   fi;
   if n=2 then
     if IsEvenInt(q) then
-      Add(R,Comm(delta*delta^U,sigma)=1);
+      Add(R,Comm(delta*delta^U,sigma));
     else
-      Add(R,Comm(lvarDelta^(QuoInt((q+1),2))*delta^-1,sigma)=1);
+      Add(R,Comm(lvarDelta^(QuoInt((q+1),2))*delta^-1,sigma));
     fi;
   fi;
-  Add(R,Comm(varZ*U*varZ^-1,sigma)=1);
+  Add(R,Comm(varZ*U*varZ^-1,sigma));
   #   centraliser of tau
   if n > 2 then
-    Add(R,Comm(U^V,tau)=1);
+    Add(R,Comm(U^V,tau));
   fi;
   if n=2 and IsOddInt(q) then
-    Add(R,Comm(delta^U,tau)=1);
+    Add(R,Comm(delta^U,tau));
   fi;
   if n > 2 then
-    Add(R,Comm(lvarDelta^V,tau)=1);
+    Add(R,Comm(lvarDelta^V,tau));
   fi;
   #   V*U is needed to generate centraliser of tau but relation not needed
   OMIT:=true;
   if not OMIT then
     if n > 3 then
-      Add(R,Comm(V*U,tau)=1);
+      Add(R,Comm(V*U,tau));
     fi;
   fi;
-  Add(R,Comm(varZ^U,tau)=1);
-  Add(R,Comm(lvarDelta^2*delta^-1,tau)=1);
-  # =v= MULTIASSIGN =v=
+  Add(R,Comm(varZ^U,tau));
+  Add(R,Comm(lvarDelta^2*delta^-1,tau));
   R1:=PresentationForSL2(p,e);
-  S:=R1.val1;
-  R1:=R1.val2;
-  # =^= MULTIASSIGN =^=
+  S:=FreeGroupOfFpGroup(R1);
+  R1:=RelatorsOfFpGroup(R1);
   if e=1 then
     phi:=GroupHomomorphismByImages(S,F,
       GeneratorsOfGroup(S),
       [tau,varZ]);
     #   need to express delta as word in <tau, Z> = SL(2, p)
     w:=PrimitiveElement(GF(p));
-    I:=Integers();
-    x:=(w^-1)*FORCEOne(I)-1;
-    y:=(w^-2-w^-1)*FORCEOne(I);
-    Add(R,delta=tau^-1*(tau^x)^varZ*tau^(w*FORCEOne(I))*(tau^-y)^varZ);
+    x:=Int(w^-1)-1;
+    y:=Int(w^-2-w^-1);
+    Add(R,delta/(tau^-1*(tau^x)^varZ*tau^(Int(w))*(tau^-y)^varZ));
   else
     phi:=GroupHomomorphismByImages(S,F,
       GeneratorsOfGroup(S),
       [delta,tau,varZ]);
   fi;
-  R1:=List(R1,r->phi(r));
+  R1:=List(R1,r->Image(phi,r));
   # rewritten select statement
   if IsEvenInt(q) then
     W:=U;
   else
     W:=U*varZ^2;
   fi;
-  # =v= MULTIASSIGN =v=
   R2:=PresentationForSL2(p,2*e);
-  S:=R2.val1;
-  R2:=R2.val2;
-  # =^= MULTIASSIGN =^=
+  S:=FreeGroupOfFpGroup(R2);
+  R2:=RelatorsOfFpGroup(R2);
   phi:=GroupHomomorphismByImages(S,F,
     GeneratorsOfGroup(S),
     [lvarDelta,sigma,W]);
-  R2:=List(R2,r->phi(r));
+  R2:=List(R2,r->Image(phi,r));
   #   Steinberg relations
   R3:=[];
-  Add(R3,Comm(sigma,tau)=1);
+  Add(R3,Comm(sigma,tau));
   if IsEvenInt(q) then
-    Add(R3,Comm(sigma,sigma^varZ)=1);
+    Add(R3,Comm(sigma,sigma^varZ));
   else
-    Add(R3,Comm(sigma,sigma^varZ)=(tau^2)^(varZ*U));
+    Add(R3,Comm(sigma,sigma^varZ)/(tau^2)^(varZ*U));
   fi;
   if (q<>3) then
     varE:=GF(q^2);
     # Implicit generator Assg from previous line.
+    ## TODO What does varE.1 access? Is it PrimitiveElement(varE)?
     w:=varE.1;
     w0:=w^(q+1);
     a:=w^(2*q)+w^2;
+    ## TODO How do we do Log for finite fields?
     m:=Log(w0,a);
-    Add(R3,Comm(sigma^lvarDelta,sigma^varZ)=tau^(varZ*U*lvarDelta^m))
+    Add(R3,Comm(sigma^lvarDelta,sigma^varZ)/tau^(varZ*U*lvarDelta^m))
      ;
   else
-    Add(R3,Comm(sigma^lvarDelta,sigma^varZ)=1);
+    Add(R3,Comm(sigma^lvarDelta,sigma^varZ));
   fi;
-  Add(R3,Comm(sigma,tau^varZ)=sigma^varZ*(tau^-1)^(varZ*U));
+  Add(R3,Comm(sigma,tau^varZ)/(sigma^varZ*(tau^-1)^(varZ*U)));
   #   additional relation needed for SU(6, 2) -- probably only #2 required
   if (n=3 and q=2) then
-    Add(R3,Comm(sigma,sigma^(U^V*lvarDelta))=1);
-    Add(R3,Comm(sigma,sigma^(V*lvarDelta))=sigma^(V*U*lvarDelta^-1))
+    Add(R3,Comm(sigma,sigma^(U^V*lvarDelta)));
+    Add(R3,Comm(sigma,sigma^(V*lvarDelta))/sigma^(V*U*lvarDelta^-1))
      ;
   fi;
   if n > 2 then
-    Add(R3,Comm(sigma,sigma^(U^V))=1);
-    Add(R3,Comm(sigma,sigma^V)=sigma^(V*U));
+    Add(R3,Comm(sigma,sigma^(U^V)));
+    Add(R3,Comm(sigma,sigma^V)/sigma^(V*U));
   fi;
   if n < 4 then
-    Add(R3,Comm(tau,tau^U)=1);
+    Add(R3,Comm(tau,tau^U));
   fi;
   if n=3 then
-    Add(R3,Comm(tau,sigma^V)=1);
+    Add(R3,Comm(tau,sigma^V));
   fi;
   if n > 3 then
-    Add(R3,Comm(sigma,sigma^(V^2))=1);
+    Add(R3,Comm(sigma,sigma^(V^2)));
   fi;
   if n=2 and q=3 then
-    Add(R3,tau=Comm((sigma^-1)^(U*varZ),sigma)^lvarDelta);
+    Add(R3,tau/Comm((sigma^-1)^(U*varZ),sigma)^lvarDelta);
   fi;
-  Rels:=Concatenation(List(Concatenation(R,R3),r->LHS(r)*RHS(r)^-1),R1,R2,R4);
-  return rec(val1:=F,
-    val2:=Rels);
+  Rels:=Concatenation(R,R1,R2,R3,R4);
+  return F/Rels;
 end;
-
-
