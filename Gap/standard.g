@@ -1,6 +1,8 @@
 #  File converted from Magma code -- requires editing and checking
 #  Magma -> GAP converter, version 0.5, 11/5/18 by AH
 
+# File checked and edited by MW 05/07/19
+
 #  Global Variables used: ClassicalStandardPresentation, GF,
 #  Internal_PresentationGenerators, Internal_StandardPresentationForOmega,
 #  Internal_StandardPresentationForSL, Internal_StandardPresentationForSU,
@@ -72,7 +74,7 @@ if not type in ["SL","Sp","SU","Omega","Omega+","Omega-"] then
   if not d > 1 then
     Error("Dimension is not valid");
   fi;
-  if not IsPrimePower(q) then
+  if Size(DuplicateFreeList(Factors(q))) > 1 then
     Error("Field size is not valid");
   fi;
   return Internal_PresentationGenerators(type,d,GF(q));
@@ -102,7 +104,7 @@ local PresentationGenerators,Projective;
   if not d > 1 then
     Error("Dimension is not valid");
   fi;
-  if not IsPrimePower(q) then
+  if Size(DuplicateFreeList(Factors(q))) > 1 then
     Error("Field size is not valid");
   fi;
   return ClassicalStandardPresentation(type,d,GF(q)
