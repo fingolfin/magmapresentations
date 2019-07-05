@@ -7,7 +7,7 @@
 #  MatrixAlgebra, Minus6Presentation, MinusConvertToStandard, MinusDeltaMatrix,
 #  MinusEvenDeltaMatrix, MinusGeneratorOfCentre, MinusPresentationToStandard,
 #  MinusStandardToPresentation, Minus_PresentationForN,
-#  Minus_PresentationForN1, Ngens, PrimitiveElement, RHS, SLPGroup,
+#  Minus_PresentationForN1, Ngens, PrimitiveElement, RHS, FreeGroup,
 #  Setup_MinusPresentation, Universe, Zero, eta, phi, tau
 
 #  Defines: Minus6Presentation, MinusConvertToStandard, MinusDeltaMatrix,
@@ -29,16 +29,15 @@ DeclareGlobalFunction("MinusStandardToPresentation");
 #  Forward declaration of MinusPresentationToStandard
 #  Forward declaration of MinusStandardToPresentation
 MinusDeltaMatrix:=function(d,q,w,i)
-local A,B,C,MA,delta,n,psi,w0;
+local A,B,C,delta,n,psi,w0;
   w0:=w^(q+1);
   psi:=w^(QuoInt((q+1),2));
   Assert(1,psi=-(w^(QuoInt((q^2+q),2))));
   Assert(1,psi^q=-psi);
-  MA:=MatrixAlgebra(GF(q),d);
   A:=(w^(q-1)+w^(1-q))/2;
   B:=psi*(w^(1-q)-w^(q-1))/2;
   C:=psi^-1*(w^(1-q)-w^(q-1))/2;
-  delta:=Identity(MA);
+  delta:=IdentityMat(d, GF(q));
   n:=QuoInt((d-2),2);
   delta[2*i-1][2*i-1]:=w0^-1;
   delta[2*i][2*i]:=w0;
@@ -46,17 +45,16 @@ local A,B,C,MA,delta,n,psi,w0;
   delta[d-1][d]:=-C;
   delta[d][d-1]:=-B;
   delta[d][d]:=A;
-  return delta*FORCEOne(GL(d,q));
+  return delta*Z(q)^0;
 end;
 
 MinusEvenDeltaMatrix:=function(d,q,w,i)
-local A,B,C,MA,delta,n,w0;
+local A,B,C,delta,n,w0;
   w0:=w^(q+1);
-  MA:=MatrixAlgebra(GF(q),d);
   A:=(w^(1-q)+w^(q-1)+1);
   B:=(w^(1)+w^(q));
   C:=(w^(-1)+w^(-q));
-  delta:=Identity(MA);
+  delta:=IdentityMat(d, GF(q));
   n:=QuoInt((d-2),2);
   delta[2*i-1][2*i-1]:=w0^-1;
   delta[2*i][2*i]:=w0;
@@ -64,15 +62,14 @@ local A,B,C,MA,delta,n,w0;
   delta[d-1][d]:=C;
   delta[d][d-1]:=B;
   delta[d][d]:=1;
-  return delta*FORCEOne(GL(d,q));
+  return delta*Z(q)^0;
 end;
 
 MinusGenerators:=function(d,q)
-local B,varE,MA,U,V,delta,gens,i,n,s,sigma,tau,w,z;
+local B,varE,U,V,delta,gens,i,n,s,sigma,tau,w,z;
   if d=4 then
     return ClassicalStandardGenerators("Omega-",d,q);
   fi;
-  MA:=MatrixAlgebra(GF(q),d);
   varE:=GF(q^2);
   w:=PrimitiveElement(varE);
   i:=1;
@@ -82,7 +79,7 @@ local B,varE,MA,U,V,delta,gens,i,n,s,sigma,tau,w,z;
     delta:=MinusDeltaMatrix(d,q,w,i);
   fi;
   n:=QuoInt((d-2),2);
-  z:=Zero(MA);
+  z:=NullMat(d, d, GF(q));
   z[1][2]:=1;
   z[2][1]:=1;
   for i in [3..d-1] do
@@ -95,7 +92,7 @@ local B,varE,MA,U,V,delta,gens,i,n,s,sigma,tau,w,z;
     z[d][d-1]:=B;
   fi;
   z[d][d]:=1;
-  tau:=Identity(MA);
+  tau:=IdentityMat(d, GF(q));
   if IsOddInt(q) then
     s:=1;
     tau[1][1]:=1;
@@ -112,7 +109,7 @@ local B,varE,MA,U,V,delta,gens,i,n,s,sigma,tau,w,z;
     tau[d][2]:=B;
   fi;
   s:=1;
-  sigma:=Zero(MA);
+  sigma:=NullMat(d, d, GF(q));
   sigma[1][1]:=1;
   sigma[1][3]:=s;
   sigma[4][4]:=1;
@@ -120,7 +117,7 @@ local B,varE,MA,U,V,delta,gens,i,n,s,sigma,tau,w,z;
   for i in Concatenation([2,3],[5..d]) do
     sigma[i][i]:=1;
   od;
-  U:=Zero(MA);
+  U:=NullMat(d, d, GF(q));
   U[1][3]:=1;
   U[3][1]:=-1;
   U[2][4]:=1;
@@ -128,7 +125,7 @@ local B,varE,MA,U,V,delta,gens,i,n,s,sigma,tau,w,z;
   for i in [5..d] do
     U[i][i]:=1;
   od;
-  V:=Zero(MA);
+  V:=NullMat(d, d, GF(q));
   for i in [1..n-1] do
     V[2*i-1][2*i+1]:=1;
     V[2*i][2*i+2]:=1;
@@ -138,7 +135,7 @@ local B,varE,MA,U,V,delta,gens,i,n,s,sigma,tau,w,z;
   for i in [d-1..d] do
     V[i][i]:=1;
   od;
-  gens:=List([z,tau,sigma,delta,U,V],x->x*FORCEOne(GL(d,q)));
+  gens:=List([z,tau,sigma,delta,U,V],x->x*Z(q)^0);
   return rec(val1:=gens,
     val2:=varE,
     val3:=w);
@@ -147,12 +144,10 @@ end;
 Minus6Presentation:=function(q)
 local N,Q,R,S,U,d,delta,eta,images,sigma,tau,z;
   d:=4;
-  # =v= MULTIASSIGN =v=
   R:=Internal_StandardPresentationForSU(d,q:Presentation:=true);
-  Q:=R.val1;
-  R:=R.val2;
-  # =^= MULTIASSIGN =^=
-  N:=SLPGroup(5);
+  Q:=FreeGroupOfFpGroup(R);
+  R:=RelatorsOfFpGroup(R);
+  N:=FreeGroup(5);
   z:=N.1;
   tau:=N.2;
   sigma:=N.3;
@@ -165,55 +160,49 @@ local N,Q,R,S,U,d,delta,eta,images,sigma,tau,z;
   fi;
   eta:=GroupHomomorphismByImages(Q,N,
     GeneratorsOfGroup(Q),images);
-  S:=List(R,r->eta(r));
+  S:=List(R,r->Image(eta,r));
   if IsOddInt(q) then
     Add(S,delta^(QuoInt((q^2-1),2)));
   fi;
-  return rec(val1:=N,
-    val2:=S);
+  return N/S;
 end;
 
 Minus_PresentationForN1:=function(d,q)
 local F,OMIT,R,R1,Rels,S,U,V,m,n,phi,z;
-  F:=SLPGroup(3);
+  F:=FreeGroup(3);
   z:=F.1;
   U:=F.2;
   V:=F.3;
   m:=QuoInt((d-2),2);
   if IsOddInt(q) then
-    # =v= MULTIASSIGN =v=
     R:=SignedPermutations(m);
-    S:=R.val1;
-    R:=R.val2;
-    # =^= MULTIASSIGN =^=
+    S:=FreeGroupOfFpGroup(R);
+    R:=RelatorsOfFpGroup(R);
   elif IsEvenInt(q) then
-    # =v= MULTIASSIGN =v=
     R:=PresentationForSn(m);
-    S:=R.val1;
-    R:=R.val2;
-    # =^= MULTIASSIGN =^=
+    S:=FreeGroupOfFpGroup(R);
+    R:=RelatorsOfFpGroup(R);
   fi;
   phi:=GroupHomomorphismByImages(S,F,
     GeneratorsOfGroup(S),
     [U,V]);
-  R:=List(R,r->phi(r));
+  R:=List(R,r->Image(phi,r));
   n:=QuoInt(d,2);
   R1:=[];
-  Add(R1,Comm(z,U^V)=1);
+  Add(R1,Comm(z,U^V));
   if n > 4 then
-    Add(R1,Comm(z,V*U^-1)=1);
+    Add(R1,Comm(z,V*U^-1));
   fi;
   OMIT:=true;
   if not OMIT then
-    Add(R1,z^2=1);
-    Add(R1,Comm(z,z^U)=1);
+    Add(R1,z^2);
+    Add(R1,Comm(z,z^U));
     if IsOddInt(q) then
-      Add(R1,Comm(z,U^2)=1);
+      Add(R1,Comm(z,U^2));
     fi;
   fi;
-  Rels:=Concatenation(List(R1,r->LHS(r)*RHS(r)^-1),R);
-  return rec(val1:=F,
-    val2:=Rels);
+  Rels:=Concatenation(R1,R);
+  return F/Rels;
 end;
 
 Minus_Order_N1:=function(d,q)
@@ -228,44 +217,41 @@ end;
 
 Minus_PresentationForN:=function(d,q)
 local F,OMIT,R,R1,Rels,S,U,V,delta,n,phi,z;
-  F:=SLPGroup(4);
+  F:=FreeGroup(4);
   delta:=F.1;
   z:=F.2;
   U:=F.3;
   V:=F.4;
-  # =v= MULTIASSIGN =v=
   R:=Minus_PresentationForN1(d,q);
-  S:=R.val1;
-  R:=R.val2;
-  # =^= MULTIASSIGN =^=
+  S:=FreeGroupOfFpGroup(R);
+  R:=RelatorsOfFpGroup(R);
   phi:=GroupHomomorphismByImages(S,F,
     GeneratorsOfGroup(S),
     [z,U,V]);
-  R:=List(R,r->phi(r));
+  R:=List(R,r->Image(phi,r));
   n:=QuoInt(d,2);
   R1:=[];
-  Add(R1,Comm(delta,U^V)=1);
+  Add(R1,Comm(delta,U^V));
   if n > 4 then
-    Add(R1,Comm(delta,V*U^-1)=1);
+    Add(R1,Comm(delta,V*U^-1));
   fi;
   OMIT:=true;
   if not OMIT then
     if IsOddInt(q) then
-      Add(R1,U^2=(delta*(delta^-1)^U)^(QuoInt((q-1),2)));
+      Add(R1,U^2/((delta*(delta^-1)^U)^(QuoInt((q-1),2))));
     fi;
-    Add(R1,Comm(delta,z^U)=delta^(q-1));
+    Add(R1,Comm(delta,z^U)/delta^(q-1));
     if IsOddInt(q) then
-      Add(R1,delta^(QuoInt((q^2-1),2))=1);
+      Add(R1,delta^(QuoInt((q^2-1),2)));
     else
-      Add(R1,delta^((q^2-1))=1);
+      Add(R1,delta^((q^2-1)));
     fi;
-    Add(R1,Comm(delta,delta^U)=1);
-    Add(R1,delta^z=delta^-1);
-    Add(R1,Comm(delta^(q-1),U)=1);
+    Add(R1,Comm(delta,delta^U));
+    Add(R1,delta^z*delta);
+    Add(R1,Comm(delta^(q-1),U));
   fi;
-  Rels:=Concatenation(List(R1,r->LHS(r)*RHS(r)^-1),R);
-  return rec(val1:=F,
-    val2:=Rels);
+  Rels:=Concatenation(R1,R);
+  return F/Rels;
 end;
 
 Minus_OrderN:=function(d,q)
@@ -283,81 +269,77 @@ local F,OMIT,R,R1,R2,R3,R4,R5,Rels,S,U,V,W,delta,e,f,n,p,phi,sigma,tau,z;
   if d=6 then
     return Minus6Presentation(q);
   fi;
-  F:=SLPGroup(6);
+  F:=FreeGroup(6);
   z:=F.1;
   tau:=F.2;
   sigma:=F.3;
   delta:=F.4;
   U:=F.5;
   V:=F.6;
-  # =v= MULTIASSIGN =v=
-  e:=IsPrimePower(q);
-  f:=e.val1;
-  p:=e.val2;
-  e:=e.val3;
-  # =^= MULTIASSIGN =^=
-  # =v= MULTIASSIGN =v=
+  e := Factors(q);
+  if Size(DuplicateFreeList(e)) > 1 then
+      f := false;
+  else
+      f := true;
+      p := e[1];
+      e := Size(e);
+  fi;
   R:=Minus_PresentationForN(d,q);
-  S:=R.val1;
-  R:=R.val2;
-  # =^= MULTIASSIGN =^=
+  S:=FreeGroupOfFpGroup(R);
+  R:=RelatorsOfFpGroup(R);
   phi:=GroupHomomorphismByImages(S,F,
     GeneratorsOfGroup(S),
     [delta,z,U,V]);
-  R:=List(R,r->phi(r));
+  R:=List(R,r->Image(phi,r));
   n:=QuoInt(d,2);
   R1:=[];
   #   centraliser of sigma in N
-  Add(R1,Comm(sigma,z^(V^2))=1);
-  Add(R1,Comm(sigma,delta^(V^2))=1);
+  Add(R1,Comm(sigma,z^(V^2)));
+  Add(R1,Comm(sigma,delta^(V^2)));
   OMIT:=true;
   if not OMIT then
-    Add(R1,Comm(sigma,delta*delta^U)=1);
-    Add(R1,Comm(sigma,z*z^U*U)=1);
+    Add(R1,Comm(sigma,delta*delta^U));
+    Add(R1,Comm(sigma,z*z^U*U));
   fi;
   if n > 4 then
-    Add(R1,Comm(sigma,U^(V^2))=1);
+    Add(R1,Comm(sigma,U^(V^2)));
   fi;
   #   elements generate the same group but for odd q reflects direct product
   if n > 5 then
     if IsOddInt(q) then
-      Add(R1,Comm(sigma,V*U^-1*(U^-1)^V)=1);
+      Add(R1,Comm(sigma,V*U^-1*(U^-1)^V));
     else
-      Add(R1,Comm(sigma,V*U*U^V)=1);
+      Add(R1,Comm(sigma,V*U*U^V));
     fi;
   fi;
   R2:=[];
   #   centraliser of tau in N
-  Add(R2,Comm(tau,U^V)=1);
+  Add(R2,Comm(tau,U^V));
   if n > 4 then
-    Add(R2,Comm(tau,V*U^-1)=1);
+    Add(R2,Comm(tau,V*U^-1));
   fi;
   if IsEvenInt(q) then
-    Add(R2,Comm(tau,delta^(V^2)*(delta^-1)^(V))=1);
+    Add(R2,Comm(tau,delta^(V^2)*(delta^-1)^(V)));
   fi;
-  # =v= MULTIASSIGN =v=
   R3:=Minus6Presentation(q);
-  S:=R3.val1;
-  R3:=R3.val2;
-  # =^= MULTIASSIGN =^=
+  S:=FreeGroupOfFpGroup(R3);
+  R3:=RelatorsOfFpGroup(R3);
   phi:=GroupHomomorphismByImages(S,F,
     GeneratorsOfGroup(S),
     [z,tau,sigma,delta,U]);
-  R3:=List(R3,r->phi(r));
+  R3:=List(R3,r->Image(phi,r));
   R4:=[];
-  Add(R4,Comm(sigma,sigma^V)=sigma^(V*U^-1));
-  Add(R4,Comm(sigma,sigma^(V*U^-1))=1);
+  Add(R4,Comm(sigma,sigma^V)/sigma^(V*U^-1));
+  Add(R4,Comm(sigma,sigma^(V*U^-1)));
   W:=U^(V*U^-1);
-  Add(R4,Comm(sigma,sigma^W)=1);
+  Add(R4,Comm(sigma,sigma^W));
   if n > 4 then
-    Add(R4,Comm(sigma,sigma^(V^2))=1);
+    Add(R4,Comm(sigma,sigma^(V^2)));
   fi;
   R5:=[];
-  Add(R5,Comm(sigma^V,tau)=1);
-  Rels:=Concatenation(List(Concatenation(R1,R2,R4,R5),r->LHS(r)*RHS(r)^-1),R,R3)
-   ;
-  return rec(val1:=F,
-    val2:=Rels);
+  Add(R5,Comm(sigma^V,tau));
+  Rels:=Concatenation(R,R1,R2,R3,R4,R5);
+  return F/Rels;
 end;
 
 MinusPresentation:=function(d,q)
@@ -374,13 +356,11 @@ local P,Presentation,Projective,Q,R,Rels,S,n,z;
   Assert(1,IsEvenInt(d));
   n:=QuoInt(d,2);
   if d=4 then
-    # =v= MULTIASSIGN =v=
     R:=ClassicalStandardPresentation("SL",2,q^2:Projective:=true);
-    Q:=R.val1;
-    R:=R.val2;
-    # =^= MULTIASSIGN =^=
-    Q:=SLPGroup(5);
+    R:=RelatorsOfFpGroup(R);
+    Q:=FreeGroup(5);
     if IsEvenInt(q) then
+    ## TODO What is evaluate?
       R:=Evaluate(R,[Q.1^Q.2,Q.1^Q.2,Q.1,Q.3]);
       Add(R,(Q.1*Q.1^Q.2*Q.1)*Q.2^-1);
     else
@@ -388,38 +368,31 @@ local P,Presentation,Projective,Q,R,Rels,S,n,z;
     fi;
     Add(R,Q.4);
     Add(R,Q.5);
-    return rec(val1:=Q,
-      val2:=R);
+    return Q/R;
   fi;
-  # =v= MULTIASSIGN =v=
   R:=Setup_MinusPresentation(d,q);
-  P:=R.val1;
-  R:=R.val2;
-  # =^= MULTIASSIGN =^=
+  P:=FreeGroupOfFpGroup(R);
+  R:=RelatorsOfFpGroup(R);
   if Projective and IsOddInt(n) and q mod 4=3 then
     z:=MinusGeneratorOfCentre(d,q,P);
     Add(R,z);
   fi;
   if Presentation then
-    return rec(val1:=P,
-      val2:=R);
+    return P/R;
   fi;
   #   do conversion
-  # =v= MULTIASSIGN =v=
   Rels:=MinusConvertToStandard(d,q,R);
-  S:=Rels.val1;
-  Rels:=Rels.val2;
-  # =^= MULTIASSIGN =^=
+  S:=FreeGroupOfFpGroup(Rels);
+  Rels:=RelatorsOfFpGroup(Rels);
   Rels:=Filtered(Rels,w->w<>w^0);
-  return rec(val1:=S,
-    val2:=Rels);
+  return S/Rels;
 end;
 
 #   relations are on presentation generators;
-#  convert to relations on standard generators 
+#  convert to relations on standard generators
 InstallGlobalFunction(MinusConvertToStandard,
 function(d,q,Rels)
-local A,B,C,Rels,T,U,W,tau;
+local A,B,C,T,U,W,tau;
   A:=MinusStandardToPresentation(d,q);
   Rels:=Evaluate(Rels,A);
   B:=MinusPresentationToStandard(d,q);
@@ -427,19 +400,18 @@ local A,B,C,Rels,T,U,W,tau;
   U:=Universe(C);
   W:=Universe(Rels);
   tau:=GroupHomomorphismByImages(U,W,
-    GeneratorsOfGroup(U),List([1..Ngens(W)],i->W.i));
-  T:=List([1..Ngens(W)],i->W.i^-1*tau(C[i]));
+    GeneratorsOfGroup(U),List([1..Size(GeneratorsOfGroup(W))],i->W.i));
+  T:=List([1..Size(GeneratorsOfGroup(W))],i->W.i^-1*tau(C[i]));
   Rels:=Concatenation(Rels,T);
-  return rec(val1:=W,
-    val2:=Rels);
+  return W/Rels;
 end);
 
-#   express presentation generators as words in standard generators 
+#   express presentation generators as words in standard generators
 InstallGlobalFunction(MinusStandardToPresentation,
 function(d,q)
-local Delta,F,U,V,W,delta,m,p,s,sigma,t,tau,w,w0,x,z;
+local lvarDelta,F,U,V,W,delta,m,p,s,sigma,t,tau,w,w0,x,z;
   Assert(1,IsEvenInt(d) and d > 4);
-  W:=SLPGroup(5);
+  W:=FreeGroup(5);
   if IsOddInt(q) then
     s:=W.1;
     t:=W.2;
@@ -471,6 +443,7 @@ local Delta,F,U,V,W,delta,m,p,s,sigma,t,tau,w,w0,x,z;
     F:=GF(q^2);
     w:=PrimitiveElement(F);
     w0:=w^(q+1);
+    ## TODO How do we do log over finite fields?
     m:=Log(w0,w^2+w^(2*q));
     x:=Comm(tau^delta,tau^U)^(z*U);
     sigma:=x^(lvarDelta^(q-m));
@@ -482,12 +455,12 @@ local Delta,F,U,V,W,delta,m,p,s,sigma,t,tau,w,w0,x,z;
   fi;
 end);
 
-#   express standard generators as words in presentation generators 
+#   express standard generators as words in presentation generators
 InstallGlobalFunction(MinusPresentationToStandard,
 function(d,q)
-local Delta,U,V,W,delta,s,sigma,t,tau,z;
+local lvarDelta,U,V,W,delta,s,sigma,t,tau,z;
   Assert(1,IsEvenInt(d) and d > 4);
-  W:=SLPGroup(6);
+  W:=FreeGroup(6);
   z:=W.1;
   tau:=W.2;
   sigma:=W.3;
@@ -530,9 +503,9 @@ local V,delta,n,z;
     fi;
     z:=V^(n-1)*delta^(QuoInt((q^2-1),4));
   else
-    z:=F.0;
+    # TODO Not sure if this is right
+    # WAS: z:=F.0;
+    z:=Zero(F);
   fi;
   return z;
 end);
-
-
