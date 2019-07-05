@@ -6,7 +6,7 @@
 #  Identity, Integers, IsOdd, IsPrime, IsPrimePower, LHS, MatrixAlgebra, Ngens,
 #  OmegaConvertToStandard, OmegaPresentationToStandard,
 #  OmegaStandardToPresentation, Omega_PresentationForN,
-#  Omega_PresentationForN1, PrimitiveElement, RHS, SLPGroup,
+#  Omega_PresentationForN1, PrimitiveElement, RHS, FreeGroup,
 #  Setup_OmegaPresentation, SpecialWordForDelta,
 #  Special_OmegaStandardToPresentation, Universe, WordForDelta, phi, tau
 
@@ -25,7 +25,7 @@ DeclareGlobalFunction("OmegaPresentationToStandard");
 #  Forward declaration of OmegaStandardToPresentation
 #  Forward declaration of OmegaPresentationToStandard
 OmegaGenerators:=function(d,q)
-local Delta,varE,F,MA,U,V,varZ,gens,n,sigma,tau,w;
+local lvarDelta,varE,F,MA,U,V,varZ,gens,n,sigma,tau,w;
   Assert(1,IsOddInt(d));
   Assert(1,IsOddInt(q));
   if d=3 then
@@ -47,7 +47,7 @@ local Delta,varE,F,MA,U,V,varZ,gens,n,sigma,tau,w;
   lvarDelta[2][2]:=w;
   lvarDelta[3][3]:=w^1;
   lvarDelta[4][4]:=w^-1;
-  lvarDelta:=lvarDelta*FORCEOne(GL(d,F));
+  lvarDelta:=lvarDelta*FORCEOne(GL(d,F)); ## TODO FORCE
   tau:=Identity(MA);
   tau[1][1]:=1;
   tau[1][2]:=1;
@@ -69,11 +69,17 @@ end;
 Omega_PresentationForN1:=function(n)
 local F,R,R1,Rels,S,U,V,varZ,phi;
   Assert(1,n > 1);
-  F:=SLPGroup(3);
+  F:=FreeGroup(3);
   varZ:=F.1;
   U:=F.2;
   V:=F.3;
   # =v= MULTIASSIGN =v=
+  # TODO I'm not sure how to implement this in GAP
+  # I think that it actually gives the presentation of the signed perms group
+  # on n points. This is easy to find e.g. at
+  # https://groupprops.subwiki.org/wiki/Signed_symmetric_group_of_finite_degree_is_a_Coxeter_group
+  # but this is given on n generators so I am not sure how we do with only two
+  # generators as seems to be required by the definition of <phi>
   R:=SignedPermutations(n);
   S:=R.val1;
   R:=R.val2;
@@ -81,20 +87,19 @@ local F,R,R1,Rels,S,U,V,varZ,phi;
   phi:=GroupHomomorphismByImages(S,F,
     GeneratorsOfGroup(S),
     [U,V]);
-  R:=List(R,r->phi(r));
+  R:=List(R,r->Image(phi,r));
   R1:=[];
   if n > 2 then
-    Add(R1,Comm(varZ,U^V)=1);
+    Add(R1,Comm(varZ,U^V));
   fi;
   if n > 3 then
-    Add(R1,Comm(varZ,V*U^-1)=1);
+    Add(R1,Comm(varZ,V*U^-1));
   fi;
-  Add(R1,varZ^2=1);
-  Add(R1,Comm(varZ,U^2)=1);
-  Add(R1,Comm(varZ,varZ^U)=1);
-  Rels:=Concatenation(List(R1,r->LHS(r)*RHS(r)^-1),R);
-  return rec(val1:=F,
-    val2:=Rels);
+  Add(R1,varZ^2);
+  Add(R1,Comm(varZ,U^2));
+  Add(R1,Comm(varZ,varZ^U));
+  R1 := Concatenation(R1, R);
+  return F/R1;
 end;
 
 Omega_OrderN1:=function(n)
@@ -102,47 +107,44 @@ return 2^(2*n-1)*Factorial(n);
 end;
 
 Omega_PresentationForN:=function(n,q)
-local Delta,F,OMIT,R,R1,Rels,S,U,V,varZ,phi;
-  F:=SLPGroup(4);
+local lvarDelta,F,OMIT,R,R1,Rels,S,U,V,varZ,phi;
+  F:=FreeGroup(4);
   lvarDelta:=F.1;
   varZ:=F.2;
   U:=F.3;
   V:=F.4;
-  # =v= MULTIASSIGN =v=
   R:=Omega_PresentationForN1(n);
-  S:=R.val1;
-  R:=R.val2;
-  # =^= MULTIASSIGN =^=
+  S:=FreeGroupOfFpGroup(R);
+  R:=RelatorsOfFpGroup(R);
   phi:=GroupHomomorphismByImages(S,F,
     GeneratorsOfGroup(S),
     [varZ,U,V]);
-  R:=List(R,r->phi(r));
+  R:=List(R,r->Image(phi, r));
   R1:=[];
   if n > 3 then
-    Add(R1,Comm(lvarDelta,U^(V^2))=1);
-    Add(R1,Comm(lvarDelta,lvarDelta^(V^2))=1);
+    Add(R1,Comm(lvarDelta,U^(V^2)));
+    Add(R1,Comm(lvarDelta,lvarDelta^(V^2)));
   fi;
   if n > 4 then
-    Add(R1,Comm(lvarDelta,V*U*U^V)=1);
+    Add(R1,Comm(lvarDelta,V*U*U^V));
   fi;
   if n > 2 then
-    Add(R1,Comm(lvarDelta,varZ^(V^2))=1);
-    Add(R1,lvarDelta*lvarDelta^V=lvarDelta^(V*U));
-    Add(R1,Comm(lvarDelta,lvarDelta^V)=1);
-    Add(R1,Comm(lvarDelta,(U^2)^V)=1);
+    Add(R1,Comm(lvarDelta,varZ^(V^2)));
+    Add(R1,lvarDelta*lvarDelta^V/lvarDelta^(V*U));
+    Add(R1,Comm(lvarDelta,lvarDelta^V));
+    Add(R1,Comm(lvarDelta,(U^2)^V));
   fi;
-  Add(R1,lvarDelta^U=lvarDelta^-1);
+  Add(R1,lvarDelta^U*lvarDelta);
   OMIT:=true;
   if not OMIT then
-    Add(R1,lvarDelta^(QuoInt((q-1),2))=U^2);
+    Add(R1,lvarDelta^(QuoInt((q-1),2))/U^2);
   fi;
-  Add(R1,lvarDelta^(varZ*varZ^U)=lvarDelta^-1);
+  Add(R1,lvarDelta^(varZ*varZ^U)*lvarDelta);
   if n=2 then
-    Add(R1,Comm(lvarDelta,lvarDelta^varZ)=1);
+    Add(R1,Comm(lvarDelta,lvarDelta^varZ));
   fi;
-  Rels:=Concatenation(List(R1,r->LHS(r)*RHS(r)^-1),R);
-  return rec(val1:=F,
-    val2:=Rels);
+  Rels:=Concatenation(R1,R);
+  return F/Rels;
 end;
 
 Omega_OrderN:=function(n,q)
@@ -150,7 +152,7 @@ return (q-1)^n*2^(n-1)*Factorial(n);
 end;
 
 Setup_OmegaPresentation:=function(d,q)
-local 
+local
    Delta,F,I,R1,R2,R3,R4,R5,R6,Rels,S,U,V,W,varZ,b,e,f,n,p,phi,sigma,tau,w,x;
   Assert(1,IsOddInt(d));
   Assert(1,IsOddInt(q));
@@ -158,13 +160,15 @@ local
   Assert(1,n > 1);
   F:=GF(q);
   w:=PrimitiveElement(F);
-  # =v= MULTIASSIGN =v=
-  e:=IsPrimePower(q);
-  f:=e.val1;
-  p:=e.val2;
-  e:=e.val3;
-  # =^= MULTIASSIGN =^=
-  F:=SLPGroup(6);
+  e := Factors(q);
+  if Size(DuplicateFreeList(f)) > 1 then
+      f := false;
+  else
+      f := true;
+      p := f[1];
+      e := Size(f);
+  fi;
+  F:=FreeGroup(6);
   lvarDelta:=F.1;
   varZ:=F.2;
   tau:=F.3;
@@ -175,37 +179,30 @@ local
   #   additional relation needed for q = p to express Delta as word in sigma
   #  and U
   if IsPrimeInt(q) then
-    I:=Integers();
-    b:=(1/w)*FORCEOne(I);
-    w:=w*FORCEOne(I);
-    Add(R3,lvarDelta=(sigma^U)^(w-w^2)*sigma^(b)*(sigma^U)^((w-1))
-     *sigma^-1);
+    b:=Int(1/w); # TODO I think that this is correct ...
+    w:=Int(w);
+    Add(R3,lvarDelta/((sigma^U)^(w-w^2)*sigma^(b)*(sigma^U)^((w-1))
+     *sigma^-1));
   fi;
   if e=1 then
-    # =v= MULTIASSIGN =v=
     R1:=Omega_PresentationForN1(n);
-    S:=R1.val1;
-    R1:=R1.val2;
-    # =^= MULTIASSIGN =^=
+    S:=FreeGroupOfFpGroup(R1);
+    R1:=RelatorsOfFpGroup(R1);
     phi:=GroupHomomorphismByImages(S,F,
       GeneratorsOfGroup(S),
       [varZ,U,V]);
   else
-    # =v= MULTIASSIGN =v=
     R1:=Omega_PresentationForN(n,q);
-    S:=R1.val1;
-    R1:=R1.val2;
-    # =^= MULTIASSIGN =^=
+    S:=FreeGroupOfFpGroup(R);
+    R:=RelatorsOfFpGroup(R);
     phi:=GroupHomomorphismByImages(S,F,
       GeneratorsOfGroup(S),
       [lvarDelta,varZ,U,V]);
   fi;
-  R1:=List(R1,r->phi(r));
-  # =v= MULTIASSIGN =v=
+  R1:=List(R1,r->Image(phi, r));
   R2:=PresentationForSL2(p,e);
-  S:=R2.val1;
-  R2:=R2.val2;
-  # =^= MULTIASSIGN =^=
+  S:=FreeGroupOfFpGroup(R2);
+  R2:=RelatorsOfFpGroup(R2);
   if e=1 then
     phi:=GroupHomomorphismByImages(S,F,
       GeneratorsOfGroup(S),
@@ -215,31 +212,29 @@ local
       GeneratorsOfGroup(S),
       [lvarDelta,sigma,U]);
   fi;
-  R2:=List(R2,r->phi(r));
+  R2:=List(R2,r->Image(phi, r));
   if e > 1 then
-    Add(R3,Comm(sigma,lvarDelta^(varZ^U))=1);
+    Add(R3,Comm(sigma,lvarDelta^(varZ^U)));
   fi;
   #   centraliser of tau
   R5:=[];
   if n > 2 then
-    Add(R5,Comm(tau,U^V)=1);
+    Add(R5,Comm(tau,U^V));
     if e > 1 then
-      Add(R5,Comm(tau,lvarDelta^V)=1);
+      Add(R5,Comm(tau,lvarDelta^V));
     fi;
   fi;
   if n > 3 then
-    Add(R5,Comm(tau,V*U^-1)=1);
+    Add(R5,Comm(tau,V*U^-1));
   fi;
-  Add(R5,Comm(tau,U^2*varZ^U)=1);
+  Add(R5,Comm(tau,U^2*varZ^U));
   if e > 1 and n=2 then
-    Add(R5,Comm(tau,lvarDelta*lvarDelta^varZ)=1);
+    Add(R5,Comm(tau,lvarDelta*lvarDelta^varZ));
   fi;
   R6:=[];
-  # =v= MULTIASSIGN =v=
   R6:=PresentationForSL2(p,e:Projective:=true);
-  S:=R6.val1;
-  R6:=R6.val2;
-  # =^= MULTIASSIGN =^=
+  S:=FreeGroupOfFpGroup(R6);
+  R6:=RelatorsOfFpGroup(R6);
   if e=1 then
     phi:=GroupHomomorphismByImages(S,F,
       GeneratorsOfGroup(S),
@@ -250,32 +245,30 @@ local
       GeneratorsOfGroup(S),
       [x,tau,varZ]);
   fi;
-  R6:=List(R6,r->phi(r));
+  R6:=List(R6,r->Image(phi, r));
   #   Steinberg relations
   R4:=[];
   if n > 2 then
-    Add(R4,Comm(sigma,sigma^V)=sigma^(V*U^-1));
-    Add(R4,Comm(sigma,sigma^(V*U^-1))=1);
+    Add(R4,Comm(sigma,sigma^V)/(sigma^(V*U^-1)));
+    Add(R4,Comm(sigma,sigma^(V*U^-1)));
     W:=U^(V*U^-1);
-    Add(R4,Comm(sigma,sigma^W)=1);
+    Add(R4,Comm(sigma,sigma^W));
     #   new relation June 2018
-    Add(R4,Comm(sigma,tau^(V^2))=1);
+    Add(R4,Comm(sigma,tau^(V^2)));
   fi;
   if n > 3 then
-    Add(R4,Comm(sigma,sigma^(V^2))=1);
+    Add(R4,Comm(sigma,sigma^(V^2)));
   fi;
-  Add(R4,Comm(sigma,sigma^(varZ^U))=1);
-  Add(R4,Comm(tau,tau^U)=(sigma^(varZ^U))^2);
-  Add(R4,Comm(sigma,tau)=1);
-  Add(R4,Comm(sigma^varZ,tau)=sigma*tau^(varZ*U));
+  Add(R4,Comm(sigma,sigma^(varZ^U)));
+  Add(R4,Comm(tau,tau^U)/(sigma^(varZ^U))^2);
+  Add(R4,Comm(sigma,tau));
+  Add(R4,Comm(sigma^varZ,tau)/sigma*tau^(varZ*U));
   #   Omega(7, 3) has multiplicator of order 6
   if d=7 and q=3 then
-    Add(R3,Comm(tau,sigma^V)=1);
+    Add(R3,Comm(tau,sigma^V));
   fi;
-  Rels:=Concatenation(List(Concatenation(R3,R4,R5),r->LHS(r)*RHS(r)^-1)
-   ,R1,R2,R6);
-  return rec(val1:=F,
-    val2:=Rels);
+  Rels:=Concatenation(R1,R2,R3,R4,R5,R6);
+  return F/Rels;
 end;
 
 OmegaPresentation:=function(d,q)
@@ -287,63 +280,54 @@ local P,Presentation,Q,R,Rels,S;
   Assert(1,IsOddInt(d) and d > 1);
   Assert(1,IsOddInt(q));
   if d=3 then
-    # =v= MULTIASSIGN =v=
     R:=ClassicalStandardPresentation("SL",2,q:Projective:=true);
-    Q:=R.val1;
-    R:=R.val2;
-    # =^= MULTIASSIGN =^=
-    Q:=SLPGroup(5);
+    R:=RelatorsOfFpGroup(R);
+    Q:=FreeGroup(5);
     R:=Evaluate(R,List([1,1,2,3],i->Q.i));
     Add(R,Q.4);
     Add(R,Q.5);
-    return rec(val1:=Q,
-      val2:=R);
+    return Q/R;
   fi;
-  # =v= MULTIASSIGN =v=
   R:=Setup_OmegaPresentation(d,q);
-  P:=R.val1;
-  R:=R.val2;
-  # =^= MULTIASSIGN =^=
+  P:=FreeGroupOfFpGroup(R);
+  R:=RelatorsOfFpGroup(R);
   if Presentation then
-    return rec(val1:=P,
-      val2:=R);
+    return P/R;
   fi;
-  # =v= MULTIASSIGN =v=
   Rels:=OmegaConvertToStandard(d,q,R);
-  S:=Rels.val1;
-  Rels:=Rels.val2;
-  # =^= MULTIASSIGN =^=
+  S:=FreeGroupOfFpGroup(Rels);
+  Rels:=RelatorsOfFpGroup(Rels);
   Rels:=Filtered(Rels,w->w<>w^0);
-  return rec(val1:=S,
-    val2:=Rels);
+  return S/Rels;
 end;
 
 #   relations are on presentation generators;
-#  convert to relations on standard generators 
+#  convert to relations on standard generators
 InstallGlobalFunction(OmegaConvertToStandard,
 function(d,q,Rels)
 local A,B,C,Rels,T,U,W,tau;
   A:=OmegaStandardToPresentation(d,q);
+  ## TODO Not sure how to translate <Evaluate>
   Rels:=Evaluate(Rels,A);
   B:=OmegaPresentationToStandard(d,q);
   C:=Evaluate(B,A);
+  ## TODO Not sure how to translate <Universe>
   U:=Universe(C);
   W:=Universe(Rels);
   tau:=GroupHomomorphismByImages(U,W,
-    GeneratorsOfGroup(U),List([1..Ngens(W)],i->W.i));
-  T:=List([1..Ngens(W)],i->W.i^-1*tau(C[i]));
+    GeneratorsOfGroup(U),List([1..Size(GeneratorsOfGroup(W))],i->W.i));
+  T:=List([1..Size(GeneratorsOfGroup(W))],i->W.i^-1*tau(C[i]));
   Rels:=Concatenation(Rels,T);
-  return rec(val1:=W,
-    val2:=Rels);
+  return W/Rels;
 end);
 
 #   word for Delta in Sp(4, 9) generated by 5 specific elements
 SpecialWordForDelta:=function()
-local 
+local
    G,w1,w10,w103,w104,w105,w106,w107,w108,w109,w11,w12,w13,w14,w15,w16,w17,w18,
    w19,w2,w20,w21,w22,w23,w24,w25,w26,w27,w28,w29,w3,w30,w31,w32,w33,w34,w35,
    w36,w37,w38,w39,w4,w45,w5,w52,w57,w58,w59,w6,w60,w61,w7,w8,w9;
-  G:=SLPGroup(5);
+  G:=FreeGroup(5);
   w10:=G.4*G.5;
   w103:=w10*G.5;
   w7:=G.3*G.1;
@@ -402,12 +386,12 @@ end;
 
 #   word for Delta for q = 1 mod 4 and q not equal to 9
 WordForDelta:=function(d,q)
-local 
+local
    A,B,C,Delta2,varE,F,I,Special_OmegaStandardToPresentation,U,V,W,varZ,a,b,c,e,
    sigma,tau,w,w_Delta,words;
   Special_OmegaStandardToPresentation:=function(d,q)
   local U,V,W,varZ,delta,p,s,sigma,t,tau;
-    W:=SLPGroup(5);
+    W:=FreeGroup(5);
     s:=W.1;
     t:=W.2;
     delta:=W.3;
@@ -425,7 +409,7 @@ local
     return [Comm(delta^V,U),varZ,tau,sigma,U,V];
   end;
 
-  W:=SLPGroup(6);
+  W:=FreeGroup(6);
   #   Delta2 = Delta^2
   Delta2:=W.1;
   varZ:=W.2;
@@ -434,9 +418,11 @@ local
   U:=W.5;
   V:=W.6;
   F:=GF(q);
-  e:=Degree(F);
+  e:=Size(F);
   w:=PrimitiveElement(F);
-  I:=Integers();
+  ##
+  ## TODO Need Magma documentation
+  ##
   varE:=SubStructure(F,w^4);
   c:=Eltseq((-w^3)*FORCEOne(varE));
   c:=List(c,x->x*FORCEOne(I));
@@ -453,11 +439,11 @@ local
   return w_Delta;
 end;
 
-#   express presentation generators as words in standard generators 
+#   express presentation generators as words in standard generators
 InstallGlobalFunction(OmegaStandardToPresentation,
 function(d,q)
 local Delta,U,V,W,varZ,delta,gens,p,s,sigma,t,tau;
-  W:=SLPGroup(5);
+  W:=FreeGroup(5);
   s:=W.1;
   t:=W.2;
   delta:=W.3;
@@ -481,17 +467,18 @@ local Delta,U,V,W,varZ,delta,gens,p,s,sigma,t,tau;
     lvarDelta:=Evaluate(lvarDelta,gens);
   else
     lvarDelta:=WordForDelta(d,q);
-    #   ensure Delta is in the correct SLPGroup
+    #   ensure Delta is in the correct FreeGroup
+    ## TODO Evaluate again
     lvarDelta:=Evaluate(lvarDelta,List([1..5],i->W.i));
   fi;
   return [lvarDelta,varZ,tau,sigma,U,V];
 end);
 
-#   express standard generators as words in presentation generators 
+#   express standard generators as words in presentation generators
 InstallGlobalFunction(OmegaPresentationToStandard,
 function(d,q)
 local Delta,U,V,W,varZ,sigma,t,tau;
-  W:=SLPGroup(6);
+  W:=FreeGroup(6);
   lvarDelta:=W.1;
   varZ:=W.2;
   tau:=W.3;
@@ -507,5 +494,3 @@ local Delta,U,V,W,varZ,sigma,t,tau;
   #   return [s, t, delta, V, U]
   return [varZ^(V^-1),t,Comm(varZ,lvarDelta^-1)^(V^-1),V,U];
 end);
-
-
