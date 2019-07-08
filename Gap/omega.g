@@ -37,6 +37,8 @@ local Presentation,Projective,Type;
    :Projective:=Projective,Presentation:=Presentation,Type:=Type);
 end;
 
+# TODO: fix multiple definition of same function
+
 Internal_StandardPresentationForOmega:=function(d,q)
 #  -> ,GrpSLP ,[ ,]  return standard presentation for Omega ( d , q )
 local Presentation,Projective,Type;
@@ -52,7 +54,7 @@ local Presentation,Projective,Type;
   if Type=fail then
     Type:="Omega+";
   fi;
-  if not IsPrimePower(q) then
+  if Size(DuplicateFreeList(Factors(q))) > 1 then
     Error("Field size is not valid");
   fi;
   if Type="Omega" then
@@ -67,17 +69,15 @@ local Presentation,Projective,Type;
       if not IsEvenInt(d) and d >= 4 then
       Error("Degree must be even and at least 4");
     fi;
-    return 
+    return
      PlusPresentation(d,q:Projective:=Projective,Presentation:=Presentation);
   elif Type="Omega-" then
       if not IsEvenInt(d) and d >= 4 then
       Error("Degree must be even and at least 4");
     fi;
-    return 
+    return
      MinusPresentation(d,q:Projective:=Projective,Presentation:=Presentation);
   else
     Error("Invalid input");
   fi;
 end;
-
-
