@@ -2,7 +2,7 @@
 #  Magma -> GAP converter, version 0.5, 11/5/18 by AH
 
 #  Global Variables used: Evaluate, Gcd, Internal_StandardPresentationForSU,
-#  IsEven, IsOdd, IsPrimePower, Ngens, SLPGroup, SUConvertToStandard,
+#  IsEven, IsOdd, IsPrimePower, Ngens, FreeGroup, SUConvertToStandard,
 #  SUGeneratorOfCentre, SUPresentationToStandard, SUStandardToPresentation,
 #  Universe, Valuation, tau
 
@@ -75,70 +75,62 @@ local P,Presentation,Projective,R,Rels,S,z;
   if not d > 2 then
     Error("Degree must be at least 3");
   fi;
-  if not IsPrimePower(q) then
+  if Size(DuplicateFreeList(Factors(q))) > 1 then
     Error("Field size is not valid");
   fi;
   if d=3 and q=2 then
     return SU32Presentation(:Projective:=Projective);
   elif IsOddInt(d) then
-    # =v= MULTIASSIGN =v=
     R:=OddSUPresentation(d,q);
-    P:=R.val1;
-    R:=R.val2;
-    # =^= MULTIASSIGN =^=
+    P:=FreeGroupOfFpGroup(R);
+    R:=RelatorsOfFpGroup(R);
   else
-    # =v= MULTIASSIGN =v=
     R:=EvenSUPresentation(d,q);
-    P:=R.val1;
-    R:=R.val2;
-    # =^= MULTIASSIGN =^=
+    P:=FreeGroupOfFpGroup(R);
+    R:=RelatorsOfFpGroup(R);
   fi;
   if Projective and Gcd(d,q+1) > 1 then
     z:=SUGeneratorOfCentre(d,q,P);
     R:=Concatenation(R,[z]);
   fi;
   if Presentation then
-    return rec(val1:=P,
-      val2:=R);
+    return P/R;
   fi;
-  # =v= MULTIASSIGN =v=
   Rels:=SUConvertToStandard(d,q,R);
-  S:=Rels.val1;
-  Rels:=Rels.val2;
-  # =^= MULTIASSIGN =^=
+  S:=FreeGroupOfFpGroup(Rels);
+  Rels:=RelatorsOfFpGroup(Rels);
   Rels:=Filtered(Rels,w->w<>w^0);
-  return rec(val1:=S,
-    val2:=Rels);
+  return S/Rels;
 end;
 
 #   relations are on presentation generators;
-#  convert to relations on standard generators 
+#  convert to relations on standard generators
 InstallGlobalFunction(SUConvertToStandard,
 function(d,q,Rels)
-local A,B,C,Rels,T,U,W,tau;
+local A,B,C,T,U,W,tau;
   if d=3 and q=2 then
-    return rec(val1:=Universe(Rels),
-      val2:=Rels);
+      ## TODO What is universe?
+    return Universe(Rels)/Rels;
   fi;
   A:=SUStandardToPresentation(d,q);
+  # TODO What is evaluate
   Rels:=Evaluate(Rels,A);
   B:=SUPresentationToStandard(d,q);
   C:=Evaluate(B,A);
   U:=Universe(C);
   W:=Universe(Rels);
   tau:=GroupHomomorphismByImages(U,W,
-    GeneratorsOfGroup(U),List([1..Ngens(W)],i->W.i));
-  T:=List([1..Ngens(W)],i->W.i^-1*tau(C[i]));
+    GeneratorsOfGroup(U),List([1..Size(GeneratorsOfGroup(W))],i->W.i));
+  T:=List([1..Size(GeneratorsOfGroup(W))],i->W.i^-1*Image(tau,C[i]));
   Rels:=Concatenation(Rels,T);
-  return rec(val1:=W,
-    val2:=Rels);
+  return W/Rels;
 end);
 
 #   return presentation generators as words in standard generators
 InstallGlobalFunction(SUStandardToPresentation,
 function(d,q)
-local Delta,Gamma,P,S,U,V,W,varZ,delta,rest,s,sigma,t,tau,v,x,y;
-  W:=SLPGroup(7);
+local lvarDelta,lvarGamma,P,S,U,V,W,varZ,delta,rest,s,sigma,t,tau,v,x,y;
+  W:=FreeGroup(7);
   S:=List([1..7],i->W.i);
   if IsEvenInt(d) then
     varZ:=S[1];
@@ -189,9 +181,9 @@ end);
 #   return standard generators as sequence [s, V, t, delta, U, x, y]
 InstallGlobalFunction(SUPresentationToStandard,
 function(d,q)
-local Delta,Gamma,P,S,U,V,W,varZ,delta,sigma,t,tau,v;
+local lvarDelta,lvarGamma,P,S,U,V,W,varZ,delta,sigma,t,tau,v;
   if d=3 then
-    W:=SLPGroup(4);
+    W:=FreeGroup(4);
     P:=List([1..4],i->W.i);
     if IsOddInt(q) then
       return [P[3]^(QuoInt((q+1),2))*P[4],P[1]^0,P[2],P[3]^(q+1),P[1]^0,P[1]
@@ -200,7 +192,7 @@ local Delta,Gamma,P,S,U,V,W,varZ,delta,sigma,t,tau,v;
       return [P[4],P[4]^0,P[2],P[3]^(q+1),P[3]^0,P[1],P[3]];
     fi;
   fi;
-  W:=SLPGroup(7);
+  W:=FreeGroup(7);
   P:=List([1..7],i->W.i);
   if IsEvenInt(d) then
     varZ:=P[1];
@@ -238,7 +230,7 @@ end);
 #   construct generator of centre of SU(d, q) as SLP in presentation generators
 InstallGlobalFunction(SUGeneratorOfCentre,
 function(d,q,F)
-local Delta,Gamma,U,V,varZ,a,b,n,t,z;
+local lvarDelta,lvarGamma,U,V,varZ,a,b,n,t,z;
   if Gcd(d,q+1)=1 then
     return F.0;
   fi;
@@ -273,5 +265,3 @@ local Delta,Gamma,U,V,varZ,a,b,n,t,z;
   fi;
   return z;
 end);
-
-
