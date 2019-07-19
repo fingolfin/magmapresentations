@@ -1,0 +1,12 @@
+Things to change in many files:
+
+1. What to do with multiple definitions of the same func?
+2. What does <Evaluate> do?
+3. What does <Universe? do?
+4. How to implement <InsertBlock>?
+5. What does <Trace(RingElt, field)> do?
+6. What does <SubStructure> do?
+7. How to implement Log with finite field elts?
+8. What does <IsPower(RingElt, Integer)> do?
+
+The file su3 needs looking at in more detail - there are functions such as MatrixToTuple and TupleToMatrix that I think will require more thought to change. 
