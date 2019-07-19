@@ -63,6 +63,8 @@ local q;
   fi;
 end;
 
+## TODO Fix duplicate fuction definition here
+
 Internal_PresentationGenerators:=function(type,d,q)
 #  -> ,]  return the Leedham - Green and O ' Brien presentation generators for
 #  the quasisimple classical group of specified type in dimension d over field
@@ -110,6 +112,8 @@ local PresentationGenerators,Projective;
   return ClassicalStandardPresentation(type,d,GF(q)
    :Projective:=Projective,PresentationGenerators:=PresentationGenerators);
 end;
+
+# TODO Fix duplicate function definition
 
 ClassicalStandardPresentation:=function(type,d,F)
 #  -> ,GrpSLP ,[ ,]  return the Leedham - Green and O ' Brien presentation on

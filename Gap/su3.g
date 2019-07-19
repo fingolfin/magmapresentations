@@ -1,6 +1,8 @@
 #  File converted from Magma code -- requires editing and checking
 #  Magma -> GAP converter, version 0.5, 11/5/18 by AH
 
+# Partially checked (up to line 409) MW 19/07/19
+
 #  Global Variables used: Append, BaseRing, BorelGenerators, BorelPresentation,
 #  Characteristic, ChooseGamma, Coefficients, ComputeRight, ConstructTauMatrix,
 #  ConstructVMatrix, DefineU0, Degree, DeltaMatrix, DiagonalMatrix, Eltseq,

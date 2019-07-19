@@ -1,6 +1,9 @@
 #  File converted from Magma code -- requires editing and checking
 #  Magma -> GAP converter, version 0.5, 11/5/18 by AH
 
+# File checked and edited by MW 05/07/19
+# Some issues remain - marked with TODO
+
 #  Global Variables used: Append, Characteristic, ClassicalStandardGenerators,
 #  ClassicalStandardPresentation, Degree, Eltseq, Evaluate, Factorial, GF, GL,
 #  Identity, Integers, IsOdd, IsPrime, IsPrimePower, LHS, MatrixAlgebra, Ngens,
@@ -73,17 +76,9 @@ local F,R,R1,Rels,S,U,V,varZ,phi;
   varZ:=F.1;
   U:=F.2;
   V:=F.3;
-  # =v= MULTIASSIGN =v=
-  # TODO I'm not sure how to implement this in GAP
-  # I think that it actually gives the presentation of the signed perms group
-  # on n points. This is easy to find e.g. at
-  # https://groupprops.subwiki.org/wiki/Signed_symmetric_group_of_finite_degree_is_a_Coxeter_group
-  # but this is given on n generators so I am not sure how we do with only two
-  # generators as seems to be required by the definition of <phi>
   R:=SignedPermutations(n);
-  S:=R.val1;
-  R:=R.val2;
-  # =^= MULTIASSIGN =^=
+  S:=FreeGroupOfFpGroup(R);
+  R:=RelatorsOfFpGroup(R);
   phi:=GroupHomomorphismByImages(S,F,
     GeneratorsOfGroup(S),
     [U,V]);
@@ -153,7 +148,7 @@ end;
 
 Setup_OmegaPresentation:=function(d,q)
 local
-   Delta,F,I,R1,R2,R3,R4,R5,R6,Rels,S,U,V,W,varZ,b,e,f,n,p,phi,sigma,tau,w,x;
+   lvarDelta,F,I,R1,R2,R3,R4,R5,R6,Rels,S,U,V,W,varZ,b,e,f,n,p,phi,sigma,tau,w,x;
   Assert(1,IsOddInt(d));
   Assert(1,IsOddInt(q));
   n:=QuoInt(d,2);
@@ -161,12 +156,12 @@ local
   F:=GF(q);
   w:=PrimitiveElement(F);
   e := Factors(q);
-  if Size(DuplicateFreeList(f)) > 1 then
+  if Size(DuplicateFreeList(e)) > 1 then
       f := false;
   else
       f := true;
-      p := f[1];
-      e := Size(f);
+      p := e[1];
+      e := Size(e);
   fi;
   F:=FreeGroup(6);
   lvarDelta:=F.1;
@@ -193,8 +188,8 @@ local
       [varZ,U,V]);
   else
     R1:=Omega_PresentationForN(n,q);
-    S:=FreeGroupOfFpGroup(R);
-    R:=RelatorsOfFpGroup(R);
+    S:=FreeGroupOfFpGroup(R1);
+    R1:=RelatorsOfFpGroup(R1);
     phi:=GroupHomomorphismByImages(S,F,
       GeneratorsOfGroup(S),
       [lvarDelta,varZ,U,V]);
@@ -305,7 +300,7 @@ end;
 #  convert to relations on standard generators
 InstallGlobalFunction(OmegaConvertToStandard,
 function(d,q,Rels)
-local A,B,C,Rels,T,U,W,tau;
+local A,B,C,T,U,W,tau;
   A:=OmegaStandardToPresentation(d,q);
   ## TODO Not sure how to translate <Evaluate>
   Rels:=Evaluate(Rels,A);
@@ -442,7 +437,7 @@ end;
 #   express presentation generators as words in standard generators
 InstallGlobalFunction(OmegaStandardToPresentation,
 function(d,q)
-local Delta,U,V,W,varZ,delta,gens,p,s,sigma,t,tau;
+local lvarDelta,U,V,W,varZ,delta,gens,p,s,sigma,t,tau;
   W:=FreeGroup(5);
   s:=W.1;
   t:=W.2;
@@ -477,7 +472,7 @@ end);
 #   express standard generators as words in presentation generators
 InstallGlobalFunction(OmegaPresentationToStandard,
 function(d,q)
-local Delta,U,V,W,varZ,sigma,t,tau;
+local lvarDelta,U,V,W,varZ,sigma,t,tau;
   W:=FreeGroup(6);
   lvarDelta:=W.1;
   varZ:=W.2;
