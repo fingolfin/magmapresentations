@@ -521,17 +521,28 @@ local P,Presentation,Projective,R,Rels,S,n,z;
   return S/Rels;
 end;
 
+#  don't know if this is really necessary
+#  I need this function to get the list of letters of the words for MappedWord (see below)
+WriteGenerators:=function(R)
+local fam, F;
+  fam:=FamilyObj(R[1]);
+  F:=fam!.freeGroup;
+  return GeneratorsOfGroup(F);
+end;
+
+
 #   relations are on presentation generators;
 #  convert to relations on standard generators
 InstallGlobalFunction(PlusConvertToStandard,
 function(d,q,Rels)
 local A,B,C,T,U,W,tau;
   A:=PlusStandardToPresentation(d,q);
-  # TODO How to implement evaluate
-  Rels:=Evaluate(Rels,A);
+  # was "Rels:=Evaluate(Rels,A);"
+  Rels:=List(Rels, w-> MappedWord(w, WriteGenerators(Rels), A);
   B:=PlusPresentationToStandard(d,q);
   # TODO How to implement evaluate
-  C:=Evaluate(B,A);
+  # was "C:=Evaluate(B,A);"
+  C:=List(B, w-> MappedWord(w, WriteGenerators(B), A);
   # TODO How to implement universe
   U:=Universe(C);
   W:=Universe(Rels);
