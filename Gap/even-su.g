@@ -278,12 +278,12 @@ local
   if (q<>3) then
     varE:=GF(q^2);
     # Implicit generator Assg from previous line.
-    ## TODO What does varE.1 access? Is it PrimitiveElement(varE)?
-    w:=varE.1;
+    # was  "w:=varE.1;"
+    w:=PrimitiveElement(varE);
     w0:=w^(q+1);
     a:=w^(2*q)+w^2;
-    ## TODO How do we do Log for finite fields?
-    m:=Log(w0,a);
+    # was "m:=Log(w0,a);"
+    m:=LogFFE(a,w0);
     Add(R3,Comm(sigma^lvarDelta,sigma^varZ)/tau^(varZ*U*lvarDelta^m))
      ;
   else
