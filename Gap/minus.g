@@ -343,7 +343,7 @@ local F,OMIT,R,R1,R2,R3,R4,R5,Rels,S,U,V,W,delta,e,f,n,p,phi,sigma,tau,z;
 end;
 
 MinusPresentation:=function(d,q)
-local P,Presentation,Projective,Q,R,Rels,S,n,z;
+local gens,P,Presentation,Projective,Q,R,Rels,S,n,z;
   Projective:=ValueOption("Projective");
   if Projective=fail then
     Projective:=false;
@@ -357,14 +357,17 @@ local P,Presentation,Projective,Q,R,Rels,S,n,z;
   n:=QuoInt(d,2);
   if d=4 then
     R:=ClassicalStandardPresentation("SL",2,q^2:Projective:=true);
+    # added variable "gen" for function MappedWord below
+    gens:=GeneratorsOfGroup(FreeGroupOfFpGroup(R));
     R:=RelatorsOfFpGroup(R);
     Q:=FreeGroup(5);
     if IsEvenInt(q) then
-    ## TODO What is evaluate?
-      R:=Evaluate(R,[Q.1^Q.2,Q.1^Q.2,Q.1,Q.3]);
+      # was "R:=Evaluate(R,[Q.1^Q.2,Q.1^Q.2,Q.1,Q.3]);"
+      R:=List(R, w -> MappedWord(w, gens, [Q.1^Q.2,Q.1^Q.2,Q.1,Q.3]));
       Add(R,(Q.1*Q.1^Q.2*Q.1)*Q.2^-1);
     else
-      R:=Evaluate(R,List([1,1,2,3],i->Q.i));
+      # was "R:=Evaluate(R,List([1,1,2,3],i->Q.i));"
+      R:=List(R, w -> MappedWord(w, gens, List([1,1,2,3],i->Q.i)));
     fi;
     Add(R,Q.4);
     Add(R,Q.5);
@@ -443,8 +446,8 @@ local lvarDelta,F,U,V,W,delta,m,p,s,sigma,t,tau,w,w0,x,z;
     F:=GF(q^2);
     w:=PrimitiveElement(F);
     w0:=w^(q+1);
-    ## TODO How do we do log over finite fields?
-    m:=Log(w0,w^2+w^(2*q));
+    # was "m:=Log(w0,w^2+w^(2*q));"
+    m:=LogFFE(w^2+w^(2*q), w0);
     x:=Comm(tau^delta,tau^U)^(z*U);
     sigma:=x^(lvarDelta^(q-m));
   fi;
@@ -505,7 +508,7 @@ local V,delta,n,z;
   else
     # TODO Not sure if this is right
     # WAS: z:=F.0;
-    z:=Zero(F);
+    z:=Identity(F);
   fi;
   return z;
 end);
