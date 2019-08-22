@@ -30,7 +30,7 @@ DeclareGlobalFunction("PlusPresentationToStandard");
 #  Forward declaration of PlusStandardToPresentation
 #  Forward declaration of PlusPresentationToStandard
 OmegaPlus4:=function(q)
-local F,Projective,S,T,Y,d,d1,gens,rels,s,s1,t,t1,v,x,y;
+local F,Projective,S,T,Y,d,d1,gens,gog,rels,s,s1,t,t1,v,x,y;
   Projective:=ValueOption("Projective");
   if Projective=fail then
     Projective:=false;
@@ -48,15 +48,18 @@ local F,Projective,S,T,Y,d,d1,gens,rels,s,s1,t,t1,v,x,y;
   rels:=[F.7];
   #   sl2 presentation on s, t, d
   S:=ClassicalStandardPresentation("SL",2,q);
+  # need the variable "gog" (Generators Of Group) for the function MappedWord below
+  gog:=GeneratorsOfGroup(FreeGroupOfFpGroup(S));
   Y:=FreeGroupOfFpGroup(S);
   S:=RelatorsOfFpGroup(S);
   gens:=[s,s,t,d,s^0,s^0,s^0,s^0];
-  # TODO how to implement evaluate?
-  T:=Evaluate(S,gens);
+  # was "T:=Evaluate(S,gens);"
+  T:=List(S, w -> MappedWord(w, gog, gens));
   rels:=Concatenation(rels,T);
   #   sl2 presentation on s1, t1, d1
   gens:=[s1,s1,t1,d1,s1^0,s1^0,s1^0,s1^0];
-  T:=Evaluate(S,gens);
+  # was "T:=Evaluate(S,gens);"
+  T:=List(S, w -> MappedWord(w, gog, gens));
   rels:=Concatenation(rels,T);
   for x in [s,t,d] do
     for y in [s1,t1,d1] do
@@ -610,8 +613,9 @@ local lvarDelta,V,varZ,n,z;
       z:=(V*varZ*lvarDelta)^(QuoInt(n*(q-1),4));
     fi;
   else
-     # TODO What is this syntax in Magma?
-    z:=F.0;
+     # TODO Not sure it is correct
+    # was "z:=F.0;"
+    z:=Identity(F);
   fi;
   return z;
 end);
