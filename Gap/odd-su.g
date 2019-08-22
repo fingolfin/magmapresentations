@@ -37,8 +37,8 @@ local F,lvarGamma,S,U,V,alpha,gamma,i,phi,psi,sigma,t,tau,v,w,x;
   #   define v
   alpha:=1;
   if IsEvenInt(q) then
-    ## TODO Don't know how to implement Trace
-    phi:=Trace(w,GF(q))^(-1)*w;
+    # was "phi:=Trace(w,GF(q))^(-1)*w;"
+    phi:=Trace(F,GF(q),w)^(-1)*w;
     Assert(1,phi=w/(w+w^q));
   else
     phi:=-1/2;
@@ -237,13 +237,15 @@ local
   Add(R4,Comm(v,sigma));
   if IsOddInt(q) then
     a:=(w^(QuoInt(-(q+1),2)))/2;
-    ## TODO How do we do log?
-    r:=Log(a);
+    ## TODO Not sure if it is right
+    # was "r:=Log(a);"
+    r:=LogFFE(a,w);
     rhs:=sigma^(lvarGamma^r*varZ^U)*(v^-1)^U;
   else
     a:=w^q/(w+w^q);
-    ## TODO How do we do log?
-    r:=Log(a);
+    ## TODO Not sure if it is right
+    # was "r:=Log(a);"
+    r:=LogFFE(a,w);
     rhs:=sigma^(lvarGamma^r*varZ^U)*(v^U);
   fi;
   Add(R4,Comm(v,sigma^U)/rhs);
@@ -269,8 +271,8 @@ local
     w:=varE.1;
     w0:=w^(q+1);
     a:=w^(2*q)+w^2;
-    ## TODO How do we do log?
-    m:=Log(w0,a);
+    # was "m:=Log(w0,a);"
+    m:=LogFFE(a,w0);
     Add(R3,Comm(sigma^lvarDelta,sigma^varZ)/tau^(varZ*U*lvarDelta^m))
      ;
   else
