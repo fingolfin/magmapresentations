@@ -59,9 +59,8 @@ local F,lvarGamma,S,U,V,alpha,gamma,i,phi,psi,sigma,t,tau,v,w,x;
   S:=ClassicalStandardGenerators("SU",d-1,q);
   x:=S[6]^(S[2]^2);
   sigma:=NullMat(d,d,F);
-  ## TODO What does InsertBlock do?
-  ## TILDE just means change sigma in situ
-  InsertBlock(TILDEsigma,x,1,1);
+  # was "InsertBlock(TILDEsigma,x,1,1);"
+  sigma{[1..NrRows(x)]}{[1..NrCols(x)]}:=x;
   sigma[d][d]:=1;
   return [lvarGamma,t,U,V,sigma,tau,v];
 end;
