@@ -538,11 +538,11 @@ function(d,q,Rels)
 local A,B,C,T,U,W,tau;
   A:=PlusStandardToPresentation(d,q);
   # was "Rels:=Evaluate(Rels,A);"
-  Rels:=List(Rels, w-> MappedWord(w, WriteGenerators(Rels), A);
+  Rels:=List(Rels, w-> MappedWord(w, WriteGenerators(Rels), A));
   B:=PlusPresentationToStandard(d,q);
   # TODO How to implement evaluate
   # was "C:=Evaluate(B,A);"
-  C:=List(B, w-> MappedWord(w, WriteGenerators(B), A);
+  C:=List(B, w-> MappedWord(w, WriteGenerators(B), A));
   # TODO How to implement universe
   U:=Universe(C);
   W:=Universe(Rels);
