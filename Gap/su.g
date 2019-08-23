@@ -103,6 +103,15 @@ local P,Presentation,Projective,R,Rels,S,z;
   return S/Rels;
 end;
 
+#  don't know if this is really necessary
+#  I need this function to get the list of letters of the words for MappedWord (see below)
+WriteGenerators:=function(R)
+local fam, F;
+  fam:=FamilyObj(R[1]);
+  F:=fam!.freeGroup;
+  return GeneratorsOfGroup(F);
+end;
+
 #   relations are on presentation generators;
 #  convert to relations on standard generators
 InstallGlobalFunction(SUConvertToStandard,
@@ -113,10 +122,11 @@ local A,B,C,T,U,W,tau;
     return Universe(Rels)/Rels;
   fi;
   A:=SUStandardToPresentation(d,q);
-  # TODO What is evaluate
-  Rels:=Evaluate(Rels,A);
+  # was "Rels:=Evaluate(Rels,A);"
+  Rels:=List(Rels, w -> MappedWord(w, WriteGenerators(Rels), A));
   B:=SUPresentationToStandard(d,q);
-  C:=Evaluate(B,A);
+  # was "C:=Evaluate(B,A);"
+  C:=List(B, w -> MappedWord(w, WriteGenerators(B), A));
   U:=Universe(C);
   W:=Universe(Rels);
   tau:=GroupHomomorphismByImages(U,W,
