@@ -31,8 +31,8 @@ local F,beta,psi,v,w;
   F:=GF(q^2);
   w:=PrimitiveElement(F);
   if IsEvenInt(q) then
-     ## TODO Don't know how to implement Trace
-    psi:=Trace(w,GF(q))^(-1)*w;
+    # was "psi:=Trace(w,GF(q))^(-1)*w;"
+    psi:=Trace(F,GF(q),w)^(-1)*w;
     Assert(1,psi=1/(1+w^(q-1)));
   else
     psi:=(-1/2)*w^0;
@@ -71,8 +71,7 @@ local F,alpha,beta,delta,tau,v,w;
   v:=VMatrix(q,1,0);
   beta:=v[1][3];
   alpha:=v[1][2];
-  ## TODO Don't know how to implement Trace
-  Assert(1,Trace(beta,GF(q))=-alpha^(q+1));
+  Assert(1,Trace(F,GF(q),beta)=-alpha^(q+1));
   if IsEvenInt(q) then
     tau:=TauMatrix(q,1);
   else
@@ -130,8 +129,8 @@ local lvarDelta,F,Gens,R,lvarTau,V,c,delta,entry,g,matrix,tau,theta,v,w,word,z;
     theta:=w^-(q+1);
     ## TODO What is SubStructure
     R:=SubStructure(F,theta);
-    ## TODO What is Eltseq
-    c:=Eltseq((entry^-1*z)*FORCEOne(R));
+    # was "c:=Eltseq((entry^-1*z)*FORCEOne(R));"
+    c:=Coefficients(Basis(F), (entry^-1*z)*FORCEOne(R));
     c:=List(c,x->Int(x));
     word:=Product(List([1..Size(c)],i->(tau^(delta^(i-1)))^c[i]));
     matrix:=Product(List([1..Size(c)],i->(lvarTau^(lvarDelta^(i-1)))^c[i]));
@@ -153,8 +152,8 @@ local F,c,d,found,m,n,psi,t,w,w0,x,y;
   w0:=w^(q+1);
   if IsEvenInt(q) then
     x:=-(q+1) mod (q^2-1);
-    # TODO How do we implement Log for elts of finite field?
-    c:=Log(w0,(1-w0)^Z(q)^0);
+    # was "c:=Log(w0,(1-w0)^Z(q)^0);"
+    c:=Log((1-w0)^Z(q)^0,w0);
     y:=-c*(q+1) mod (q^2-1);
     Assert(1,w^(x*m)+w^(y*m)=1 and w^(-x*n)+w^(-y*n)=1);
     # TODO What is SubStructure?
@@ -174,9 +173,9 @@ local F,c,d,found,m,n,psi,t,w,w0,x,y;
     if c=0 or d=0 then
       continue;
     fi;
-    # TODO Log problem
-    x:=-Log(c) mod (q^2-1);
-    y:=-Log(d) mod (q^2-1);
+    # was "x:=-Log(c) mod (q^2-1);"
+    x:=-LogFFE(c,w) mod (q^2-1);
+    y:=-LogFFE(d,w) mod (q^2-1);
     if w^(x*m)+w^(y*m)=1 and w^(-x*n)+w^(-y*n)=1 then
     # TODO SubStructure problem
       found:=Size(SubStructure(GF(q^2),w^(x*m)))=q^2 and
@@ -207,10 +206,10 @@ local P,W,e,g,h,l,one,r,two;
   one:=w^((q+1)*(q-2));
   two:=(w^(2*q-4)-one)*w^-(q-2);
   if one in W and two in W then
-    ## TODO What is Eltseq
-    g:=Eltseq(one*FORCEOne(W))*FORCEOne(P);
-    h:=Eltseq(two*FORCEOne(W))*FORCEOne(P);
-    ## TODO What is evaluate?
+    # was "g:=Eltseq(one*FORCEOne(W))*FORCEOne(P);"
+    g:=Coefficients(Basis(F),one*FORCEOne(W))*FORCEOne(P);
+    h:=Coefficients(Basis(F),two*FORCEOne(W))*FORCEOne(P);
+    ## TODO What is evaluate? g and h are lists of values, not functions...
     if w^(2*q-4)=Evaluate(g,r)+w^(q-2)*Evaluate(h,r) then
     ## TODO Not sure what this func should be returning
       return rec(val1:=g,
@@ -223,9 +222,9 @@ local P,W,e,g,h,l,one,r,two;
       z->z+w^(q-2)*u=w^(2*q-4))));
   one:=pair[1];
   two:=pair[2];
-  ## TODO What is Eltseq
-  g:=Eltseq(one*FORCEOne(W))*FORCEOne(P);
-  h:=Eltseq(two*FORCEOne(W))*FORCEOne(P);
+  # was "g:=Eltseq(one*FORCEOne(W))*FORCEOne(P);"
+  g:=Coefficients(Basis(F),one*FORCEOne(W))*FORCEOne(P);
+  h:=Coefficients(Basis(F),two*FORCEOne(W))*FORCEOne(P);
   Assert(1,w^(2*q-4)=Evaluate(g,r)+w^(q-2)*Evaluate(h,r));
   ## TODO Not sure what this func should be returning
   return rec(val1:=g,
@@ -291,8 +290,9 @@ local
   if e=1 or Gcd(x,q^2-1) > 1 then
      ## TODO SubStructure
     K:=SubStructure(F,w0^-x);
-    ## TODO Eltseq
-    b2:=Eltseq((w0^-1)*FORCEOne(K));
+     ## TODO not 100% sure that the field is varE in the fuction Coefficients below.
+    # was "b2:=Eltseq((w0^-1)*FORCEOne(K));"
+    b2:=Coefficients(Basis(varE),(w0^-1)*FORCEOne(K));
     b2:=List(b2,Int);
     Add(Rels,Product(List([1..Size(b2)],i->(tau^(a^(i-1)))^b2[i])
      /tau^(delta)));
@@ -335,8 +335,9 @@ local
   if IsOddInt(q) and Gcd(x,q^2-1) > 1 then
       ## TODO SubStructure
     K:=SubStructure(varE,w^(x*(q-2)));
-    ## TODO Eltseq
-    b:=Eltseq((w^(q-2))*FORCEOne(K));
+      ## not 100% sure the field is is varE
+    # was "b:=Eltseq((w^(q-2))*FORCEOne(K));"
+    b:=Coefficients(Basis(varE), (w^(q-2))*FORCEOne(K));
     b:=List(b,Int);
     L:=V^(lvarDelta);
     R:=Product(List([1..Size(b)],i->(V^(A^(i-1)))^b[i]));
@@ -368,12 +369,12 @@ end;
 
 ChooseGamma:=function(q,beta,eta,w,zeta)
 local gamma,t,x;
-## TODO Trace
-  Assert(1,Trace(eta,GF(q))<>0);
-  Assert(1,Trace(beta,GF(q))<>0);
-  t:=Trace(beta,GF(q))*Trace(eta,GF(q))^-1;
+  Assert(1,Trace(GF(q^2),GF(q),eta)<>0);
+  # was "Assert(1,Trace(beta,GF(q))<>0);"
+  Assert(1,Trace(GF(q^2),GF(q),beta)<>0);
+  t:=Trace(GF(q^2),GF(q),beta)*Trace(GF(q^2),GF(q),eta)^-1;
   gamma:=t*eta-beta;
-  Assert(1,Trace(gamma,GF(q))=0);
+  Assert(1,Trace(GF(q^2),GF(q),gamma)=0);
   x:=(w*zeta^-1)*(beta+gamma);
   Assert(1,x in GF(q) and x<>0);
   return gamma;
@@ -386,17 +387,15 @@ local Alpha,F,alpha,beta0,eta,gamma0,n,t,w,w0,zeta;
   w:=PrimitiveElement(F);
   w0:=w^(q+1);
   beta0:=w^(1+QuoInt((q^2+q),2));
-  ## TODO Trace
-  t:=Trace(beta0,GF(q));
-  ## TODO Log
-  n:=Log(w0*FORCEOne(GF(q)),-t*FORCEOne(GF(q)));
+  t:=Trace(F,GF(q),beta0);
+  n:=Log(-t*FORCEOne(GF(q)), w0*FORCEOne(GF(q)));
   alpha:=w^n;
   Assert(1,alpha^(q+1)=-t);
   if q mod 3<>2 then
     lvarAlpha:=[alpha];
   else
     lvarAlpha:=[alpha,alpha*w^(q-1),alpha*w^(2*(q-1))];
-    ## TODO Not sure what IsPower does here
+    ## TODO Aren't the last two conditions equivalent to : q not equal 2,4 ?
     Assert(1,ForAll(lvarAlpha,a->a^(q+1)=-t) and IsPower(w^(q-1),3)=false and
      IsPower(w^(2*(q-1)),3)=false);
   fi;
@@ -489,7 +488,8 @@ local A,varE,F,I,m,n,nu,w,z;
   w:=PrimitiveElement(F);
   nu:=w^z;
   varE:=SubStructure(F,nu);
-  A:=Eltseq(power*FORCEOne(varE));
+  # was "A:=Eltseq(power*FORCEOne(varE));"
+  A:=Coefficients(Basis(varE), power*FORCEOne(varE));
   I:=Integers();
   A:=List(A,a->a*FORCEOne(I));
   return Product(List([0..Size(A)-1],i->(v^(delta^(n*i)))^A[i+1]));
@@ -511,7 +511,8 @@ local A,varE,F,I,gamma,w,w0;
     gamma:=power;
   fi;
   Assert(1,gamma in varE);
-  A:=Eltseq(gamma*FORCEOne(varE));
+  # was "A:=Eltseq(gamma*FORCEOne(varE));"
+  A:=Coefficients(Basis(varE),gamma*FORCEOne(varE));
   A:=List(A,a->a*FORCEOne(I));
   return Product(List([0..Size(A)-1],i->(tau^(delta^(-i)))^A[i+1]));
 end;
