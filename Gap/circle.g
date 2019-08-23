@@ -267,7 +267,7 @@ local
 end;
 
 OmegaPresentation:=function(d,q)
-local P,Presentation,Q,R,Rels,S;
+local gens,P,Presentation,Q,R,Rels,S;
   Presentation:=ValueOption("Presentation");
   if Presentation=fail then
     Presentation:=false;
@@ -276,9 +276,11 @@ local P,Presentation,Q,R,Rels,S;
   Assert(1,IsOddInt(q));
   if d=3 then
     R:=ClassicalStandardPresentation("SL",2,q:Projective:=true);
+    gens:=GeneratorsOfFpGroup(FreeGroupOfFpGroup(R));
     R:=RelatorsOfFpGroup(R);
     Q:=FreeGroup(5);
-    R:=Evaluate(R,List([1,1,2,3],i->Q.i));
+    # was "R:=Evaluate(R,List([1,1,2,3],i->Q.i));" . This required the new variable "gens"
+    R:=List(R, w -> MappedWord(w, gens, List([1,1,2,3],i->Q.i)));
     Add(R,Q.4);
     Add(R,Q.5);
     return Q/R;
@@ -296,16 +298,26 @@ local P,Presentation,Q,R,Rels,S;
   return S/Rels;
 end;
 
+#  don't know if this is really necessary
+#  I need this function to get the list of letters of the words for MappedWord (see below)
+WriteGenerators:=function(R)
+local fam, F;
+  fam:=FamilyObj(R[1]);
+  F:=fam!.freeGroup;
+  return GeneratorsOfGroup(F);
+end;
+
 #   relations are on presentation generators;
 #  convert to relations on standard generators
 InstallGlobalFunction(OmegaConvertToStandard,
 function(d,q,Rels)
 local A,B,C,T,U,W,tau;
   A:=OmegaStandardToPresentation(d,q);
-  ## TODO Not sure how to translate <Evaluate>
-  Rels:=Evaluate(Rels,A);
+  # was "Rels:=Evaluate(Rels,A);"
+  Rels:=List(Rels, w-> MappedWord(w, WriteGenerators(Rels), A));
   B:=OmegaPresentationToStandard(d,q);
-  C:=Evaluate(B,A);
+  # was "C:=Evaluate(B,A);"
+  C:=List(B, w-> MappedWord(w, WriteGenerators(B), A));
   ## TODO Not sure how to translate <Universe>
   U:=Universe(C);
   W:=Universe(Rels);
@@ -419,18 +431,20 @@ local
   ## TODO Need Magma documentation
   ##
   varE:=SubStructure(F,w^4);
-  c:=Eltseq((-w^3)*FORCEOne(varE));
+  # was "c:=Eltseq((-w^3)*FORCEOne(varE));"
+  c:=Coefficients(Basis(F), (-w^3)*FORCEOne(varE));
   c:=List(c,x->x*FORCEOne(I));
-  b:=Eltseq((1-w)*FORCEOne(varE));
+  b:=Coefficients(Basis(F), (1-w)*FORCEOne(varE));
   b:=List(b,x->x*FORCEOne(I));
-  a:=Eltseq((-w^-1+1)*FORCEOne(varE));
+  a:=Coefficients(Basis(F), (-w^-1+1)*FORCEOne(varE));
   a:=List(a,x->x*FORCEOne(I));
   C:=Product(List([0..e-1],i->(sigma^(Delta2^i*U))^c[i+1]));
   B:=Product(List([0..e-1],i->(sigma^(Delta2^i*sigma^U))^b[i+1]));
   A:=Product(List([0..e-1],i->(sigma^(Delta2^i))^a[i+1]));
   w_Delta:=C*Delta2*sigma^U*B*A;
   words:=Special_OmegaStandardToPresentation(d,q);
-  w_Delta:=Evaluate(w_Delta,words);
+  # was "w_Delta:=Evaluate(w_Delta,words);"
+  w_Delta:=List(w_Delta, w-> MappedWord(w, WriteGenerators(w_Delta), words));
   return w_Delta;
 end;
 
@@ -459,12 +473,13 @@ local lvarDelta,U,V,W,varZ,delta,gens,p,s,sigma,t,tau;
   elif q=9 then
     gens:=[Comm(delta^V,U),s^V,U,tau,sigma];
     lvarDelta:=SpecialWordForDelta();
-    lvarDelta:=Evaluate(lvarDelta,gens);
+    # was "lvarDelta:=Evaluate(lvarDelta,gens);"
+    lvarDelta:=List(lvarDelta, w-> MappedWord(w, WriteGenerators(lvarDelta), gens));
   else
     lvarDelta:=WordForDelta(d,q);
     #   ensure Delta is in the correct FreeGroup
-    ## TODO Evaluate again
-    lvarDelta:=Evaluate(lvarDelta,List([1..5],i->W.i));
+    # was "lvarDelta:=Evaluate(lvarDelta,List([1..5],i->W.i));"
+    lvarDelta:=List(lvarDelta, w-> MappedWord(w, WriteGenerators(lvarDelta), List([1..5],i->W.i)));
   fi;
   return [lvarDelta,varZ,tau,sigma,U,V];
 end);
