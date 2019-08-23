@@ -33,8 +33,8 @@ local Q,R,S,d,q;
         Q:=FreeGroupOfFpGroup(R);
         R:=RelatorsOfFpGroup(R);
         S:=ClassicalStandardGenerators("SL",d,q);
-        ## TODO Evaluate
-        Assert(1,Size(Set(Evaluate(R,S)))=1);
+        # was "Assert(1,Size(Set(Evaluate(R,S)))=1);"
+        Assert(1,Size(Set(List(R, w-> MappedWord(w, GeneratorsOfGroup(Q), S))))=1);
       fi;
     od;
   od;
@@ -105,22 +105,33 @@ local DD,F,I,K,Presentation,Projective,QQ,U,V,d,delta,e,f,p,q,tau;
 end;
 
 SpElements:=function()
-local R,S,d,q;
+local R,S,d,Q,q;
   for d in [4,4+2..dim_limit] do
     for q in [2..field_limit] do
       if Size(DuplicateFreeList(Factors(p))) > 1 then
         R:=ClassicalStandardPresentation("Sp",d,q:PresentationGenerators:=false)
          ;
+        Q:=FreeGroupOfFpGroup(R);
         R:=RelatorsOfFpGroup(R);
         S:=ClassicalStandardGenerators("Sp",d,q);
         Print(d," ",q,"\n");
-        ## TODO Evaluate
-        Assert(1,Size(Set(Evaluate(R,S)))=1);
+        # was "Assert(1,Size(Set(Evaluate(R,S)))=1);"
+        Assert(1,Size(Set(List(R, w-> MappedWord(w, GeneratorsOfGroup(Q), S))))=1);
       fi;
     od;
   od;
   return true;
 end;
+
+#  don't know if this is really necessary
+#  I need this function to get the list of letters of the words for MappedWord (see below)
+WriteGenerators:=function(R)
+local fam, F;
+  fam:=FamilyObj(R[1]);
+  F:=fam!.freeGroup;
+  return GeneratorsOfGroup(F);
+end;
+
 
 TestSp:=function(list_a,list_b)
 local
@@ -158,8 +169,8 @@ local
         sigma:=F.6;
       else
         words:=SpStandardToPresentation(d,q);
-        ## TODO Evaluate
-        varX:=Evaluate(words,List([1..Size(GeneratorsOfGroup(Q))],i->Q.i));
+        # was "varX:=Evaluate(words,List([1..Size(GeneratorsOfGroup(Q))],i->Q.i));"
+        varX:=List(words,w-> MappedWord(w, WriteGenerators(words), List([1..Size(GeneratorsOfGroup(Q))],i->Q.i)));
         phi:=GroupHomomorphismByImages(Q,F,
           GeneratorsOfGroup(Q),List([1..Size(GeneratorsOfGroup(F))],i->F.i));
         varX:=List(varX,x->Image(phi,x));
@@ -200,10 +211,11 @@ local Q,R,S,d,q;
         Print(d," ",q,"\n");
         R:=ClassicalStandardPresentation("SU",d,q:PresentationGenerators:=false)
          ;
+        Q:=FreeGroupOfFpGroup(R);
          R := RelatorsOfFpGroup(R);
         S:=ClassicalStandardGenerators("SU",d,q);
-        ## TODO Evaluate
-        Assert(1,Size(Set(Evaluate(R,S)))=1);
+        # was "Assert(1,Size(Set(Evaluate(R,S)))=1);"
+        Assert(1,Size(Set(List(R, w-> MappedWord(w, GeneratorsOfGroup(Q), S))))=1);
       fi;
     od;
   od;
@@ -384,10 +396,11 @@ local varE,Q,R,d,q;
         Print(d," ",q,"\n");
         R:=ClassicalStandardPresentation("Omega+",d,
          q:PresentationGenerators:=false);
+        Q:=FreeGroupOfFpGroup(R);
         R:=RelatorsOfFpGroup(R);
         varE:=ClassicalStandardGenerators("Omega+",d,q);
-        ## TODO Evaluate
-        Assert(1,Size(Set(Evaluate(R,varE)))=1);
+        # was "Assert(1,Size(Set(Evaluate(R,varE)))=1);"
+        Assert(1,Size(Set(List(R, w-> MappedWord(w, GeneratorsOfGroup(Q), varE))))=1);
       fi;
     od;
   od;
@@ -402,10 +415,11 @@ local varE,Q,R,d,q;
         Print(d," ",q,"\n");
         R:=ClassicalStandardPresentation("Omega-",d,
          q:PresentationGenerators:=false);
+        Q:=FreeGroupOfFpGroup(R);
         R:=RelatorsOfFpGroup(R);
         varE:=ClassicalStandardGenerators("Omega-",d,q);
-        ## TODO Evaluate
-        Assert(1,Size(Set(Evaluate(R,varE)))=1);
+        # was "Assert(1,Size(Set(Evaluate(R,varE)))=1);"
+        Assert(1,Size(Set(List(R, w-> MappedWord(w, GeneratorsOfGroup(Q), varE))))=1);
       fi;
     od;
   od;
@@ -457,8 +471,8 @@ local
       else
         if Presentation=false then
           words:=OmegaStandardToPresentation(d,q);
-          # TODO Evaluate
-          varX:=Evaluate(words,List([1..Size(GeneratorsOfGroup(Q))],i->Q.i));
+          # was "varX:=Evaluate(words,List([1..Size(GeneratorsOfGroup(Q))],i->Q.i));"
+          varX:=List(words,w-> MappedWord(w, WriteGenerators(words), List([1..Size(GeneratorsOfGroup(Q))],i->Q.i)));
           phi:=GroupHomomorphismByImages(Q,F,
             GeneratorsOfGroup(Q),List([1..Size(GeneratorsOfGroup(F))],i->F.i));
           varX:=List(varX,x->Image(phi,x));
@@ -526,8 +540,8 @@ local
           fi;
         else
           words:=MinusStandardToPresentation(d,q);
-          ## TODO Evaluate
-          varX:=Evaluate(words,List([1..Size(GeneratorsOfGroup(Q))],i->Q.i));
+          # was "varX:=Evaluate(words,List([1..Size(GeneratorsOfGroup(Q))],i->Q.i));"
+          varX:=List(words,w-> MappedWord(w, WriteGenerators(words), List([1..Size(GeneratorsOfGroup(Q))],i->Q.i)));
           phi:=GroupHomomorphismByImages(Q,F,
             GeneratorsOfGroup(Q),List([1..Size(GeneratorsOfGroup(F))],i->F.i));
           varX:=List(varX,x->Image(phi,x));
@@ -593,8 +607,8 @@ local
           V:=F.5;
         else
           words:=PlusStandardToPresentation(d,q);
-          # TODO Evaluate
-          varX:=Evaluate(words,List([1..Size(GeneratorsOfGroup(Q))],i->Q.i));
+          # was "varX:=Evaluate(words,List([1..Size(GeneratorsOfGroup(Q))],i->Q.i));"
+          varX:=List(words,w-> MappedWord(w, WriteGenerators(words), List([1..Size(GeneratorsOfGroup(Q))],i->Q.i)));
           phi:=GroupHomomorphismByImages(Q,F,
             GeneratorsOfGroup(Q),List([1..Size(GeneratorsOfGroup(F))],i->F.i));
           varX:=List(varX,x->Image(phi,x));
@@ -644,8 +658,8 @@ local Delta,F,I,K,Presentation,Q,R,U,V,varX,varZ,d,delta,phi,q,sigma,words;
           V:=F.5;
         else
           words:=PlusStandardToPresentation(d,q);
-          # TODO Evaluate
-          varX:=Evaluate(words,List([1..Size(GeneratorsOfGroup(Q))],i->Q.i));
+          # was "varX:=Evaluate(words,List([1..Size(GeneratorsOfGroup(Q))],i->Q.i));"
+          varX:=List(words,w-> MappedWord(w, WriteGenerators(words), List([1..Size(GeneratorsOfGroup(Q))],i->Q.i)));
           phi:=GroupHomomorphismByImages(Q,F,
             GeneratorsOfGroup(Q),List([1..Size(GeneratorsOfGroup(F))],i->F.i));
           varX:=List(varX,x->Image(phi,x));
