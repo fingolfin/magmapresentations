@@ -1,3 +1,34 @@
+File Status:
+
+Done:
+sl2q.g (AH, 9/21/21)
+sn.g (AH, 9/21/21)
+
+Process:
+
+circle.g
+even-su.g
+minus.g
+odd-su.g
+omega.g
+plus.g
+signed.g
+sl.g
+standard-generators.g
+standard.g
+su.g
+su3.g
+test.g
+
+
+
+
+
+
+
+
+
+
 Things to change in many files:
 
 1. What to do with multiple definitions of the same func?

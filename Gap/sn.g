@@ -1,13 +1,5 @@
-#  File converted from Magma code -- requires editing and checking
-#  Magma -> GAP converter, version 0.5, 11/5/18 by AH
-
-#  Global Variables used: Append, FPGroup, FreeGroup, IsEven, IsOdd, LHS,
-#  PresentationForSn, RHS, Relations, Rewrite, SLPGroup, Sym, tau
-
-#  Defines: PresentationForAn, PresentationForSn
-
 #   presentation for Sym (d) defined on (1, 2) and (1..n)
-PresentationForSn:=function(d)
+BindGlobal("PresentationForSn@",function(d)
 local F,Rels,S,U,V,i,tau;
   # note that SLP option does not make sense here
   F:=FreeGroup("U","V");
@@ -31,36 +23,10 @@ local F,Rels,S,U,V,i,tau;
     Add(Rels,Comm(U,V^i)^2);
   od;
   return F/Rels;
-end;
-
-#PresentationForAn:=function(d)
-#local A,Rels,S,T,W,tau;
-#  S:=PresentationForSn(d:SLP:=false);
-#  if IsEvenInt(d) then
-#    W:=S.1*S.2;
-#    T:=(S.2*S.2^S.1)^-1;
-#  fi;
-#  A:=SubStructure(S,W,#TODO CLOSURE
-#    T);
-#  Rewrite(S,TILDEA:Simplify:=false);
-#  S:=SymmetricGroup(d);
-#  W:=S.1*S.2;
-#  T:=(S.2*S.2^S.1)^-1;
-#  A:=SubStructure(S,W,#TODO CLOSURE
-#    T);
-#  A:=FPGroup(A);
-#  Rels:=Relations(A);
-#  S:=SLPGroup(2);
-#  tau:=GroupHomomorphismByImages(A,S,
-#    GeneratorsOfGroup(A),[S.1,S.2]);
-#  Rels:=List(Rels,r->LHS(r)*RHS(r)^-1);
-#  Rels:=List(Rels,r->tau(r));
-#  return rec(val1:=S,
-#    val2:=Rels);
-#end;
+end);
 
 #   presentation for Alt (n)
-PresentationForAn:=function(n)
+BindGlobal("PresentationForAn@",function(n)
 local F,a,b,A,Rels,S,tau;
   F:=FreeGroup("a","b");
   a:=F.1;b:=F.2;
@@ -75,6 +41,6 @@ local F,a,b,A,Rels,S,tau;
      List([1..QuoInt(n,2)-2],j->((b^-1*a*b^-1)^j*(a^-1*b^2)^j*a^-1)^2));
   fi;
   return A;
-end;
+end);
 
 

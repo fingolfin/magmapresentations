@@ -57,6 +57,7 @@ local F,OMIT,R,Rels,S,U,V,delta,tau;
   delta:=F.3;
   if IsEvenInt(q) then
     # =v= MULTIASSIGN =v=
+  Error("MULTI");
     R:=PresentationForSn(d);
     S:=R.val1;
     R:=R.val2;
@@ -131,6 +132,7 @@ local F,I,R1,R2,Rels,S,U,V,a,b,delta,e,f,p,phi,tau,w,wm1;
   if IsPrimeInt(q) then
     if q=2 then
       # =v= MULTIASSIGN =v=
+  Error("MULTI");
       R1:=PresentationForSn(d);
       S:=R1.val1;
       R1:=R1.val2;
