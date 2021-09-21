@@ -2,7 +2,6 @@
 #  Magma -> GAP converter, version 0.5, 11/5/18 by AH
 
 #  Global Variables used: Internal_StandardPresentationForOmega, IsEven, IsOdd,
-#  IsPrimePower
 
 #  Defines: Internal_StandardPresentationForOmega
 

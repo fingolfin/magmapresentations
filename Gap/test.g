@@ -3,7 +3,7 @@
 
 #  Global Variables used: ClassicalStandardGenerators,
 #  ClassicalStandardPresentation, CompositionFactors, CosetImage, Degree,
-#  Evaluate, IsEven, IsOdd, IsPrimePower, Ngens, RandomSchreier, SLPToFP, Set,
+#  Evaluate, IsEven, IsOdd, Ngens, RandomSchreier, SLPToFP, Set,
 #  SetGlobalTCParameters, Sp, TestPlusEven, TestPlusOdd, TestSUEven, TestSUOdd,
 #  phi
 

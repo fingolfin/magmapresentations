@@ -6,7 +6,7 @@
 
 #  Global Variables used: Append, Characteristic, ClassicalStandardGenerators,
 #  ClassicalStandardPresentation, Degree, Eltseq, Evaluate, Factorial, GF, GL,
-#  Identity, Integers, IsOdd, IsPrime, IsPrimePower, LHS, MatrixAlgebra, Ngens,
+#  Identity, Integers, IsOdd, IsPrime, LHS, MatrixAlgebra, Ngens,
 #  OmegaConvertToStandard, OmegaPresentationToStandard,
 #  OmegaStandardToPresentation, Omega_PresentationForN,
 #  Omega_PresentationForN1, PrimitiveElement, RHS, FreeGroup,

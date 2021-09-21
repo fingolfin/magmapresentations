@@ -2,7 +2,7 @@
 #  Magma -> GAP converter, version 0.5, 11/5/18 by AH
 
 #  Global Variables used: Append, ClassicalStandardGenerators, Factorial, GF,
-#  Integers, IsEven, IsOdd, IsPrimePower, LHS, Log, PrimitiveElement, RHS,
+#  Integers, IsEven, IsOdd, Log, PrimitiveElement, RHS,
 #  FreeGroup, SU_PresentationForN, Thm71, Thm72, eta, phi, tau
 
 #  Defines: EvenSUGenerators, EvenSUPresentation, OrderSU_N, OrderThm71,

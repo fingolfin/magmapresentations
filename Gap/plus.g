@@ -4,7 +4,7 @@
 #  Global Variables used: Append, ClassicalStandardGenerators,
 #  ClassicalStandardPresentation, Evaluate, EvenPlus,
 #  EvenPlus_PresentationForN, EvenPlus_PresentationForN1, Factorial, GF, GL,
-#  Id, Identity, Integers, IsEven, IsOdd, IsPrime, IsPrimePower, LHS,
+#  Id, Identity, Integers, IsEven, IsOdd, IsPrime, LHS,
 #  MatrixAlgebra, Ngens, OddPlus, OddPlusGenerators, OddPlus_PresentationForN,
 #  OddPlus_PresentationForN1, OmegaPlus4, PlusConvertToStandard,
 #  PlusGeneratorOfCentre, PlusPresentationToStandard,

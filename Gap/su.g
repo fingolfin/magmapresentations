@@ -2,7 +2,7 @@
 #  Magma -> GAP converter, version 0.5, 11/5/18 by AH
 
 #  Global Variables used: Evaluate, Gcd, Internal_StandardPresentationForSU,
-#  IsEven, IsOdd, IsPrimePower, Ngens, FreeGroup, SUConvertToStandard,
+#  IsEven, IsOdd, Ngens, FreeGroup, SUConvertToStandard,
 #  SUGeneratorOfCentre, SUPresentationToStandard, SUStandardToPresentation,
 #  Universe, Valuation, tau
 

@@ -4,7 +4,7 @@
 #  Global Variables used: Append, BaseRing, Characteristic, ChevalleyGroup,
 #  ClassicalStandardGenerators, Degree, DiagonalJoin, DiagonalMatrix,
 #  Dimension, GF, GL, Generic, Id, Identity, InsertBlock,
-#  Internal_PresentationGenerators, IsEven, IsOdd, IsPrimePower, IsPrimitive,
+#  Internal_PresentationGenerators, IsEven, IsOdd, IsPrimitive,
 #  Isqrt, MatrixAlgebra, MinusChar2Elements, MinusChosenElements, Ngens,
 #  NormEquation, Nrows, Omega, OmegaMinus, OmegaPlus, PlusChosenElements,
 #  PrimitiveElement, SL, SLChosenElements, SOChosenElements, SOMinus, SU,
@@ -729,7 +729,7 @@ local PresentationGenerators,SpecialGroup;
   if not d > 1 then
     Error("Dimension is not valid");
   fi;
-  if not IsPrimePower(q) then
+  if not IsPrimePowerInt(q) then
     Error("Field size is not valid");
   fi;
   return ClassicalStandardGenerators(type,d,GF(q)

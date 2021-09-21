@@ -3,7 +3,7 @@
 
 #  Global Variables used: Append, Characteristic, ClassicalStandardGenerators,
 #  ClassicalStandardPresentation, Evaluate, Factorial, GF, GL, Identity,
-#  Internal_StandardPresentationForSU, IsEven, IsOdd, IsPrimePower, LHS, Log,
+#  Internal_StandardPresentationForSU, IsEven, IsOdd, LHS, Log,
 #  MatrixAlgebra, Minus6Presentation, MinusConvertToStandard, MinusDeltaMatrix,
 #  MinusEvenDeltaMatrix, MinusGeneratorOfCentre, MinusPresentationToStandard,
 #  MinusStandardToPresentation, Minus_PresentationForN,

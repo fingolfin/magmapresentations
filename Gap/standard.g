@@ -6,7 +6,7 @@
 #  Global Variables used: ClassicalStandardPresentation, GF,
 #  Internal_PresentationGenerators, Internal_StandardPresentationForOmega,
 #  Internal_StandardPresentationForSL, Internal_StandardPresentationForSU,
-#  Internal_StandardPresentationForSp, IsEven, IsOdd, IsPrimePower
+#  Internal_StandardPresentationForSp, IsEven, IsOdd
 
 #  Defines: ClassicalStandardPresentation, Internal_PresentationGenerators
 

@@ -3,7 +3,7 @@
 
 #  Global Variables used: Append, Characteristic, ClassicalStandardGenerators,
 #  Degree, Evaluate, Factorial, GF, Gcd, Integers,
-#  Internal_StandardPresentationForSL, IsEven, IsOdd, IsPrime, IsPrimePower,
+#  Internal_StandardPresentationForSL, IsEven, IsOdd, IsPrime, 
 #  LHS, MatrixAlgebra, Ngens, PresentationForN, PrimitiveElement, RHS,
 #  SLConvertToStandard, SLGeneratorOfCentre, SLPGroup, SLPresentation,
 #  SLPresentationToStandard, SLStandardToPresentation, Universe, Zero, phi, tau
@@ -27,12 +27,9 @@ DeclareGlobalFunction("SLGeneratorOfCentre");
 SLGenerators:=function(d,q)
 local MA,S,V,e,f,i,p;
   if d=2 then
-    # =v= MULTIASSIGN =v=
-    e:=IsPrimePower(q);
-    f:=e.val1;
-    p:=e.val2;
-    e:=e.val3;
-    # =^= MULTIASSIGN =^=
+    p:=PrimeBase(q);
+    e:=LogInt(q,p);
+    if q<>p^e then Error("<q> is not a prime power");fi;
     return SL2Generators(p,e);
   fi;
   S:=ClassicalStandardGenerators("SL",d,q);
@@ -107,12 +104,9 @@ end;
 SLPresentation:=function(d,q)
 local F,I,R1,R2,Rels,S,U,V,a,b,delta,e,f,p,phi,tau,w,wm1;
   Assert(1,d > 2);
-  # =v= MULTIASSIGN =v=
-  e:=IsPrimePower(q);
-  f:=e.val1;
-  p:=e.val2;
-  e:=e.val3;
-  # =^= MULTIASSIGN =^=
+  p:=PrimeBase(q);
+  e:=LogInt(q,p);
+  if q<>p^e then Error("<q> is not a prime power");fi;
   F:=SLPGroup(4);
   U:=F.1;
   V:=F.2;
@@ -233,7 +227,7 @@ local Presentation,Projective;
   if not d > 1 then
     Error("Degree must be at least 2");
   fi;
-  if not IsPrimePower(q) then
+  if not IsPrimePowerInt(q) then
     Error("Field size is not valid");
   fi;
   return Internal_StandardPresentationForSL(d,GF(q)
