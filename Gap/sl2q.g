@@ -1,20 +1,9 @@
-#  File converted from Magma code -- requires editing and checking
-#  Magma -> GAP converter, version 0.5, 11/5/18 by AH
-
-#  Global Variables used: Append, Coefficients, Eltseq, FreeGroup, GF, GL,
-#  Integers, IsEven, IsSquare, LHS, Log, MinimalPolynomial, Modified_CR,
-#  PrimitiveElement, RHS, SL2_even, SL2_odd, SL2_special, SLPGroup
-
-#  Defines: CR, Modified_CR, PresentationForSL2, SL2Generators, SL2_even,
-#  SL2_odd, SL2_special, Zassenhaus
-
-#  $Id:: sl2q.m 2340 2012-09-30 01:03:09Z eobr007                             
 #   Campbell, Robertson, Williams J. Austral. Math. Soc. 1990
 #   Campbell and Robertson, BLMS 1980
 #   generators for SL(2, p^e) 
 
 # Generators for SL_2(p^e)
-SL2Generators:=function(p,e)
+BindGlobal("SL2Generators@",function(p,e)
 local F,varZ,delta,tau,w;
   F:=GF(p^e);
   w:=PrimitiveElement(F);
@@ -26,11 +15,11 @@ local F,varZ,delta,tau,w;
   else
     return [delta,tau,varZ];
   fi;
-end;
+end);
 
 #   presentation for SL(2, p^e); p odd
 #   Projective = true: return presentation for PSL
-SL2_odd:=function(p,e)
+BindGlobal("SL2_odd@",function(p,e)
 local B,bas,I,K,Projective,Q,Rels,U,c,delta,f,i,m,q,tau,tau1,w,gens;
   Projective:=ValueOption("Projective");
   if Projective=fail then
@@ -87,10 +76,10 @@ local B,bas,I,K,Projective,Q,Rels,U,c,delta,f,i,m,q,tau,tau1,w,gens;
   od;
   Add(Rels,Product(List([0..e],i->B[i+1]^c[i+1])));
   return Q/Rels;
-end;
+end);
 
 #   special presentation for SL(2, p^e) when p^e mod 4 = 3
-SL2_special:=function(p,e)
+BindGlobal("SL2_special@",function(p,e)
 local B,bas,I,K,Projective,Q,Rels,U,c,delta,f,i,m,q,r,tau,tau1,w;
   Projective:=ValueOption("Projective");
   if Projective=fail then
@@ -147,10 +136,10 @@ local B,bas,I,K,Projective,Q,Rels,U,c,delta,f,i,m,q,r,tau,tau1,w;
   od;
   Add(Rels,Product(List([0..e],i->B[i+1]^c[i+1])));
   return Q/Rels;
-end;
+end);
 
 #   presentation for SL(2, 2^e) where e > 1 
-SL2_even:=function(p,e)
+BindGlobal("SL2_even@",function(p,e)
 local B,varE,F,I,Rels,U,c,delta,f,i,m,q,tau,u,w;
   Assert(1,p=2);
   q:=2^e;
@@ -172,7 +161,7 @@ local B,varE,F,I,Rels,U,c,delta,f,i,m,q,tau,u,w;
   Rels:=[Product(List([0..e],i->B[i+1]^u[i+1])),(U*tau)^3,U^2,(U*delta)^2,
     tau^2,(tau*delta)^(q-1),tau^(delta^m)*Comm(tau,delta)^-1];
   return F/Rels;
-end;
+end);
 
 # #   Zassenhaus presentation for SL (2, p) where p is not 17 
 # Zassenhaus:=function(p)
@@ -203,7 +192,7 @@ end;
 # end;
 
 #   Campbell Robertson presentation for SL(2, p) modified for our generators 
-Modified_CR:=function(p)
+BindGlobal("Modified_CR@",function(p)
 local F,Projective,Rels,a,b,k,r;
   Projective:=ValueOption("Projective");
   if Projective=fail then
@@ -229,35 +218,35 @@ local F,Projective,Rels,a,b,k,r;
     Rels:=Concatenation(Rels,[b^2]);
   fi;
   return F/Rels;
-end;
+end);
 
 #   presentation for SL(2, p^e) 
-PresentationForSL2:=function(p,e)
+BindGlobal("PresentationForSL2@",function(p,e)
 local Projective,Q,R;
   Projective:=ValueOption("Projective");
   if Projective=fail then
     Projective:=false;
   fi;
   if e=1 then
-    R:=Modified_CR(p:Projective:=Projective);
+    R:=Modified_CR@(p:Projective:=Projective);
   elif IsEvenInt(p) then
-    R:=SL2_even(p,e);
+    R:=SL2_even@(p,e);
   elif p^e mod 4=3 then
-    R:=SL2_special(p,e:Projective:=Projective);
+    R:=SL2_special@(p,e:Projective:=Projective);
   else
-    R:=SL2_odd(p,e:Projective:=Projective);
+    R:=SL2_odd@(p,e:Projective:=Projective);
   fi;
   return R;
-end;
+end);
 
 #  
-TestPresSL2:=function()
+BindGlobal("TestPresSL2@",function()
 local p,e,R,X,Y,G;
   for p in [2,3,5,7,11,13,17,19,23,29,31] do
     for e in [1..Maximum(2,LogInt(100,p))] do
       Print("p,e=",p,",",e,"\n");
-      R := PresentationForSL2 (p, e);
-      X := SL2Generators (p, e);
+      R := PresentationForSL2@(p, e);
+      X := SL2Generators@(p, e);
       Y := List(RelatorsOfFpGroup(R),x->MappedWord(x,FreeGeneratorsOfFpGroup(R),X));
       if not ForAll(Y,IsOne) then Error("rels");fi;
       G:=Group(X);
@@ -265,5 +254,5 @@ local p,e,R,X,Y,G;
       if Size(G)<>Size(R) then Error("pressize");fi;
     od;
   od;
-end;
+end);
 

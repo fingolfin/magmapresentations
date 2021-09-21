@@ -213,7 +213,7 @@ local
       [v,tau^-1,lvarGamma^-1,t]);
   fi;
   R_SU3:=List(R_SU3,r->Image(phi,r));
-  R_SL2:=PresentationForSL2(p,2*e);
+  R_SL2:=PresentationForSL2@(p,2*e);
   Q:=FreeGroupOfFpGroup(R_SL2);
   R_SL2:=RelatorsOfFpGroup(R_SL2);
   # rewritten select statement

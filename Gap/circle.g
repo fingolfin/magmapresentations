@@ -195,7 +195,7 @@ local
       [lvarDelta,varZ,U,V]);
   fi;
   R1:=List(R1,r->Image(phi, r));
-  R2:=PresentationForSL2(p,e);
+  R2:=PresentationForSL2@(p,e);
   S:=FreeGroupOfFpGroup(R2);
   R2:=RelatorsOfFpGroup(R2);
   if e=1 then
@@ -227,7 +227,7 @@ local
     Add(R5,Comm(tau,lvarDelta*lvarDelta^varZ));
   fi;
   R6:=[];
-  R6:=PresentationForSL2(p,e:Projective:=true);
+  R6:=PresentationForSL2@(p,e:Projective:=true);
   S:=FreeGroupOfFpGroup(R6);
   R6:=RelatorsOfFpGroup(R6);
   if e=1 then

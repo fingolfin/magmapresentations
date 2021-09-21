@@ -157,7 +157,8 @@ local F,I,R1,R2,Rels,S,U,V,a,b,delta,e,f,p,phi,tau,w,wm1;
   fi;
   R1:=List(R1,r->phi(r));
   # =v= MULTIASSIGN =v=
-  R2:=PresentationForSL2(p,e);
+  Error("MULTI");
+  R2:=PresentationForSL2@(p,e);
   S:=R2.val1;
   R2:=R2.val2;
   # =^= MULTIASSIGN =^=
@@ -257,7 +258,8 @@ local P,Presentation,Projective,R,Rels,S,e,p,q,z;
   e:=Degree(K);
   if d=2 then
     # =v= MULTIASSIGN =v=
-    R:=PresentationForSL2(p,e:Projective:=Projective);
+  Error("MULTI");
+    R:=PresentationForSL2@(p,e:Projective:=Projective);
     P:=R.val1;
     R:=R.val2;
     # =^= MULTIASSIGN =^=
