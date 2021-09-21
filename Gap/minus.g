@@ -2,7 +2,7 @@
 #  Magma -> GAP converter, version 0.5, 11/5/18 by AH
 
 #  Global Variables used: Append, Characteristic, ClassicalStandardGenerators,
-#  ClassicalStandardPresentation, Evaluate, Factorial, GF, GL, Identity,
+#  Evaluate, Factorial, GF, GL, Identity,
 #  Internal_StandardPresentationForSU, IsEven, IsOdd, LHS, Log,
 #  MatrixAlgebra, Minus6Presentation, MinusConvertToStandard, MinusDeltaMatrix,
 #  MinusEvenDeltaMatrix, MinusGeneratorOfCentre, MinusPresentationToStandard,
@@ -63,82 +63,6 @@ local A,B,C,delta,n,w0;
   delta[d][d-1]:=B;
   delta[d][d]:=1;
   return delta*Z(q)^0;
-end;
-
-MinusGenerators:=function(d,q)
-local B,varE,U,V,delta,gens,i,n,s,sigma,tau,w,z;
-  if d=4 then
-    return ClassicalStandardGenerators("Omega-",d,q);
-  fi;
-  varE:=GF(q^2);
-  w:=PrimitiveElement(varE);
-  i:=1;
-  if IsEvenInt(q) then
-    delta:=MinusEvenDeltaMatrix(d,q,w,i);
-  else
-    delta:=MinusDeltaMatrix(d,q,w,i);
-  fi;
-  n:=QuoInt((d-2),2);
-  z:=NullMat(d, d, GF(q));
-  z[1][2]:=1;
-  z[2][1]:=1;
-  for i in [3..d-1] do
-    z[i][i]:=1;
-  od;
-  if IsOddInt(q) then
-    z[d-1][d-1]:=-1;
-  else
-    B:=w+w^q;
-    z[d][d-1]:=B;
-  fi;
-  z[d][d]:=1;
-  tau:=IdentityMat(d, GF(q));
-  if IsOddInt(q) then
-    s:=1;
-    tau[1][1]:=1;
-    tau[1][2]:=s^2;
-    tau[1][d-1]:=s;
-    tau[d-1][d-1]:=1;
-    tau[d-1][2]:=2*s;
-  else
-    B:=w+w^q;
-    tau[1][1]:=1;
-    tau[1][2]:=1;
-    tau[1][d-1]:=1;
-    tau[d][d]:=1;
-    tau[d][2]:=B;
-  fi;
-  s:=1;
-  sigma:=NullMat(d, d, GF(q));
-  sigma[1][1]:=1;
-  sigma[1][3]:=s;
-  sigma[4][4]:=1;
-  sigma[4][2]:=-s;
-  for i in Concatenation([2,3],[5..d]) do
-    sigma[i][i]:=1;
-  od;
-  U:=NullMat(d, d, GF(q));
-  U[1][3]:=1;
-  U[3][1]:=-1;
-  U[2][4]:=1;
-  U[4][2]:=-1;
-  for i in [5..d] do
-    U[i][i]:=1;
-  od;
-  V:=NullMat(d, d, GF(q));
-  for i in [1..n-1] do
-    V[2*i-1][2*i+1]:=1;
-    V[2*i][2*i+2]:=1;
-  od;
-  V[d-3][1]:=(-1)^(n-1);
-  V[d-2][2]:=(-1)^(n-1);
-  for i in [d-1..d] do
-    V[i][i]:=1;
-  od;
-  gens:=List([z,tau,sigma,delta,U,V],x->x*Z(q)^0);
-  return rec(val1:=gens,
-    val2:=varE,
-    val3:=w);
 end;
 
 Minus6Presentation:=function(q)
@@ -356,7 +280,7 @@ local gens,P,Presentation,Projective,Q,R,Rels,S,n,z;
   Assert(1,IsEvenInt(d));
   n:=QuoInt(d,2);
   if d=4 then
-    R:=ClassicalStandardPresentation("SL",2,q^2:Projective:=true);
+    R:=ClassicalStandardPresentation@("SL",2,q^2:Projective:=true);
     # added variable "gen" for function MappedWord below
     gens:=GeneratorsOfGroup(FreeGroupOfFpGroup(R));
     R:=RelatorsOfFpGroup(R);
@@ -511,4 +435,80 @@ local V,delta,n,z;
     z:=Identity(F);
   fi;
   return z;
+end);
+
+InstallGlobalFunction(MinusGenerators@,function(d,q)
+local B,varE,U,V,delta,gens,i,n,s,sigma,tau,w,z;
+  if d=4 then
+    return ClassicalStandardGenerators("Omega-",d,q);
+  fi;
+  varE:=GF(q^2);
+  w:=PrimitiveElement(varE);
+  i:=1;
+  if IsEvenInt(q) then
+    delta:=MinusEvenDeltaMatrix(d,q,w,i);
+  else
+    delta:=MinusDeltaMatrix(d,q,w,i);
+  fi;
+  n:=QuoInt((d-2),2);
+  z:=NullMat(d, d, GF(q));
+  z[1][2]:=1;
+  z[2][1]:=1;
+  for i in [3..d-1] do
+    z[i][i]:=1;
+  od;
+  if IsOddInt(q) then
+    z[d-1][d-1]:=-1;
+  else
+    B:=w+w^q;
+    z[d][d-1]:=B;
+  fi;
+  z[d][d]:=1;
+  tau:=IdentityMat(d, GF(q));
+  if IsOddInt(q) then
+    s:=1;
+    tau[1][1]:=1;
+    tau[1][2]:=s^2;
+    tau[1][d-1]:=s;
+    tau[d-1][d-1]:=1;
+    tau[d-1][2]:=2*s;
+  else
+    B:=w+w^q;
+    tau[1][1]:=1;
+    tau[1][2]:=1;
+    tau[1][d-1]:=1;
+    tau[d][d]:=1;
+    tau[d][2]:=B;
+  fi;
+  s:=1;
+  sigma:=NullMat(d, d, GF(q));
+  sigma[1][1]:=1;
+  sigma[1][3]:=s;
+  sigma[4][4]:=1;
+  sigma[4][2]:=-s;
+  for i in Concatenation([2,3],[5..d]) do
+    sigma[i][i]:=1;
+  od;
+  U:=NullMat(d, d, GF(q));
+  U[1][3]:=1;
+  U[3][1]:=-1;
+  U[2][4]:=1;
+  U[4][2]:=-1;
+  for i in [5..d] do
+    U[i][i]:=1;
+  od;
+  V:=NullMat(d, d, GF(q));
+  for i in [1..n-1] do
+    V[2*i-1][2*i+1]:=1;
+    V[2*i][2*i+2]:=1;
+  od;
+  V[d-3][1]:=(-1)^(n-1);
+  V[d-2][2]:=(-1)^(n-1);
+  for i in [d-1..d] do
+    V[i][i]:=1;
+  od;
+  gens:=List([z,tau,sigma,delta,U,V],x->x*Z(q)^0);
+  return rec(val1:=gens,
+    val2:=varE,
+    val3:=w);
 end);

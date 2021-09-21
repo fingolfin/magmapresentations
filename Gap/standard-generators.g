@@ -1,23 +1,3 @@
-#  File converted from Magma code -- requires editing and checking
-#  Magma -> GAP converter, version 0.5, 11/5/18 by AH
-
-#  Global Variables used: Append, BaseRing, Characteristic, ChevalleyGroup,
-#  ClassicalStandardGenerators, Degree, DiagonalJoin, DiagonalMatrix,
-#  Dimension, GF, GL, Generic, Id, Identity, InsertBlock,
-#  Internal_PresentationGenerators, IsEven, IsOdd, IsPrimitive,
-#  Isqrt, MatrixAlgebra, MinusChar2Elements, MinusChosenElements, Ngens,
-#  NormEquation, Nrows, Omega, OmegaMinus, OmegaPlus, PlusChosenElements,
-#  PrimitiveElement, SL, SLChosenElements, SOChosenElements, SOMinus, SU,
-#  SUAdditionalElements, SUChosenElements, Sp, SpAdditionalElement,
-#  SpChosenElements, TensorProduct, Trace, Transpose, Valuation, Zero
-
-#  Defines: ClassicalStandardGenerators, MinusChar2Elements,
-#  MinusChosenElements, PlusChosenElements, SLChosenElements, SOChosenElements,
-#  SUAdditionalElements, SUChosenElements, SpAdditionalElement,
-#  SpChosenElements, find_quad_ext_prim
-
-#   import "../rewriting/orth_minus_char2.m" : find_quad_ext_prim;
-
 #AH 7/19: commented out as unused
 # #   function from Allan Steel
 # find_quad_ext_prim:=function(K,L)
@@ -44,7 +24,7 @@
 # end;
 
 #   canonical basis for SL(d, q) 
-SLChosenElements:=function(G)
+BindGlobal("SLChosenElements@",function(G)
 local F,M,P,a,b,d,delta,i,t,w;
   d:=DimensionOfMatrixGroup(G);
   F:=DefaultFieldOfMatrixGroup(G);
@@ -70,20 +50,20 @@ local F,M,P,a,b,d,delta,i,t,w;
   t:=ImmutableMatrix(F,t);
   delta:=ImmutableMatrix(F,delta);
   return [a,b,t,delta];
-end;
+end);
 
 #   additional element to generate all of Sp 
-SpAdditionalElement:=function(F)
+BindGlobal("SpAdditionalElement@",function(F)
 local I,M;
   I:=IdentityMat(4,F);
   I[2][3]:=1*One(F);
   I[4][1]:=1*One(F);
   I:=ImmutableMatrix(F,I);
   return I;
-end;
+end);
 
 #   canonical basis for Sp(d, q) 
-SpChosenElements:=function(G)
+BindGlobal("SpChosenElements@",function(G)
 local F,M,P,a,b,d,delta,i,n,p,t,v,w;
   d:=DimensionOfMatrixGroup(G);
   F:=DefaultFieldOfMatrixGroup(G);
@@ -132,19 +112,19 @@ local F,M,P,a,b,d,delta,i,n,p,t,v,w;
   if d > 4 then
     #v:=(DirectSumMat(Identity(MatrixAlgebra(F,d-4)),SpAdditionalElement(F))) *FORCEOne(P);
     v:=IdentityMat(d,F);
-    v{[d-3..d]}{[d-3..d]}:=SpAdditionalElement(F);
+    v{[d-3..d]}{[d-3..d]}:=SpAdditionalElement@(F);
   elif d=4 then
-    v:=SpAdditionalElement(F);
+    v:=SpAdditionalElement@(F);
   else
     v:=IdentityMat(d,F);
   fi;
   v:=ImmutableMatrix(F,v);
 
   return [a,b,t,delta,p,v];
-end;
+end);
 
 #   additional elements to generate SU 
-SUAdditionalElements:=function(F)
+BindGlobal("SUAdditionalElements@",function(F)
 local EvenCase,I,J,M,d,gamma,phi,q;
   EvenCase:=ValueOption("EvenCase");
   if EvenCase=fail then
@@ -175,10 +155,10 @@ local EvenCase,I,J,M,d,gamma,phi,q;
   I:=ImmutableMatrix(F,I);
   J:=ImmutableMatrix(F,J);
   return [I,J];
-end;
+end);
 
 #   canonical basis for SU(d, q) 
-SUChosenElements:=function(G)
+BindGlobal("SUChosenElements",function(G)
 local varE,F,M,P,a,alpha,b,d,delta,f,i,n,p,q,t,w,w0,x,y;
   d:=DimensionOfMatrixGroup(G);
   varE:=DefaultFieldOfMatrixGroup(G);
@@ -250,11 +230,11 @@ local varE,F,M,P,a,alpha,b,d,delta,f,i,n,p,q,t,w,w0,x,y;
     x:=IdentityMat(d,varE);
     y:=IdentityMat(d,varE);
   elif d in [3,4] then
-    y:=SUAdditionalElements(varE:EvenCase:=IsEvenInt(d));
+    y:=SUAdditionalElements@(varE:EvenCase:=IsEvenInt(d));
     x:=y[1];
     y:=y[2];
   else
-    y:=SUAdditionalElements(varE:EvenCase:=IsEvenInt(d));
+    y:=SUAdditionalElements@(varE:EvenCase:=IsEvenInt(d));
     x:=y[1];
     y:=y[2];
     #x:=(DirectSumMat(Identity(MatrixAlgebra(varE,f)),x))*FORCEOne(GL(d,varE));
@@ -267,11 +247,11 @@ local varE,F,M,P,a,alpha,b,d,delta,f,i,n,p,q,t,w,w0,x,y;
   x:=ImmutableMatrix(varE,x);
   y:=ImmutableMatrix(varE,y);
   return [a,b,t,delta,p,x,y];
-end;
+end);
 
 #   if SpecialGroup is true, then standard generators
 #  for SO^0, otherwise for Omega 
-SOChosenElements:=function(G)
+BindGlobal("SOChosenElements@",function(G)
 local A,D,F,Gens,I,L,M,MA,P,SpecialGroup,U,_,a,b,delta,gens,h,i,m,n,q,u,w,x,y;
   SpecialGroup:=ValueOption("SpecialGroup");
   if SpecialGroup=fail then
@@ -338,11 +318,11 @@ local A,D,F,Gens,I,L,M,MA,P,SpecialGroup,U,_,a,b,delta,gens,h,i,m,n,q,u,w,x,y;
   P:=GL(n,q);
   gens:=List(Gens,x->x*FORCEOne(P));
   return gens;
-end;
+end);
 
 #   if SpecialGroup is true, then standard generators
 #  for SO+, otherwise for Omega+ 
-PlusChosenElements:=function(G)
+BindGlobal("PlusChosenElements@",function(G)
 local 
    A,F,Gens,I,M,MA,P,SpecialGroup,_,a,b,delta,delta1,delta4,gens,i,n,q,s,s1,t,
    t1,t4,u,v,w,x,y;
@@ -432,9 +412,9 @@ local
   P:=GL(n,F);
   gens:=List(Gens,x->x*FORCEOne(P));
   return gens;
-end;
+end);
 
-MinusChar2Elements:=function(G)
+BindGlobal("MinusChar2Elements@",function(G)
 local 
    C,CC,F,G,GG,Gens,I,II,K,M,O,SpecialGroup,a,alpha,d,d1,dd,delta,deltaq,gamma,
    h,i,m,p,pow,q,r,r1,rr,sl,t,t1,tt,x,y;
@@ -525,11 +505,11 @@ local
     fi;
   fi;
   return List(Gens,g->g*FORCEOne(GL(d,q)));
-end;
+end);
 
 #   if SpecialGroup is true, then standard generators
 #  for SO-, otherwise for Omega- 
-MinusChosenElements:=function(G)
+BindGlobal("MinusChosenElements@",function(G)
 local 
    A,D,varE,EE,F,Gens,I,L,M,MA,P,SpecialGroup,U,a,b,c,d,delta,gens,h,i,m,mu,n,p,
    q,w,x,y;
@@ -541,7 +521,7 @@ local
   F:=BaseRing(G);
   q:=Size(F);
   if IsEvenInt(q) then
-    return MinusChar2Elements(G:SpecialGroup:=SpecialGroup);
+    return MinusChar2Elements@(G:SpecialGroup:=SpecialGroup);
   fi;
   A:=MatrixAlgebra(F,2);
   if n=2 then
@@ -653,7 +633,7 @@ local
   gens:=List(Gens,x->x*FORCEOne(P));
   return rec(val1:=gens,
     val2:=varE);
-end;
+end);
 
 ClassicalStandardGenerators:=function(type,d,F)
 #  -> ,]  return the Leedham - Green and O ' Brien standard generators for the
@@ -685,27 +665,27 @@ local PresentationGenerators,SpecialGroup;
     fi;
   fi;
   if PresentationGenerators=true then
-    return Internal_PresentationGenerators(type,d,Size(F));
+    return Internal_PresentationGenerators@(type,d,Size(F));
   fi;
   if type="SL" then
-    return rec(val1:=SLChosenElements(SL(d,F)),
+    return rec(val1:=SLChosenElements@(SL(d,F)),
       val2:=_);
   elif type="Sp" then
-    return rec(val1:=SpChosenElements(SP(d,F)),
+    return rec(val1:=SpChosenElements@(SP(d,F)),
       val2:=_);
   elif type="SU" then
-    return rec(val1:=SUChosenElements(SU(d,ExtStructure(F,2))),
+    return rec(val1:=SUChosenElements@(SU(d,ExtStructure(F,2))),
       val2:=_);
   elif type="Omega" then
     return rec(val1:=SOChosenElements(Omega(d,F):SpecialGroup:=SpecialGroup),
       val2:=_);
   elif type="Omega+" then
-    return rec(val1:=PlusChosenElements(OmegaPlus(d,F)
+    return rec(val1:=PlusChosenElements@(OmegaPlus(d,F)
      :SpecialGroup:=SpecialGroup),
       val2:=_);
     #   avoid OmegaMinus -- it sets order, too hard for large d, q
   elif type="Omega-" then
-    return MinusChosenElements(ChevalleyGroup("2D",QuoInt(d,2),F)
+    return MinusChosenElements@(ChevalleyGroup("2D",QuoInt(d,2),F)
      :SpecialGroup:=SpecialGroup);
   fi;
 end;

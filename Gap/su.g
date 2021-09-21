@@ -31,7 +31,7 @@ DeclareGlobalFunction("SUGeneratorOfCentre");
 #  Forward declaration of SUStandardToPresentation
 #  Forward declaration of SUPresentationToStandard
 #  Forward declaration of SUGeneratorOfCentre
-SUGenerators:=function(d,q)
+InstallGlobalFunction(SUGenerators@,function(d,q)
 if d=3 then
     return SU3Generators(q);
   elif IsOddInt(d) then
@@ -39,7 +39,7 @@ if d=3 then
   else
     return EvenSUGenerators(d,q);
   fi;
-end;
+end);
 
 Internal_StandardPresentationForSU:=function(d,F)
 #  -> ,GrpSLP ,[ ,]  return standard presentation for SU ( d , F ) ; if

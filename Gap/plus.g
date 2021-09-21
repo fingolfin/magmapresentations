@@ -2,7 +2,7 @@
 #  Magma -> GAP converter, version 0.5, 11/5/18 by AH
 
 #  Global Variables used: Append, ClassicalStandardGenerators,
-#  ClassicalStandardPresentation, Evaluate, EvenPlus,
+#  Evaluate, EvenPlus,
 #  EvenPlus_PresentationForN, EvenPlus_PresentationForN1, Factorial, GF, GL,
 #  Id, Identity, Integers, IsEven, IsOdd, IsPrime, LHS,
 #  MatrixAlgebra, Ngens, OddPlus, OddPlusGenerators, OddPlus_PresentationForN,
@@ -47,7 +47,7 @@ local F,Projective,S,T,Y,d,d1,gens,gog,rels,s,s1,t,t1,v,x,y;
   #   one of the standard generators is the identity
   rels:=[F.7];
   #   sl2 presentation on s, t, d
-  S:=ClassicalStandardPresentation("SL",2,q);
+  S:=ClassicalStandardPresentation@("SL",2,q);
   # need the variable "gog" (Generators Of Group) for the function MappedWord below
   gog:=GeneratorsOfGroup(FreeGroupOfFpGroup(S));
   Y:=FreeGroupOfFpGroup(S);
@@ -97,34 +97,6 @@ local lvarDelta,varE,F,U,V,varZ,gens,sigma,w;
   sigma:=varE[5];
   V:=varE[8];
   gens:=[lvarDelta,sigma,varZ,U,V];
-  return gens;
-end;
-
-PlusGenerators:=function(d,q)
-local varE,F,MA,U,V,varZ,delta,gens,sigma,w;
-  if d=4 then
-    return ClassicalStandardGenerators("Omega+",d,q);
-  fi;
-  if IsOddInt(q) then
-    return OddPlusGenerators(d,q);
-  fi;
-  F:=GF(q);
-  w:=PrimitiveElement(F);
-  delta:=IdentityMat(d, F);
-  delta[1][1]:=w^-1;
-  delta[2][2]:=w;
-  varE:=ClassicalStandardGenerators("Omega+",d,q);
-  sigma:=varE[5];
-  U:=varE[4];
-  V:=varE[8];
-  varZ:=IdentityMat(d,F);
-  varZ[1][1]:=0;
-  varZ[1][2]:=1;
-  varZ[2][1]:=1;
-  varZ[2][2]:=0;
-  varZ:=varZ*w^0;
-  varZ:=varZ*varZ^U;
-  gens:=[delta,sigma,varZ,U,V];
   return gens;
 end;
 
@@ -629,4 +601,32 @@ local lvarDelta,V,varZ,n,z;
     z:=Identity(F);
   fi;
   return z;
+end);
+
+InstallGlobalFunction(PlusGenerators@,function(d,q)
+local varE,F,MA,U,V,varZ,delta,gens,sigma,w;
+  if d=4 then
+    return ClassicalStandardGenerators("Omega+",d,q);
+  fi;
+  if IsOddInt(q) then
+    return OddPlusGenerators(d,q);
+  fi;
+  F:=GF(q);
+  w:=PrimitiveElement(F);
+  delta:=IdentityMat(d, F);
+  delta[1][1]:=w^-1;
+  delta[2][2]:=w;
+  varE:=ClassicalStandardGenerators("Omega+",d,q);
+  sigma:=varE[5];
+  U:=varE[4];
+  V:=varE[8];
+  varZ:=IdentityMat(d,F);
+  varZ[1][1]:=0;
+  varZ[1][2]:=1;
+  varZ[2][1]:=1;
+  varZ[2][2]:=0;
+  varZ:=varZ*w^0;
+  varZ:=varZ*varZ^U;
+  gens:=[delta,sigma,varZ,U,V];
+  return gens;
 end);

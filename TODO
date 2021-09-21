@@ -3,8 +3,9 @@ File Status:
 Done:
 sl2q.g (AH, 9/21/21)
 sn.g (AH, 9/21/21)
+standard.g (AH, 9/21/21)
 
-Process:
+Still to do:
 
 circle.g
 even-su.g
@@ -15,7 +16,6 @@ plus.g
 signed.g
 sl.g
 standard-generators.g
-standard.g
 su.g
 su3.g
 test.g

@@ -24,7 +24,7 @@ DeclareGlobalFunction("SLGeneratorOfCentre");
 #  Forward declaration of SLPresentationToStandard
 #  Forward declaration of SLStandardToPresentation
 #  Forward declaration of SLGeneratorOfCentre
-SLGenerators:=function(d,q)
+InstallGlobalFunction(SLGenerators@,function(d,q)
 local MA,S,V,e,f,i,p;
   if d=2 then
     p:=PrimeBase(q);
@@ -42,7 +42,7 @@ local MA,S,V,e,f,i,p;
   S[2]:=V;
   S[4]:=S[4]^-1;
   return S;
-end;
+end);
 
 #   presentation for extension of direct product of
 #   d - 1 copies of Z_{q - 1} by a copy of Sym (d)

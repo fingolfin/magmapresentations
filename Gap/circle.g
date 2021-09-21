@@ -5,7 +5,7 @@
 # Some issues remain - marked with TODO
 
 #  Global Variables used: Append, Characteristic, ClassicalStandardGenerators,
-#  ClassicalStandardPresentation, Degree, Eltseq, Evaluate, Factorial, GF, GL,
+#  Degree, Eltseq, Evaluate, Factorial, GF, GL,
 #  Identity, Integers, IsOdd, IsPrime, LHS, MatrixAlgebra, Ngens,
 #  OmegaConvertToStandard, OmegaPresentationToStandard,
 #  OmegaStandardToPresentation, Omega_PresentationForN,
@@ -27,7 +27,7 @@ DeclareGlobalFunction("OmegaPresentationToStandard");
 #  Forward declaration of OmegaConvertToStandard
 #  Forward declaration of OmegaStandardToPresentation
 #  Forward declaration of OmegaPresentationToStandard
-OmegaGenerators:=function(d,q)
+InstallGlobalFunction(OmegaGenerators@,function(d,q)
 local lvarDelta,varE,F,MA,U,V,varZ,gens,n,sigma,tau,w;
   Assert(1,IsOddInt(d));
   Assert(1,IsOddInt(q));
@@ -67,7 +67,7 @@ local lvarDelta,varE,F,MA,U,V,varZ,gens,n,sigma,tau,w;
   V:=varE[4];
   gens:=[lvarDelta,varZ,tau,sigma,U,V];
   return gens;
-end;
+end);
 
 Omega_PresentationForN1:=function(n)
 local F,R,R1,Rels,S,U,V,varZ,phi;
@@ -275,7 +275,7 @@ local gens,P,Presentation,Q,R,Rels,S;
   Assert(1,IsOddInt(d) and d > 1);
   Assert(1,IsOddInt(q));
   if d=3 then
-    R:=ClassicalStandardPresentation("SL",2,q:Projective:=true);
+    R:=ClassicalStandardPresentation@("SL",2,q:Projective:=true);
     gens:=GeneratorsOfFpGroup(FreeGroupOfFpGroup(R));
     R:=RelatorsOfFpGroup(R);
     Q:=FreeGroup(5);
