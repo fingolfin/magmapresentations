@@ -1,0 +1,5 @@
+(cd ..;COPYFILE_DISABLE=1 tar zcvf classicpres.tar.gz classicpres/{PackageInfo.g,init.g,read.g,README.md,lib,htm} classicpres/doc/{manual.ind,manual.pdf,classicpres.tex,manual.tex,manual.six,manual.bbl} classicpres/tst/*)
+mv ../classicpres.tar.gz `grep "^Version" PackageInfo.g | awk -F\" '{print "../classicpres" $2 ".tar.gz"}'`
+cp README.md ~/Creative/Homepage/classicpres/README
+cp PackageInfo.g ~/Creative/Homepage/classicpres/
+cp ../classicpres*.tar.gz ~/Creative/Homepage/classicpres/
