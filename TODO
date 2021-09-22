@@ -5,7 +5,11 @@ sl2q.g (AH, 9/21/21)
 sn.g (AH, 9/21/21)
 standard.g (AH, 9/21/21)
 signed.g (AH, 9/22/21)
-standard-generators.g (untested yet)
+standard-generators.g (AH, 9/22/21)
+sl.g (AH, 9/22/21)
+
+On the way:
+test.g, from test_abattoir.g
 
 Still to do:
 
@@ -15,10 +19,8 @@ minus.g
 odd-su.g
 omega.g
 plus.g
-sl.g
 su.g
 su3.g
-test.g
 
 
 
