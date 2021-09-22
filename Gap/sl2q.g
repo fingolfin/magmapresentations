@@ -221,7 +221,7 @@ local F,Projective,Rels,a,b,k,r;
 end);
 
 #   presentation for SL(2, p^e) 
-BindGlobal("PresentationForSL2@",function(p,e)
+InstallGlobalFunction(PresentationForSL2@,function(p,e)
 local Projective,Q,R;
   Projective:=ValueOption("Projective");
   if Projective=fail then

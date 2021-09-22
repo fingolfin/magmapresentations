@@ -1,4 +1,5 @@
 DeclareGlobalFunction("Internal_PresentationGenerators@");
+DeclareGlobalFunction("PresentationForSL2@");
 DeclareGlobalFunction("Internal_StandardPresentationForSL@");
 DeclareGlobalFunction("Internal_StandardPresentationForSp@");
 DeclareGlobalFunction("Internal_StandardPresentationForSU@");
