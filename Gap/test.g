@@ -43,8 +43,10 @@ local DD,F,I,K,Presentation,Projective,QQ,U,V,d,delta,e,f,p,q,tau,gens;
       fi;
       # verify relators
       U:=FreeGeneratorsOfFpGroup(F);
-      if ForAny(RelatorsOfFpGroup(F),
-        x->not IsOne(MappedWord(x,FreeGeneratorsOfFpGroup(F),gens))) then
+      V:=List(RelatorsOfFpGroup(F),
+        x->MappedWord(x,FreeGeneratorsOfFpGroup(F),gens));
+      V:=Unique(Filtered(V,x->not IsOne(x)));
+      if Length(V)>0 and (Projective=false or ForAny(V,x->x<>x^0*x[1][1])) then
         Error("Relators don't hold");
       fi;
 

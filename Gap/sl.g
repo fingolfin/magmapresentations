@@ -111,7 +111,7 @@ local F,I,R1,R2,Rels,S,U,V,a,b,delta,e,f,p,phi,tau,w,wm1;
     phi:=GroupHomomorphismByImages(S,F,GeneratorsOfGroup(S),[U,V,delta]);
   fi;
   R1:=List(R1,r->ImagesRepresentative(phi,r));
-  R2:=PresentationForSL2@(p,e);
+  R2:=PresentationForSL2@(p,e:Projective:=false);
   S:=FreeGroupOfFpGroup(R2);
   R2:=RelatorsOfFpGroup(R2);
   if e=1 then
