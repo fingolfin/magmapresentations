@@ -4,11 +4,11 @@
 #  Global Variables used: Append, Characteristic, ClassicalStandardGenerators,
 #  Degree, Evaluate, Factorial, GF, Gcd, Integers,
 #  Internal_StandardPresentationForSL, IsEven, IsOdd, IsPrime, 
-#  LHS, MatrixAlgebra, Ngens, PresentationForN, PrimitiveElement, RHS,
+#  LHS, MatrixAlgebra, Ngens, PrimitiveElement, RHS,
 #  SLConvertToStandard, SLGeneratorOfCentre, SLPGroup, SLPresentation,
 #  SLPresentationToStandard, SLStandardToPresentation, Universe, Zero, phi, tau
 
-#  Defines: Internal_StandardPresentationForSL, PresentationForN,
+#  Defines: Internal_StandardPresentationForSL, 
 #  SLConvertToStandard, SLGeneratorOfCentre, SLGenerators, SLPresentation,
 #  SLPresentationToStandard, SLStandardToPresentation, SL_Order_NSubgroup
 
@@ -32,13 +32,14 @@ local MA,S,V,e,f,i,p;
     if q<>p^e then Error("<q> is not a prime power");fi;
     return SL2Generators(p,e);
   fi;
-  S:=ClassicalStandardGenerators("SL",d,q);
-  MA:=MatrixAlgebra(GF(q),d);
-  V:=Zero(MA);
+  S:=ShallowCopy(ClassicalStandardGenerators("SL",d,q));
+  f:=GF(q);
+  V:=NullMat(d,d,);
   for i in [1..d-1] do
     V[i][i+1]:=1;
   od;
   V[d][1]:=(-1)^(d-1);
+  V:=ImmutableMatrix(f,V);
   S[2]:=V;
   S[4]:=S[4]^-1;
   return S;
@@ -46,22 +47,19 @@ end);
 
 #   presentation for extension of direct product of
 #   d - 1 copies of Z_{q - 1} by a copy of Sym (d)
-PresentationForN:=function(d,q)
+BindGlobal("PresentationForN@",function(d,q)
 local F,OMIT,R,Rels,S,U,V,delta,tau;
-  F:=SLPGroup(3);
+  F:=FreeGroup(3);
   U:=F.1;
   V:=F.2;
   delta:=F.3;
   if IsEvenInt(q) then
-    # =v= MULTIASSIGN =v=
-  Error("MULTI");
     R:=PresentationForSn(d);
-    S:=R.val1;
-    R:=R.val2;
-    # =^= MULTIASSIGN =^=
+    S:=FreeGroupOfFpGroup(R);
+    R:=RelatorsOfFpGroup(R);
   else
     # =v= MULTIASSIGN =v=
-    R:=SignedPermutations(d);
+    R:=SignedPermutations@(d);
     S:=R.val1;
     R:=R.val2;
     # =^= MULTIASSIGN =^=
@@ -133,7 +131,7 @@ local F,I,R1,R2,Rels,S,U,V,a,b,delta,e,f,p,phi,tau,w,wm1;
       # =^= MULTIASSIGN =^=
     else
       # =v= MULTIASSIGN =v=
-      R1:=SignedPermutations(d);
+      R1:=SignedPermutations@(d);
       S:=R1.val1;
       R1:=R1.val2;
       # =^= MULTIASSIGN =^=
@@ -143,7 +141,7 @@ local F,I,R1,R2,Rels,S,U,V,a,b,delta,e,f,p,phi,tau,w,wm1;
       [U,V]);
   else
     # =v= MULTIASSIGN =v=
-    R1:=PresentationForN(d,q);
+    R1:=PresentationForN@(d,q);
     S:=R1.val1;
     R1:=R1.val2;
     # =^= MULTIASSIGN =^=

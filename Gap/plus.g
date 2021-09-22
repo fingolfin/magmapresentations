@@ -283,7 +283,7 @@ local F,R,R1,Rels,S,U,V,varZ,e,f,p,phi,w;
   varZ:=F.1;
   U:=F.2;
   V:=F.3;
-  R:=SignedPermutations(n);
+  R:=SignedPermutations@(n);
   S:=FreeGroupOfFpGroup(R);
   R:=RelatorsOfFpGroup(R);
   phi:=GroupHomomorphismByImages(S,F,

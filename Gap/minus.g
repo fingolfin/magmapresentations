@@ -99,7 +99,7 @@ local F,OMIT,R,R1,Rels,S,U,V,m,n,phi,z;
   V:=F.3;
   m:=QuoInt((d-2),2);
   if IsOddInt(q) then
-    R:=SignedPermutations(m);
+    R:=SignedPermutations@(m);
     S:=FreeGroupOfFpGroup(R);
     R:=RelatorsOfFpGroup(R);
   elif IsEvenInt(q) then
