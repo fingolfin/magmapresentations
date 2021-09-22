@@ -2,7 +2,7 @@
 #  Magma -> GAP converter, version 0.5, 11/5/18 by AH
 
 #  Global Variables used: Append, ClassicalStandardGenerators, DiagonalMatrix,
-#  Factorial, GF, GL, Identity, InsertBlock, IsEven, IsOdd, LHS,
+#  Factorial, GF, GL, Identity, IsEven, IsOdd, LHS,
 #  Log, MatrixAlgebra, Odd_SU_PresentationForN, PrimitiveElement, RHS,
 #  FreeGroup, Trace, Zero, phi, tau
 

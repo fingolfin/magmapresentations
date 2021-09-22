@@ -4,6 +4,7 @@ Done:
 sl2q.g (AH, 9/21/21)
 sn.g (AH, 9/21/21)
 standard.g (AH, 9/21/21)
+standard-generators.g (untested yet)
 
 Still to do:
 
@@ -15,7 +16,6 @@ omega.g
 plus.g
 signed.g
 sl.g
-standard-generators.g
 su.g
 su3.g
 test.g

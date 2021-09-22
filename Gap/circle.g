@@ -275,7 +275,7 @@ local gens,P,Presentation,Q,R,Rels,S;
   Assert(1,IsOddInt(d) and d > 1);
   Assert(1,IsOddInt(q));
   if d=3 then
-    R:=ClassicalStandardPresentation@("SL",2,q:Projective:=true);
+    R:=ClassicalStandardPresentation("SL",2,q:Projective:=true);
     gens:=GeneratorsOfFpGroup(FreeGroupOfFpGroup(R));
     R:=RelatorsOfFpGroup(R);
     Q:=FreeGroup(5);

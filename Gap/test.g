@@ -28,7 +28,7 @@ local Q,R,S,d,q;
     for q in [2..field_limit] do
       if Size(DuplicateFreeList(Factors(q))) > 1 then
         Print(d," ",q,"\n");
-        R:=ClassicalStandardPresentation@("SL",d,q:PresentationGenerators:=false)
+        R:=ClassicalStandardPresentat("SL",d,q:PresentationGenerators:=false)
          ;
         Q:=FreeGroupOfFpGroup(R);
         R:=RelatorsOfFpGroup(R);
@@ -58,10 +58,10 @@ local DD,F,I,K,Presentation,Projective,QQ,U,V,d,delta,e,f,p,q,tau;
       QQ:=q;
       Print("\n D = ",d,"q = ",q,"\n");
       if d=2 then
-        F:=ClassicalStandardPresentation@("SL",d,q:Projective:=Projective,
+        F:=ClassicalStandardPresentation("SL",d,q:Projective:=Projective,
          PresentationGenerators:=false);
       else
-        F:=ClassicalStandardPresentation@("SL",d,q:Projective:=Projective,
+        F:=ClassicalStandardPresentation("SL",d,q:Projective:=Projective,
          PresentationGenerators:=Presentation);
       fi;
       e := Factors(q);
@@ -109,7 +109,7 @@ local R,S,d,Q,q;
   for d in [4,4+2..dim_limit] do
     for q in [2..field_limit] do
       if Size(DuplicateFreeList(Factors(p))) > 1 then
-        R:=ClassicalStandardPresentation@("Sp",d,q:PresentationGenerators:=false)
+        R:=ClassicalStandardPresentation("Sp",d,q:PresentationGenerators:=false)
          ;
         Q:=FreeGroupOfFpGroup(R);
         R:=RelatorsOfFpGroup(R);
@@ -155,7 +155,7 @@ local
             p := e[1];
             e := Size(e);
         fi;
-      R:=ClassicalStandardPresentation@("Sp",d,q:Projective:=Projective,
+      R:=ClassicalStandardPresentation("Sp",d,q:Projective:=Projective,
        PresentationGenerators:=Presentation);
       Q:=FreeGroupOfFpGroup(R);
       R:=RelatorsOfFpGroup(R);
@@ -209,7 +209,7 @@ local Q,R,S,d,q;
     for q in [2..field_limit] do
       if Size(DuplicateFreeList(Factors(p))) > 1 then
         Print(d," ",q,"\n");
-        R:=ClassicalStandardPresentation@("SU",d,q:PresentationGenerators:=false)
+        R:=ClassicalStandardPresentation("SU",d,q:PresentationGenerators:=false)
          ;
         Q:=FreeGroupOfFpGroup(R);
          R := RelatorsOfFpGroup(R);
@@ -236,7 +236,7 @@ local Delta,F,I,K,Presentation,Projective,U,V,varZ,d,delta,n,q,sigma,tau;
     Assert(1,IsEvenInt(d));
     n:=QuoInt(d,2);
     for q in list_b do
-      F:=ClassicalStandardPresentation@("SU",d,q:Projective:=Projective,
+      F:=ClassicalStandardPresentation("SU",d,q:Projective:=Projective,
        PresentationGenerators:=Presentation);
       varZ:=F.1;
       V:=F.2;
@@ -297,12 +297,12 @@ local
     n:=QuoInt(d,2);
     for q in list_b do
       if d=3 then
-        R:=ClassicalStandardPresentation@("SU",d,q:Projective:=Projective,
+        R:=ClassicalStandardPresentation("SU",d,q:Projective:=Projective,
          PresentationGenerators:=true);
         Q:=R.FreeGroupOfFpGroup(R);
         R:=RelatorsOfFpGroup(R);
       else
-        R:=ClassicalStandardPresentation@("SU",d,q:Projective:=Projective,
+        R:=ClassicalStandardPresentation("SU",d,q:Projective:=Projective,
          PresentationGenerators:=Presentation);
         Q:=R.FreeGroupOfFpGroup(R);
         R:=RelatorsOfFpGroup(R);
@@ -394,7 +394,7 @@ local varE,Q,R,d,q;
     for q in [2..field_limit] do
       if Size(DuplicateFreeList(Factors(p))) > 1 then
         Print(d," ",q,"\n");
-        R:=ClassicalStandardPresentation@("Omega+",d,
+        R:=ClassicalStandardPresentation("Omega+",d,
          q:PresentationGenerators:=false);
         Q:=FreeGroupOfFpGroup(R);
         R:=RelatorsOfFpGroup(R);
@@ -413,7 +413,7 @@ local varE,Q,R,d,q;
     for q in [2..field_limit] do
       if Size(DuplicateFreeList(Factors(p))) > 1 then
         Print(d," ",q,"\n");
-        R:=ClassicalStandardPresentation@("Omega-",d,
+        R:=ClassicalStandardPresentation("Omega-",d,
          q:PresentationGenerators:=false);
         Q:=FreeGroupOfFpGroup(R);
         R:=RelatorsOfFpGroup(R);
@@ -432,7 +432,7 @@ local varE,Q,R,d,q;
     for q in [3..field_limit] do
       if Size(DuplicateFreeList(Factors(p))) > 1 and IsOddInt(q) then
         Print(d," ",q,"\n");
-        R:=ClassicalStandardPresentation@("Omega",d,
+        R:=ClassicalStandardPresentation("Omega",d,
          q:PresentationGenerators:=false);
         R:=RelatorsOfFpGroup(R);
         varE:=ClassicalStandardGenerators("Omega",d,q);
@@ -459,7 +459,7 @@ local
     Assert(1,IsOddInt(d));
     for q in list_b do
       Assert(1,IsOddInt(q));
-      R:=ClassicalStandardPresentation@("Omega",d,q:Projective:=Projective,
+      R:=ClassicalStandardPresentation("Omega",d,q:Projective:=Projective,
        PresentationGenerators:=Presentation);
       Q:=FreeGroupOfFpGroup(R);
      R:=RelatorsOfFpGroup(R);
@@ -518,7 +518,7 @@ local
   for d in list_a do
     Assert(1,IsEvenInt(d));
     for q in list_b do
-      R:=ClassicalStandardPresentation@("Omega-",d,
+      R:=ClassicalStandardPresentation("Omega-",d,
        q:PresentationGenerators:=Presentation,Projective:=Projective);
       Q:=FreeGroupOfFpGroup(R);
      R:=RelatorsOfFpGroup(R);
@@ -590,7 +590,7 @@ local
     Assert(1,IsEvenInt(d));
     for q in list_b do
       Assert(1,IsOddInt(q));
-      R:=ClassicalStandardPresentation@("Omega+",d,
+      R:=ClassicalStandardPresentation("Omega+",d,
        q:PresentationGenerators:=Presentation,Projective:=Projective);
       Q:=FreeGroupOfFpGroup(R);
       R:=RelatorsOfFpGroup(R);
@@ -641,7 +641,7 @@ local Delta,F,I,K,Presentation,Q,R,U,V,varX,varZ,d,delta,phi,q,sigma,words;
     Assert(1,IsEvenInt(d));
     for q in list_b do
       Assert(1,IsEvenInt(q));
-      R:=ClassicalStandardPresentation@("Omega+",d,
+      R:=ClassicalStandardPresentation("Omega+",d,
        q:PresentationGenerators:=Presentation);
       Q:=FreeGroupOfFpGroup(R);
       R:=RelatorsOfFpGroup(R);

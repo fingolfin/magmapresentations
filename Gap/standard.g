@@ -1,7 +1,5 @@
 # File checked and edited by MW 05/07/19
 
-#  Defines: ClassicalStandardPresentation, Internal_PresentationGenerators
-
 InstallGlobalFunction(Internal_PresentationGenerators@,function(type,d,F)
 #  -> ,]  return the Leedham - Green and O ' Brien presentation generators for
 #  the quasisimple classical group of specified type in dimension d and
@@ -68,7 +66,7 @@ local q;
   fi;
 end);
 
-InstallGlobalFunction(ClassicalStandardPresentation@,function(type,d,F)
+InstallGlobalFunction(ClassicalStandardPresentation,function(type,d,F)
 #  -> ,GrpSLP ,[ ,]  return the Leedham - Green and O ' Brien presentation on
 #  standard generators for the quasisimple classical group of specified type in
 #  dimension d over field of size q ; the string type := one of SL , Sp , SU ,

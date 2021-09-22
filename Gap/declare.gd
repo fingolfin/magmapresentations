@@ -9,4 +9,5 @@ DeclareGlobalFunction("SUGenerators@");
 DeclareGlobalFunction("OmegaGenerators@");
 DeclareGlobalFunction("PlusGenerators@");
 DeclareGlobalFunction("MinusGenerators@");
-DeclareGlobalFunction("ClassicalStandardPresentation@");
+DeclareGlobalFunction("ClassicalStandardPresentation");
+DeclareGlobalFunction("ClassicalStandardGenerators");

@@ -280,7 +280,7 @@ local gens,P,Presentation,Projective,Q,R,Rels,S,n,z;
   Assert(1,IsEvenInt(d));
   n:=QuoInt(d,2);
   if d=4 then
-    R:=ClassicalStandardPresentation@("SL",2,q^2:Projective:=true);
+    R:=ClassicalStandardPresentation("SL",2,q^2:Projective:=true);
     # added variable "gen" for function MappedWord below
     gens:=GeneratorsOfGroup(FreeGroupOfFpGroup(R));
     R:=RelatorsOfFpGroup(R);

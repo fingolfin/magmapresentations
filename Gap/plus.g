@@ -47,7 +47,7 @@ local F,Projective,S,T,Y,d,d1,gens,gog,rels,s,s1,t,t1,v,x,y;
   #   one of the standard generators is the identity
   rels:=[F.7];
   #   sl2 presentation on s, t, d
-  S:=ClassicalStandardPresentation@("SL",2,q);
+  S:=ClassicalStandardPresentation("SL",2,q);
   # need the variable "gog" (Generators Of Group) for the function MappedWord below
   gog:=GeneratorsOfGroup(FreeGroupOfFpGroup(S));
   Y:=FreeGroupOfFpGroup(S);
