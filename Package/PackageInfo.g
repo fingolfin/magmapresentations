@@ -88,7 +88,6 @@ Persons := [
   
 ],
   
-],
 
 ##  Status information. Currently the following cases are recognized:
 ##    "accepted"      for successfully refereed packages
@@ -202,7 +201,7 @@ Autoload := false,
 ##  If the default banner does not suffice then provide a string that is
 ##  printed when the package is loaded (not when it is autoloaded or if
 ##  command line options `-b' or `-q' are given).
-BannerString := "Matrix Group Interface routines by A. Hulpke\n\
+BannerString := "Classical Group Presentations\n\
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n",
 
 TestFile := "tst/testall.g",
