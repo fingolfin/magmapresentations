@@ -1,7 +1,7 @@
 #  File converted from Magma code -- requires editing and checking
 #  Magma -> GAP converter, version 0.5, 11/5/18 by AH
 
-#  Global Variables used: Append, ClassicalStandardGenerators, DiagonalMatrix,
+#  Global Variables used: Append, ClassicalStandardGenerators, 
 #  Factorial, GF, GL, Identity, IsEven, IsOdd, LHS,
 #  Log, MatrixAlgebra, Odd_SU_PresentationForN, PrimitiveElement, RHS,
 #  FreeGroup, Trace, Zero, phi, tau
@@ -53,10 +53,12 @@ local F,lvarGamma,S,U,V,alpha,gamma,i,phi,psi,sigma,t,tau,v,w,x;
   od;
   v[d][2]:=-alpha^q;
   #   U and V
-  S:=ClassicalStandardGenerators("SU",d,q);
+  S:=ClassicalStandardGenerators("SU",d,q:
+    PresentationGenerators:=false);
   U:=S[5];
   V:=S[2];
-  S:=ClassicalStandardGenerators("SU",d-1,q);
+  S:=ClassicalStandardGenerators("SU",d-1,q:
+    PresentationGenerators:=false);
   x:=S[6]^(S[2]^2);
   sigma:=NullMat(d,d,F);
   # was "InsertBlock(TILDEsigma,x,1,1);"

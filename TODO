@@ -8,6 +8,7 @@ signed.g (AH, 9/22/21)
 standard-generators.g (AH, 9/22/21)
 sl.g (AH, 9/22/21)
 sp.g (AH, 9/22/21)
+plus.g (AH, 9/27/21)
 
 On the way:
 test.g, from test_abattoir.g
@@ -19,7 +20,6 @@ even-su.g
 minus.g
 odd-su.g
 omega.g
-plus.g
 su.g
 su3.g
 

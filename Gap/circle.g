@@ -32,7 +32,8 @@ local lvarDelta,varE,F,MA,U,V,varZ,gens,n,sigma,tau,w;
   Assert(1,IsOddInt(d));
   Assert(1,IsOddInt(q));
   if d=3 then
-    return ClassicalStandardGenerators("Omega",3,q);
+    return ClassicalStandardGenerators("Omega",3,q:
+      PresentationGenerators:=false);
   fi;
   n:=QuoInt(d,2);
   Assert(1,n > 1);
@@ -62,7 +63,8 @@ local lvarDelta,varE,F,MA,U,V,varZ,gens,n,sigma,tau,w;
   sigma[1][3]:=1;
   sigma[4][2]:=-1;
   sigma[4][4]:=1;
-  varE:=ClassicalStandardGenerators("Omega",d,q);
+  varE:=ClassicalStandardGenerators("Omega",d,q:
+    PresentationGenerators:=false);
   U:=varE[5];
   V:=varE[4];
   gens:=[lvarDelta,varZ,tau,sigma,U,V];

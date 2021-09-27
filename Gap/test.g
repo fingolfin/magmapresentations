@@ -171,3 +171,162 @@ local
   od;
   return true;
 end;
+
+
+TestPlusOdd:=function(list_a,list_b)
+local lvarDelta,F,I,K,Presentation,Projective,Q,R,U,V,varX,varZ,d,phi,q,
+  sigma,words,gens;
+
+  Presentation:=ValueOption("Presentation");
+  if Presentation=fail then
+    Presentation:=true;
+  fi;
+  Projective:=ValueOption("Projective");
+  if Projective=fail then
+    Projective:=false;
+  fi;
+  for d in list_a do
+    Assert(1,IsEvenInt(d));
+    for q in list_b do
+      Assert(1,IsOddInt(q));
+      R:=ClassicalStandardPresentation("Omega+",d,
+       q:PresentationGenerators:=Presentation,Projective:=Projective);
+      Q:=FreeGroupOfFpGroup(R);
+      R:=RelatorsOfFpGroup(R);
+      F:=Q/R;
+      if d=4 then
+          # TODO SubStructure
+        K:=Subgroup(F,GeneratorsOfGroup(F){[1,3,5,6,7]});
+      else
+        if Presentation then
+          lvarDelta:=F.1;
+          sigma:=F.2;
+          varZ:=F.3;
+          U:=F.4;
+          V:=F.5;
+        else
+          words:=PlusStandardToPresentation@(d,q);
+          # was "varX:=Evaluate(words,List([1..Size(GeneratorsOfGroup(Q))],i->Q.i));"
+          gens:=GeneratorsOfGroup(FamilyObj(words)!.wholeGroup);
+          varX:=List(words,
+            w-> MappedWord(w, gens, GeneratorsOfGroup(Q)));
+          phi:=GroupHomomorphismByImages(Q,F,
+            GeneratorsOfGroup(Q),GeneratorsOfGroup(F));
+          varX:=List(varX,x->Image(phi,x));
+          lvarDelta:=varX[1];
+          sigma:=varX[2];
+          varZ:=varX[3];
+          U:=varX[4];
+          V:=varX[5];
+        fi;
+        K:=Subgroup(F, [U^V,varZ^V,sigma^V,lvarDelta^V,
+          (sigma^(varZ^V))^V,V*U,sigma,lvarDelta]);
+      fi;
+      gens:=ClassicalStandardGenerators("Omega+",d,q:Projective:=Projective,
+       PresentationGenerators:=Presentation);
+
+      # verify relators
+      U:=FreeGeneratorsOfFpGroup(F);
+      V:=List(RelatorsOfFpGroup(F),
+        x->MappedWord(x,FreeGeneratorsOfFpGroup(F),gens));
+      V:=Unique(Filtered(V,x->not IsOne(x)));
+      if Length(V)>0 and (Projective=false or ForAny(V,x->x<>x^0*x[1][1])) then
+        Error("Relators don't hold");
+      fi;
+
+      I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
+      Size(I);
+    od;
+  od;
+  return true;
+end;
+
+TestPlusEven:=function(list_a,list_b)
+local lvarDelta,F,I,K,Presentation,Q,R,U,V,varX,varZ,d,delta,phi,q,sigma,
+  gens,words;
+  Presentation:=ValueOption("Presentation");
+  if Presentation=fail then
+    Presentation:=true;
+  fi;
+  for d in list_a do
+    Assert(1,IsEvenInt(d));
+    for q in list_b do
+      Assert(1,IsEvenInt(q));
+      R:=ClassicalStandardPresentation("Omega+",d,
+       q:PresentationGenerators:=Presentation);
+      Q:=FreeGroupOfFpGroup(R);
+      R:=RelatorsOfFpGroup(R);
+      F:=Q/R;
+      if d=4 then
+          # TODO SubStructure
+        K:=Subgroup(F,GeneratorsOfGroup(F){[1,3,5,6,7]});
+      else
+        if Presentation then
+          delta:=F.1;
+          sigma:=F.2;
+          varZ:=F.3;
+          U:=F.4;
+          V:=F.5;
+        else
+          words:=PlusStandardToPresentation@(d,q);
+          # was "varX:=Evaluate(words,List([1..Size(GeneratorsOfGroup(Q))],i->Q.i));"
+          gens:=GeneratorsOfGroup(FamilyObj(words)!.wholeGroup);
+          varX:=List(words,w-> MappedWord(w, gens, GeneratorsOfGroup(Q)));
+          phi:=GroupHomomorphismByImages(Q,F,
+            GeneratorsOfGroup(Q),GeneratorsOfGroup(F));
+          varX:=List(varX,x->Image(phi,x));
+          delta:=varX[1];
+          sigma:=varX[2];
+          varZ:=varX[3];
+          U:=varX[4];
+          V:=varX[5];
+        fi;
+        lvarDelta:=delta*(delta^-1)^U;
+        K:=Subgroup(F,[U^V,varZ^V,sigma^V,lvarDelta^V,
+          (sigma^(varZ^V))^V,V*U,sigma,lvarDelta]);
+      fi;
+      gens:=ClassicalStandardGenerators("Omega+",d,q:
+       PresentationGenerators:=Presentation);
+
+      # verify relators
+      U:=FreeGeneratorsOfFpGroup(F);
+      V:=List(RelatorsOfFpGroup(F),
+        x->MappedWord(x,FreeGeneratorsOfFpGroup(F),gens));
+      V:=Unique(Filtered(V,x->not IsOne(x)));
+      if Length(V)>0 then
+        Error("Relators don't hold");
+      fi;
+      # TODO Lots of things to change here
+      I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
+      Size(I);
+    od;
+  od;
+  return true;
+end;
+
+TestPlus:=function(list_a,list_b)
+local Presentation,Projective,d,f,q;
+  Presentation:=ValueOption("Presentation");
+  if Presentation=fail then
+    Presentation:=true;
+  fi;
+  Projective:=ValueOption("Projective");
+  if Projective=fail then
+    Projective:=false;
+  fi;
+  if Projective then Print("Doing Projective\n");fi;
+  if Presentation then Print("Doing Presentation\n");fi;
+  for d in list_a do
+    for q in list_b do
+      Print(" D = ",d,", q = ",q,"\n");
+      if IsEvenInt(q) then
+        f:=TestPlusEven([d],[q]:Presentation:=Presentation);
+      else
+        f:=TestPlusOdd([d],[q]
+         :Presentation:=Presentation,Projective:=Projective);
+      fi;
+    od;
+  od;
+  return true;
+end;
+

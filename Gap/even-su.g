@@ -12,7 +12,8 @@
 EvenSUGenerators:=function(d,q)
 local lvarDelta,S,T,U,V,varZ,delta,sigma,tau;
   Assert(1,IsEvenInt(d));
-  S:=ClassicalStandardGenerators("SU",d,q);
+  S:=ClassicalStandardGenerators("SU",d,q:
+    PresentationGenerators:=false);
   varZ:=S[1];
   varZ:=varZ^-1;
   V:=S[2];

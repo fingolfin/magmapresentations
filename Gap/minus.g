@@ -440,7 +440,8 @@ end);
 InstallGlobalFunction(MinusGenerators@,function(d,q)
 local B,varE,U,V,delta,gens,i,n,s,sigma,tau,w,z;
   if d=4 then
-    return ClassicalStandardGenerators("Omega-",d,q);
+    return ClassicalStandardGenerators("Omega-",d,q:
+      PresentationGenerators:=false);
   fi;
   varE:=GF(q^2);
   w:=PrimitiveElement(varE);

@@ -3,25 +3,6 @@
 
 # Partially checked (up to line 409) MW 19/07/19
 
-#  Global Variables used: Append, BaseRing, BorelGenerators, BorelPresentation,
-#  Characteristic, ChooseGamma, Coefficients, ComputeRight, ConstructTauMatrix,
-#  ConstructVMatrix, DefineU0, Degree, DeltaMatrix, DiagonalMatrix, Eltseq,
-#  Evaluate, ExceptionalCase, ExtendedGreatestCommonDivisor, FindSolutions,
-#  FreeGroup, GF, GL, Gcd, Id, Identity, Integers, IsEven, IsOdd, IsPower,
-#  IsUpperTriangular, Isqrt, LHS, Log, MatrixAlgebra, MatrixToTuple,
-#  MinimalPolynomial, Normalise, Nrows, Parent, PolynomialRing,
-#  PrimitiveElement, ProcessRelation, R2Relations, RHS, Relations, Reverse,
-#  SLPForElement, SLPGroup, SU, SU32Generators, SU3Generators,
-#  SpecialSLPForElement, TMatrix, TauMatrix, Trace, TupleToMatrix,
-#  TwoPolynomials, Type, VMatrix, VectorSpace, Zero, phi
-
-#  Defines: BorelGenerators, BorelPresentation, ChooseGamma, ComputeRight,
-#  ConstructTauMatrix, ConstructVMatrix, DefineU0, DeltaMatrix,
-#  ExceptionalCase, FindSolutions, MatrixToTuple, ProcessRelation, R2Relations,
-#  SLPForElement, SU32Generators, SU32Presentation, SU3Generators,
-#  SU3Presentation, SpecialSLPForElement, TMatrix, TauMatrix, TupleToMatrix,
-#  TwoPolynomials, VMatrix
-
 #   Explicit version of presentation for SU(3, q)
 #   Last revised Ocotober 2018
 #   to get paper version V (alpha, beta)
@@ -38,7 +19,7 @@ local F,beta,psi,v,w;
     psi:=(-1/2)*w^0;
   fi;
   beta:=psi*alpha^(1+q)+gamma;
-  v:=[1,alpha,beta,0,1,-alpha^q,0,0,1]*IdentityMat(3, F);
+  v:=[[1,alpha,beta],[0,1,-alpha^q],[0,0,1]]*IdentityMat(3, F);
   return v;
 end;
 
@@ -119,31 +100,9 @@ local lvarDelta,F,Gens,R,lvarTau,V,c,delta,entry,g,matrix,tau,theta,v,w,word,z;
   delta:=W.3;
   F:=GF(q^2);
   w:=PrimitiveElement(F);
-  Gens:=SU3Generators(q);
-  V:=Gens[1];
-  lvarTau:=Gens[2];
-  lvarDelta:=Gens[3];
-  entry:=lvarTau[1][3];
-  z:=g[1][3];
-  if z<>0 then
-    theta:=w^-(q+1);
-    ## TODO What is SubStructure
-    R:=SubStructure(F,theta);
-    # was "c:=Eltseq((entry^-1*z)*FORCEOne(R));"
-    c:=Coefficients(Basis(F), (entry^-1*z)*FORCEOne(R));
-    c:=List(c,x->Int(x));
-    word:=Product(List([1..Size(c)],i->(tau^(delta^(i-1)))^c[i]));
-    matrix:=Product(List([1..Size(c)],i->(lvarTau^(lvarDelta^(i-1)))^c[i]));
-    g:=matrix^-1*g;
-    Assert(1,g[1][3]=0);
-  fi;
-  ## TODO Not sure what this func is returning - why is g being returned?
-  return rec(val1:=word,
-    val2:=g);
-end;
 
 #   find solutions x and y to Lemma 4.1
-FindSolutions:=function(q)
+BindGlobal("FindSolutions@",function(q)
 local F,c,d,found,m,n,psi,t,w,w0,x,y;
   F:=GF(q^2);
   w:=PrimitiveElement(F);
@@ -153,12 +112,11 @@ local F,c,d,found,m,n,psi,t,w,w0,x,y;
   if IsEvenInt(q) then
     x:=-(q+1) mod (q^2-1);
     # was "c:=Log(w0,(1-w0)^Z(q)^0);"
-    c:=Log((1-w0)^Z(q)^0,w0);
+    c:=Log((1-w0)*Z(q)^0,w0);
     y:=-c*(q+1) mod (q^2-1);
     Assert(1,w^(x*m)+w^(y*m)=1 and w^(-x*n)+w^(-y*n)=1);
-    # TODO What is SubStructure?
-    Assert(1,Size(SubStructure(GF(q^2),w^(x*m)))=q and Size(SubStructure(GF(q^2)
-     ,w^(x*n)))=q);
+    Assert(1,Size(Subfield(GF(q^2),[w^(x*m))])=q and Size(Subfield(GF(q^2)
+     ,[w^(x*n)]))=q);
      # TODO Not sure what this func is returning but think this is fine
     return rec(val1:=x,
       val2:=y);
@@ -177,9 +135,8 @@ local F,c,d,found,m,n,psi,t,w,w0,x,y;
     x:=-LogFFE(c,w) mod (q^2-1);
     y:=-LogFFE(d,w) mod (q^2-1);
     if w^(x*m)+w^(y*m)=1 and w^(-x*n)+w^(-y*n)=1 then
-    # TODO SubStructure problem
-      found:=Size(SubStructure(GF(q^2),w^(x*m)))=q^2 and
-       Size(SubStructure(GF(q^2),w^(x*n)))=q;
+      found:=Size(Subfield(GF(q^2),[w^(x*m))])=q^2 and
+       Size(Subfield(GF(q^2),[w^(x*n)]))=q;
       if found then
           # TODO Not sure what this func is returning but think this is fine
         return rec(val1:=x,
@@ -188,30 +145,23 @@ local F,c,d,found,m,n,psi,t,w,w0,x,y;
     fi;
   od;
   Error("Failed to find x and y");
-end;
+end);
 
 #   find two polynomials g, h of degree Degree (F) - 1 which satisfy
 #      w^(2*q - 4) = g(r) + w^(q - 2) * h(r)
 #   where r  = w^(x * (q - 2))
-TwoPolynomials:=function(varE,F,p,q,w,x)
+BindGlobal("TwoPolynomials@",function(varE,F,p,q,w,x)
 local P,W,e,g,h,l,one,r,two;
   x:=IndeterminateOfUnivariateRationalFunction(F);
   e:=Degree(F,x);
-  P:=PolynomialRing(GF(p));
-  # Implicit generator Assg from previous line.
-  l:=P.1;
   r:=w^(x*(q-2));
-  ## TODO SubStructure
-  W:=SubStructure(varE,r);
   one:=w^((q+1)*(q-2));
   two:=(w^(2*q-4)-one)*w^-(q-2);
   if one in W and two in W then
     # was "g:=Eltseq(one*FORCEOne(W))*FORCEOne(P);"
-    g:=Coefficients(Basis(F),one*FORCEOne(W))*FORCEOne(P);
-    h:=Coefficients(Basis(F),two*FORCEOne(W))*FORCEOne(P);
-    ## TODO What is evaluate? g and h are lists of values, not functions...
-    if w^(2*q-4)=Evaluate(g,r)+w^(q-2)*Evaluate(h,r) then
-    ## TODO Not sure what this func should be returning
+    g:=Coefficients(Basis(F),one);
+    h:=Coefficients(Basis(F),two);
+    if w^(2*q-4)=ValuePol(g,r)+w^(q-2)*ValuePol(h,r) then
       return rec(val1:=g,
         val2:=h);
     fi;
@@ -223,41 +173,38 @@ local P,W,e,g,h,l,one,r,two;
   one:=pair[1];
   two:=pair[2];
   # was "g:=Eltseq(one*FORCEOne(W))*FORCEOne(P);"
-  g:=Coefficients(Basis(F),one*FORCEOne(W))*FORCEOne(P);
-  h:=Coefficients(Basis(F),two*FORCEOne(W))*FORCEOne(P);
-  Assert(1,w^(2*q-4)=Evaluate(g,r)+w^(q-2)*Evaluate(h,r));
-  ## TODO Not sure what this func should be returning
+  g:=Coefficients(Basis(F),one);
+  h:=Coefficients(Basis(F),two);
+  Assert(1,w^(2*q-4)=ValuePol(g,r)+w^(q-2)*ValuePol(h,r));
   return rec(val1:=g,
     val2:=h);
-end;
+end);
 
 #   Presentation for Borel subgroup
 #   power relation needed in Borel presentation only
 #   if used to set up SU(3, q) then AddPower = false;
-BorelPresentation:=function(q)
+BindGlobal("BorelPresentation@",function(q)
 local
    A,AddPower,B,Delta,varE,F,Gens,I,K,L,R,Rels,Tau,V,W,a,b,b1,b2,b3,b4,delta,e,
    f,lhs,m1,m2,m3,m4,matrix,p,rhs,tau,theta,v,w,w0,word,x,y;
   AddPower:=ValueOption("AddPower");
-  if AddPower=fail then
-    AddPower:=false;
-  fi;
-  W:=FreeGroup(3);
+  if AddPower=fail then AddPower:=false; fi;
+  W:=FreeGroup("v","tau","delta");
   v:=W.1;
   tau:=W.2;
   delta:=W.3;
   varE:=GF(q^2);
   F:=GF(q);
-  e:=Degree(F);
+  e:=DegreeOverPrimeField(F);
   p:=Characteristic(varE);
   w:=PrimitiveElement(varE);
   w0:=w^(q+1);
   theta:=w^(q-2);
-  Gens:=BorelGenerators(q);
+  Gens:=BorelGenerators@(q);
   V:=Gens[1];
   lvarTau:=Gens[2];
   lvarDelta:=Gens[3];
-  y:=FindSolutions(q);
+  y:=FindSolutions@(q);
   x:=y.val1;
   y:=y.val2;
   A:=(lvarDelta^1)^x;
@@ -288,11 +235,9 @@ local
     Add(Rels,Product(List([1..Size(b1)],i->(tau^(a^(i-1)))^b1[i])));
   fi;
   if e=1 or Gcd(x,q^2-1) > 1 then
-     ## TODO SubStructure
-    K:=SubStructure(F,w0^-x);
      ## TODO not 100% sure that the field is varE in the fuction Coefficients below.
     # was "b2:=Eltseq((w0^-1)*FORCEOne(K));"
-    b2:=Coefficients(Basis(varE),(w0^-1)*FORCEOne(K));
+    b2:=Coefficients(Basis(varE),(w0^-1));
     b2:=List(b2,Int);
     Add(Rels,Product(List([1..Size(b2)],i->(tau^(a^(i-1)))^b2[i])
      /tau^(delta)));
@@ -300,11 +245,11 @@ local
   #   R3
   #   (i)
   lhs:=v;
-  rhs:=v^a*v^b*SpecialSLPForElement((V^A*V^B)^-1*V,q,W);
+  rhs:=v^a*v^b*SpecialSLPForElement@((V^A*V^B)^-1*V,q,W);
   Add(Rels,lhs/rhs);
   if IsOddInt(p) then
     lhs:=v;
-    rhs:=v^b*v^a*SpecialSLPForElement((V^B*V^A)^-1*V,q,W);
+    rhs:=v^b*v^a*SpecialSLPForElement@((V^B*V^A)^-1*V,q,W);
     Add(Rels,lhs/rhs);
   fi;
   #   (ii)
@@ -312,15 +257,15 @@ local
   Add(Rels,Comm(v^b,tau));
   #   (iii)
   lhs:=Comm(v,v^a);
-  rhs:=SpecialSLPForElement(Comm(V,V^A),q,W);
+  rhs:=SpecialSLPForElement@(Comm(V,V^A),q,W);
   Add(Rels,lhs/rhs);
   #   (iv)
   if IsEvenInt(q) and e > 1 then
     lhs:=Comm(v^delta,v^a);
-    rhs:=SpecialSLPForElement(Comm(V^lvarDelta,V^A),q,W);
+    rhs:=SpecialSLPForElement@(Comm(V^lvarDelta,V^A),q,W);
     Add(Rels,lhs/rhs);
     lhs:=Comm(v^delta,v^b);
-    rhs:=SpecialSLPForElement(Comm(V^lvarDelta,V^B),q,W);
+    rhs:=SpecialSLPForElement@(Comm(V^lvarDelta,V^B),q,W);
     Add(Rels,lhs/rhs);
   fi;
   #   (v)
@@ -329,25 +274,23 @@ local
   b:=List(b,Int);
   lhs:=Product(List([1..Size(b)],i->(v^(a^(i-1)))^b[i]));
   matrix:=Product(List([1..Size(b)],i->(V^(A^(i-1)))^b[i]));
-  rhs:=SpecialSLPForElement(matrix,q,W);
+  rhs:=SpecialSLPForElement@(matrix,q,W);
   Add(Rels,lhs/rhs);
   #   (vi)
   if IsOddInt(q) and Gcd(x,q^2-1) > 1 then
-      ## TODO SubStructure
-    K:=SubStructure(varE,w^(x*(q-2)));
       ## not 100% sure the field is is varE
     # was "b:=Eltseq((w^(q-2))*FORCEOne(K));"
-    b:=Coefficients(Basis(varE), (w^(q-2))*FORCEOne(K));
+    b:=Coefficients(Basis(varE), (w^(q-2)));
     b:=List(b,Int);
     L:=V^(lvarDelta);
     R:=Product(List([1..Size(b)],i->(V^(A^(i-1)))^b[i]));
     matrix:=R^-1*L;
-    word:=SpecialSLPForElement(matrix,q,W);
+    word:=SpecialSLPForElement@(matrix,q,W);
     lhs:=v^delta;
     rhs:=Product(List([1..Size(b)],i->(v^(a^(i-1)))^b[i])*word);
     Add(Rels,lhs/rhs);
   elif IsEvenInt(q) then
-    m4:=TwoPolynomials(varE,F,p,q,w,x);
+    m4:=TwoPolynomials@(varE,F,p,q,w,x);
     m3:=m4.val1;
     m4:=m4.val2;
     b3:=Coefficients(m3);
@@ -358,16 +301,16 @@ local
     R:=Product(List([1..Size(b3)],i->(V^(A^(i-1)))^b3[i])
      *Product(List([1..Size(b4)],i->(V^(lvarDelta*A^(i-1)))^b4[i])));
     matrix:=R^-1*L;
-    word:=SpecialSLPForElement(matrix,q,W);
+    word:=SpecialSLPForElement@(matrix,q,W);
     lhs:=v^(delta^2);
     rhs:=Product(List([1..Size(b3)],i->(v^(a^(i-1)))^b3[i])
      *Product(List([1..Size(b4)],i->(v^(delta*a^(i-1)))^b4[i])*word));
     Add(Rels,lhs/rhs);
   fi;
   return W/Rels;
-end;
+end);
 
-ChooseGamma:=function(q,beta,eta,w,zeta)
+BindGlobal("ChooseGamma@",function(q,beta,eta,w,zeta)
 local gamma,t,x;
   Assert(1,Trace(GF(q^2),GF(q),eta)<>0);
   # was "Assert(1,Trace(beta,GF(q))<>0);"
@@ -378,17 +321,17 @@ local gamma,t,x;
   x:=(w*zeta^-1)*(beta+gamma);
   Assert(1,x in GF(q) and x<>0);
   return gamma;
-end;
+end);
 
 #   definition of U0
-DefineU0:=function(q)
+BindGlobal("DefineU0@",function(q)
 local Alpha,F,alpha,beta0,eta,gamma0,n,t,w,w0,zeta;
   F:=GF(q^2);
   w:=PrimitiveElement(F);
   w0:=w^(q+1);
   beta0:=w^(1+QuoInt((q^2+q),2));
   t:=Trace(F,GF(q),beta0);
-  n:=Log(-t*FORCEOne(GF(q)), w0*FORCEOne(GF(q)));
+  n:=LogFFE(-t, w0);
   alpha:=w^n;
   Assert(1,alpha^(q+1)=-t);
   if q mod 3<>2 then
@@ -402,10 +345,10 @@ local Alpha,F,alpha,beta0,eta,gamma0,n,t,w,w0,zeta;
   zeta:=-w^(QuoInt((q^2+q),2));
   Assert(1,zeta^2=w0);
   eta:=w^-1*zeta;
-  gamma0:=ChooseGamma(q,beta0,eta,w,zeta);
+  gamma0:=ChooseGamma@(q,beta0,eta,w,zeta);
   return rec(val1:=lvarAlpha,
     val2:=gamma0);
-end;
+end);
 
 ##############################
 ###
@@ -432,9 +375,9 @@ local A,F,alpha,beta,psi,q,w;
   return [alpha,beta];
 end;
 
-TupleToMatrix:=function(q,v)
-return VMatrix(q,v[1],v[2]);
-end;
+BindGlobal("TupleToMatrix@",function(q,v)
+  return VMatrix@(q,v[1],v[2]);
+end);
 
 ComputeRight:=function(q,U)
 local V,m,r,s,t;
@@ -443,7 +386,7 @@ local V,m,r,s,t;
   s:=Normalise(r);
   s[2]:=-s[2];
   t:=MatrixToTuple(s);
-  m:=TupleToMatrix(q,t);
+  m:=TupleToMatrix@(q,t);
   Assert(1,MatrixToTuple(m)=t);
   return rec(val1:=m,
     val2:=t);
@@ -452,15 +395,15 @@ end;
 ProcessRelation:=function(G,v)
 local U,d,left,lv,q,rest,right,rv,t;
   q:=RootInt(Size(BaseRing(G)));
-  t:=TMatrix(q);
-  U:=TupleToMatrix(q,v);
+  t:=TMatrix@(q);
+  U:=TupleToMatrix@(q,v);
   # =v= MULTIASSIGN =v=
   rv:=ComputeRight(q,U);
   right:=rv.val1;
   rv:=rv.val2;
   # =^= MULTIASSIGN =^=
   rest:=t^-1*U*t*right^-1*t^-1;
-  d:=DiagonalMat(BaseRing(G),List([1..Length(rest)],i->rest[i][i]));
+  d:=DiagonalMat(List([1..Length(rest)],i->rest[i][i]));
   left:=rest*d^-1;
   Assert(1,IsUpperTriangular(left));
   lv:=MatrixToTuple(left);
@@ -570,11 +513,11 @@ local
   else
     psi:=-1/2;
   fi;
-  tau0:=VMatrix(q,0,gamma0);
+  tau0:=VMatrix@(q,0,gamma0);
   mats:=[];
   for i in [1..Size(lvarAlpha)] do
     e:=beta0-psi*lvarAlpha[i]^(q+1);
-    Add(mats,VMatrix(q,lvarAlpha[i],e));
+    Add(mats,VMatrix@(q,lvarAlpha[i],e));
   od;
   mats:=Concatenation(mats,List(mats,m->m*tau0));
   Add(mats,tau0);
@@ -593,28 +536,22 @@ local
     right:=right.val6;
     # =^= MULTIASSIGN =^=
     pow:=Log(d[1][1]);
-    m:=TupleToMatrix(q,u);
-    # =v= MULTIASSIGN =v=
+    m:=TupleToMatrix@(q,u);
     b1:=SLPForElement(q,delta,v,tau,u,m,wdelta,wv,wtau);
     a:=b1.val1;
     b:=b1.val2;
     a1:=b1.val3;
     b1:=b1.val4;
-    # =^= MULTIASSIGN =^=
-    # =v= MULTIASSIGN =v=
     y1:=SLPForElement(q,delta,v,tau,lv,left,wdelta,wv,wtau);
     x:=y1.val1;
     y:=y1.val2;
     x1:=y1.val3;
     y1:=y1.val4;
-    # =^= MULTIASSIGN =^=
-    # =v= MULTIASSIGN =v=
     w1:=SLPForElement(q,delta,v,tau,rv,right,wdelta,wv,wtau);
     z:=w1.val1;
     w:=w1.val2;
     z1:=w1.val3;
     w1:=w1.val4;
-    # =^= MULTIASSIGN =^=
     lhs:=t^-1*a1*b1*t;
     rhs:=(x1*y1)*delta^pow*t*z1*w1;
     Assert(1,lhs/rhs);
@@ -718,13 +655,11 @@ local Q,R,R1,R2,Rels,W,delta,phi,t,tau,v;
   delta:=W.3;
   t:=W.4;
   #   relations of type R1
-  # =v= MULTIASSIGN =v=
-  R1:=BorelPresentation(q);
-  Q:=R1.val1;
-  R1:=R1.val2;
-  # =^= MULTIASSIGN =^=
+  R1:=BorelPresentation@(q);
+  Q:=FreeGroupOfFpGroup(R1);
+  R1:=RelatorsOfFpGroup(Q);
   phi:=GroupHomomorphismByImages(Q,W,
-    GeneratorsOfGroup(Q),List([1..3],i->W.i));
+    GeneratorsOfGroup(Q),GeneratorsOfGroup(W){[1..3]});
   Rels:=List(R1,r->phi(r));
   #   relations of type R2
   # =v= MULTIASSIGN =v=
@@ -741,40 +676,86 @@ local Q,R,R1,R2,Rels,W,delta,phi,t,tau,v;
   return rec(val1:=W,
     val2:=Rels);
 end;
+# Partially checked (up to line 409) MW 19/07/19
 
-#
-#  for q in [3..1000] do
-#  if IsOdd(q) and  IsPrimePower (q) then
-#  q;
-#  Q, R := OddBorelPresentation (q);
-#  X := SU3Generators (q);
-#  S := Evaluate (R, X); assert #Set (S) eq 1;
-#  end if;
-#  end for;
-#
-#  for q in [7..1000] do
-#  if  IsPrimePower (q) then
-#  q;
-#  Q, R := BorelPresentation (q);
-#  X := SU3Generators (q);
-#  S := Evaluate (R, X); assert #Set (S) eq 1;
-#  end if;
-#  end for;
-#
-#  for q in [2..1000] do
-#  if IsPrimePower (q) then
-#  q;
-#  Q, R := BorelPresentation (q);
-#  X := BorelGenerators (q);
-#  S := Evaluate (R, X); assert #Set (S) eq 1;
-#  end if;
-#  end for;
-#
-#  for q in [2..100000] do
-#  if IsPrimePower (q) then
-#  q;
-#  time Q, R := SU3Presentation (q);
-#  X := SU3Generators (q);
+#   Explicit version of presentation for SU(3, q)
+#   Last revised Ocotober 2018
+#   to get paper version V (alpha, beta)
+#   call V(alpha, beta - psi * alpha^(1+q))
+BindGlobal("VMatrix@",function(q,alpha,gamma)
+local F,beta,psi,v,w;
+  F:=GF(q^2);
+  w:=PrimitiveElement(F);
+  if IsEvenInt(q) then
+    # was "psi:=Trace(w,GF(q))^(-1)*w;"
+    psi:=Trace(F,GF(q),w)^(-1)*w;
+    Assert(1,psi=1/(1+w^(q-1)));
+  else
+    psi:=(-1/2)*w^0;
+  fi;
+  beta:=psi*alpha^(1+q)+gamma;
+  v:=[[1,alpha,beta],[0,1,-alpha^q],[0,0,1]]*One(F);
+  v:=ImmutableMatrix(F,v);
+  return v;
+end);
+
+BindGlobal("DeltaMatrix@",function(q,alpha)
+local delta;
+  delta:=DiagonalMat([alpha,alpha^(q-1),alpha^-q]);
+  return delta;
+end);
+
+BindGlobal("TauMatrix@",function(q,gamma)
+local F,tau;
+  F:=GF(q^2);
+  tau:=[[1,0,gamma],[0,1,0],[0,0,1]]*One(F);
+  tau:=ImmutableMatrix(F,tau);
+  return tau;
+end);
+
+BindGlobal("TMatrix@",function(q)
+local t,one;
+  one:=Z(q)^0;
+  t:=NullMat(3, 3, GF(q^2));
+  t[1][3]:=one;
+  t[2][2]:=-one;
+  t[3][1]:=one;
+  return t;
+end);
+
+BindGlobal("BorelGenerators@",function(q)
+local F,alpha,beta,delta,tau,v,w;
+  F:=GF(q^2);
+  w:=PrimitiveElement(F);
+  v:=VMatrix@(q,1,0);
+  beta:=v[1][3];
+  alpha:=v[1][2];
+  Assert(1,Trace(F,GF(q),beta)=-alpha^(q+1));
+  if IsEvenInt(q) then
+    tau:=TauMatrix@(q,1);
+  else
+    tau:=TauMatrix@(q,w^(QuoInt((q+1),2)));
+  fi;
+
+  delta:=DeltaMatrix@(q,w);
+  return [v,tau,delta];
+end);
+
+BindGlobal("SU32Generators@",function()
+local lvarDelta,F,beta0,q,t,v,v1,w,w0;
+  q:=2;
+  F:=GF(q^2);
+  w:=PrimitiveElement(F);
+  w0:=w^(q+1);
+  beta0:=w^(1+QuoInt((q^2+q),2));
+  v:=VMatrix@(q,1,0);
+  v1:=VMatrix@(q,w^2,0);
+  lvarDelta:=DeltaMatrix@(q,w);
+  t:=TMatrix@(q);
+  return [v,v1,lvarDelta,t];
+end);
+
+BindGlobal("SU3Generators@",function(q)
 #  S := Evaluate (R, X); assert #Set (S) eq 1;
 #  end if;
 #  end for;
