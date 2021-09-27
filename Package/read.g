@@ -15,3 +15,5 @@ ReadPackage("classicpres","lib/standard.gi");
 ReadPackage("classicpres","lib/standard-generators.gi");
 ReadPackage("classicpres","lib/sl.gi");
 ReadPackage("classicpres","lib/sp.gi");
+
+ReadPackage("classicpres","lib/isofp.gi");

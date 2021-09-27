@@ -162,7 +162,7 @@ end);
 
 #   canonical basis for SU(d, q) 
 BindGlobal("SUChosenElements@",function(G)
-local varE,F,M,P,a,alpha,b,d,delta,f,i,n,p,q,t,w,w0,x,y,one;
+local varE,F,P,a,alpha,b,d,delta,f,i,n,p,q,t,w,w0,x,y,one;
   d:=DimensionOfMatrixGroup(G);
   varE:=DefaultFieldOfMatrixGroup(G);
   f:=QuoInt(DegreeOverPrimeField(varE),2);
@@ -186,7 +186,7 @@ local varE,F,M,P,a,alpha,b,d,delta,f,i,n,p,q,t,w,w0,x,y,one;
   od;
   t:=IdentityMat(d,varE);
   t[1][2]:=alpha;
-  delta:=Identity(M);
+  delta:=IdentityMat(d,varE);
   if (d=3 and p=2 and f=1) then
     delta[1][2]:=w;
     delta[1][3]:=w;
@@ -261,7 +261,7 @@ local one,D,F,Gens,I,L,M,P,SpecialGroup,U,_,a,b,delta,gens,h,i,m,n,q,u,w,x,y;
   if SpecialGroup=fail then
     SpecialGroup:=false;
   fi;
-  n:=Degree(G);
+  n:=DegreeOfMatrixGroup(G);
   Assert(1,IsOddInt(n) and n > 1);
   F:=DefaultFieldOfMatrixGroup(G);
   q:=Size(F);
@@ -333,20 +333,20 @@ end);
 #  for SO+, otherwise for Omega+ 
 BindGlobal("PlusChosenElements@",function(G)
 local 
-   A,F,Gens,I,M,MA,P,SpecialGroup,_,a,b,delta,delta1,delta4,gens,i,n,q,s,s1,t,
+   A,F,Gens,I,M,P,SpecialGroup,_,a,b,delta,delta1,delta4,gens,i,n,q,s,s1,t,
    t1,t4,u,v,w,x,y,one;
   SpecialGroup:=ValueOption("SpecialGroup");
   if SpecialGroup=fail then
     SpecialGroup:=false;
   fi;
-  n:=Degree(G);
+  n:=DegreeOfMatrixGroup(G);
   F:=DefaultFieldOfMatrixGroup(G);
   one:=One(F);
   q:=Size(F);
   w:=PrimitiveElement(F);
   #A:=MatrixAlgebra(F,2);
   if n=2 then
-    Gens:=List([1..8],i->Identity(A));
+    Gens:=List([1..8],i->IdentityMat(2,F));
     if Size(F) > 3 then
       x:=OmegaPlus(2,F).1;
       Gens[3]:=x;
@@ -364,38 +364,38 @@ local
     #M:=MatrixAlgebra(F,4);
     s:=NullMat(n,n,F);
     for i in [5..n] do
-      s[i][i]:=1;
+      s[i][i]:=one;
     od;
-    s[1][4]:=-1;
-    s[2][3]:=-1;
-    s[3][2]:=1;
-    s[4][1]:=1;
+    s[1][4]:=-one;
+    s[2][3]:=-one;
+    s[3][2]:=one;
+    s[4][1]:=one;
     t4:=[[1,0,0,-1],[0,1,0,0],[0,1,1,0],[0,0,0,1]]*one;
     t:=IdentityMat(n,F);
     #InsertBlock(TILDEt,t4,1,1);
     t{[1..4]}{[1..4]}:=t4;
-    delta4:=DiagonalMat(F,[w,w^-1,w,w^-1]);
-    delta:=Identity(MA);
+    delta4:=DiagonalMat([w,w^-1,w,w^-1]);
+    delta:=IdentityMat(n,F);
     #InsertBlock(TILDEdelta,delta4,1,1);
     delta{[1..4]}{[1..4]}:=delta4;
     s1:=NullMat(n,n,F);
     for i in [5..n] do
-      s1[i][i]:=1;
+      s1[i][i]:=one;
     od;
-    s1[1][3]:=1;
-    s1[2][4]:=1;
-    s1[3][1]:=-1;
-    s1[4][2]:=-1;
+    s1[1][3]:=one;
+    s1[2][4]:=one;
+    s1[3][1]:=-one;
+    s1[4][2]:=-one;
     t4:=[[1,0,1,0],[0,1,0,0],[0,0,1,0],[0,-1,0,1]]*one;
-    t1:=Identity(MA);
+    t1:=IdentityMat(n,F);
     #InsertBlock(TILDEt1,t4,1,1);
     t1{[1..4]}{[1..4]}:=t4;
-    delta4:=DiagonalMat(F,[w,w^-1,w^-1,w]);
-    delta1:=Identity(MA);
+    delta4:=DiagonalMat([w,w^-1,w^-1,w]);
+    delta1:=IdentityMat(n,F);
     #InsertBlock(TILDEdelta1,delta4,1,1);
     delta1{[1..4]}{[1..4]}:=delta4;
-    u:=Identity(MA);
-    I:=Identity(A);
+    u:=IdentityMat(n,F);
+    I:=IdentityMat(2,F);
     v:=NullMat(n,n,F);
     for i in [1..QuoInt(n,2)-1] do
       x:=(i-1)*2+1;
@@ -407,7 +407,7 @@ local
     v{[n-1..n-1+Length(I)-1]}{[1..Length(I[1])]}:=(-1)^(QuoInt(n,2)+1)*I;
     Gens:=[s,t,delta,s1,t1,delta1,u,v];
     if SpecialGroup then
-      a:=Identity(MA);
+      a:=IdentityMat(n,F);
       if IsOddInt(q) then
         # =v= MULTIASSIGN =v=
         b:=Valuation(q-1,2);
@@ -417,10 +417,10 @@ local
         a[1][1]:=w^b;
         a[2][2]:=w^-b;
       else
-        a[1][1]:=0;
-        a[1][2]:=1;
-        a[2][1]:=1;
-        a[2][2]:=0;
+        a[1][1]:=0*one;
+        a[1][2]:=one;
+        a[2][1]:=one;
+        a[2][2]:=0*one;
       fi;
       Add(Gens,a);
     fi;
@@ -454,7 +454,7 @@ local
   Assert(1,gamma^(q+1)=alpha);
   M:=MatrixAlgebra(GF(q^2),d);
   if d=2 then
-    Gens:=List([1..5],i->Identity(G));
+    Gens:=List([1..5],i->One(G));
     O:=OmegaMinus(d,q);
     x:=O.Ngens(O);
     Gens[3]:=x;
@@ -539,27 +539,27 @@ end);
 #  for SO-, otherwise for Omega- 
 BindGlobal("MinusChosenElements@",function(G)
 local 
-   A,D,varE,lvarEE,F,Gens,I,L,M,MA,P,SpecialGroup,U,a,b,c,d,delta,gens,h,i,m,mu,n,p,
+   A,D,varE,lvarEE,F,Gens,I,L,M,P,SpecialGroup,U,a,b,c,d,delta,gens,h,i,m,mu,n,p,
    q,w,x,y,one;
   SpecialGroup:=ValueOption("SpecialGroup");
   if SpecialGroup=fail then
     SpecialGroup:=false;
   fi;
-  n:=Degree(G);
+  n:=DegreeOfMatrixGroup(G);
   F:=DefaultFieldOfMatrixGroup(G);
   one:=One(F);
   q:=Size(F);
   if IsEvenInt(q) then
     return MinusChar2Elements@(G:SpecialGroup:=SpecialGroup);
   fi;
-  A:=MatrixAlgebra(F,2);
+  #A:=MatrixAlgebra(F,2);
   if n=2 then
-    Gens:=List([1..5],i->Identity(A));
+    Gens:=List([1..5],i->IdentityMat(2,F));
     x:=OmegaMinus(n,q).1;
     Gens[2]:=x;
     if SpecialGroup then
       if q mod 4=1 then
-        Gens[Size(Gens)+1]:=-Identity(GL(2,F));
+        Gens[Size(Gens)+1]:=-IdentityMat(2,F);
       else
         y:=SO(-1,n,q).1;
         Gens[Size(Gens)+1]:=y*x^-1;
@@ -568,7 +568,7 @@ local
     return List(Gens,x->ImmutableMatrix(F,x));
   fi;
   w:=PrimitiveElement(F);
-  MA:=MatrixAlgebra(F,n);
+  #MA:=MatrixAlgebra(F,n);
   #   EE := ext<F | 2>;
   lvarEE:=GF(q^2);
   delta:=PrimitiveElement(lvarEE);
@@ -630,7 +630,7 @@ local
   D:=TransposedMat(D);
   Gens:=[U,L,D];
   if n <= 4 then
-    p:=Identity(MA);
+    p:=IdentityMat(n,F);
   elif n > 4 then
     p:=NullMat(n,n,F);
     #InsertBlock(TILDEp,I,1,3);
@@ -658,7 +658,7 @@ local
   Add(Gens,h);
   #   end if;
   if SpecialGroup then
-    m:=Identity(MA);
+    m:=IdentityMat(n,F);
     if q mod 4=3 then
       m[1][1]:=-1;
       m[2][2]:=-1;
@@ -728,7 +728,7 @@ local PresentationGenerators,SpecialGroup,q;
   elif type="Omega" then
     return SOChosenElements@(Omega(d,F):SpecialGroup:=SpecialGroup);
   elif type="Omega+" then
-    return PlusChosenElements@(OmegaPlus(d,F)
+    return PlusChosenElements@(OmegaPlus(d,Size(F))
      :SpecialGroup:=SpecialGroup);
     #   avoid OmegaMinus -- it sets order, too hard for large d, q
   elif type="Omega-" then

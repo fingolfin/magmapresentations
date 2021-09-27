@@ -2,7 +2,7 @@
 
 BindGlobal("SignedOdd@",function(d)
 local Rels,S,u,v;
-  S:=FreeGroup("u","v");
+  S:=FreeGroup(2);
   u:=S.1;
   v:=S.2;
   Rels:=Concatenation([u^4,(u^2)^(v*u)*u^2*(u^2)^v,v^d,(u*v)^(d-1),(u*v^-1*u*v)
@@ -12,7 +12,7 @@ end);
 
 BindGlobal("SignedEven@",function(d)
 local R,Rels,S,u,v;
-  S:=FreeGroup("u","v");
+  S:=FreeGroup(2);
   u:=S.1;
   v:=S.2;
   if d=2 then

@@ -27,7 +27,7 @@ end);
 #   d - 1 copies of Z_{q - 1} by a copy of Sym (d)
 BindGlobal("PresentationForN@",function(d,q)
 local F,OMIT,R,Rels,S,U,V,delta,tau;
-  F:=FreeGroup("U","V","delta");
+  F:=FreeGroup(3);
   U:=F.1;
   V:=F.2;
   delta:=F.3;
@@ -78,7 +78,7 @@ local F,I,R1,R2,Rels,S,U,V,a,b,delta,e,f,p,phi,tau,w,wm1;
   p:=PrimeBase(q);
   e:=LogInt(q,p);
   if q<>p^e then Error("<q> is not a prime power");fi;
-  F:=FreeGroup("U","V","tau","delta");
+  F:=FreeGroup(4);
   U:=F.1;
   V:=F.2;
   tau:=F.3;
@@ -181,7 +181,7 @@ end);
 BindGlobal("SLStandardToPresentation@",
 function(d,q)
 local P,S,U,V,V_p,delta,tau;
-  S:=FreeGroup("U","V","tau","delta");
+  S:=FreeGroup(4);
   if d=2 then
     if IsPrimeInt(q) then
       P:=[S.3,S.2,One(S),One(S)];
@@ -208,7 +208,7 @@ function(d,q)
 local I,P,S,U,V,V_s,delta,tau,w,x,y;
   if d=2 then
     if IsPrimeInt(q) then
-      P:=FreeGroup("tau","U");
+      P:=FreeGroup(2);
       w:=PrimitiveElement(GF(q));
       x:=Int(w^-1)-1;
       y:=Int(w^-2-w^-1);
@@ -222,7 +222,7 @@ local I,P,S,U,V,V_s,delta,tau,w,x,y;
     fi;
     return S;
   fi;
-  P:=FreeGroup("U","V","tau","delta");
+  P:=FreeGroup(4);
   U:=P.1;
   V:=P.2;
   tau:=P.3;
