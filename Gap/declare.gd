@@ -8,6 +8,7 @@ DeclareGlobalFunction("SLGenerators@");
 DeclareGlobalFunction("SpGenerators@");
 DeclareGlobalFunction("SUGenerators@");
 DeclareGlobalFunction("OmegaGenerators@");
+DeclareGlobalFunction("OmegaPresentation@");
 DeclareGlobalFunction("PlusPresentation@");
 DeclareGlobalFunction("PlusGenerators@");
 DeclareGlobalFunction("MinusGenerators@");

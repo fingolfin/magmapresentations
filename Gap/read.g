@@ -7,6 +7,7 @@ Reread("sp.gi");
 Reread("standard.gi");
 Reread("standard-generators.gi");
 Reread("plus.gi");
+Reread("minus.gi");
 Reread("omega.gi");
 
 Reread("test.g");

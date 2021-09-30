@@ -81,7 +81,7 @@ local F,lvarGamma,OMIT,R,Rels,S,U,V,t,tau;
   tau:=GroupHomomorphismByImages(S,F,
     GeneratorsOfGroup(S),
     [U,V]);
-  R:=List(R,r->Image(tau,r));
+  R:=List(R,r->ImagesRepresentative(tau,r));
   OMIT:=true;
   if not OMIT then
     Add(Rels,lvarGamma^(q^2-1));
@@ -200,7 +200,7 @@ local
   phi:=GroupHomomorphismByImages(Q,F,
     GeneratorsOfGroup(Q),
     [lvarGamma,t,U,V]);
-  lvarR_N:=List(lvarR_N,r->Image(phi,r));
+  lvarR_N:=List(lvarR_N,r->ImagesRepresentative(phi,r));
   #   tau = tau^-1 in char 2
   R_SU3:=SU3Presentation(q);
   Q:=FreeGroupOfFpGroup(R_SU3);
@@ -214,7 +214,7 @@ local
       GeneratorsOfGroup(Q),
       [v,tau^-1,lvarGamma^-1,t]);
   fi;
-  R_SU3:=List(R_SU3,r->Image(phi,r));
+  R_SU3:=List(R_SU3,r->ImagesRepresentative(phi,r));
   R_SL2:=PresentationForSL2@(p,2*e);
   Q:=FreeGroupOfFpGroup(R_SL2);
   R_SL2:=RelatorsOfFpGroup(R_SL2);
@@ -227,7 +227,7 @@ local
   phi:=GroupHomomorphismByImages(Q,F,
     GeneratorsOfGroup(Q),
     [lvarDelta,sigma,W]);
-  R_SL2:=List(R_SL2,r->Image(phi,r));
+  R_SL2:=List(R_SL2,r->ImagesRepresentative(phi,r));
   #   Steinberg relations
   R4:=[];
   Add(R4,Comm(v,v^U)/(sigma^-1)^(t^U));

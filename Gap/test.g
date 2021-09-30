@@ -212,7 +212,7 @@ local lvarDelta,F,I,K,Presentation,Projective,Q,R,U,V,varX,varZ,d,phi,q,
             w-> MappedWord(w, gens, GeneratorsOfGroup(Q)));
           phi:=GroupHomomorphismByImages(Q,F,
             GeneratorsOfGroup(Q),GeneratorsOfGroup(F));
-          varX:=List(varX,x->Image(phi,x));
+          varX:=List(varX,x->ImagesRepresentative(phi,x));
           lvarDelta:=varX[1];
           sigma:=varX[2];
           varZ:=varX[3];
@@ -258,8 +258,7 @@ local lvarDelta,F,I,K,Presentation,Q,R,U,V,varX,varZ,d,delta,phi,q,sigma,
       R:=RelatorsOfFpGroup(R);
       F:=Q/R;
       if d=4 then
-          # TODO SubStructure
-        K:=Subgroup(F,GeneratorsOfGroup(F){[1,3,5,6,7]});
+        K:=SubgroupNC(F,GeneratorsOfGroup(F){[1,3,5,6,7]});
       else
         if Presentation then
           delta:=F.1;
@@ -274,7 +273,7 @@ local lvarDelta,F,I,K,Presentation,Q,R,U,V,varX,varZ,d,delta,phi,q,sigma,
           varX:=List(words,w-> MappedWord(w, gens, GeneratorsOfGroup(Q)));
           phi:=GroupHomomorphismByImages(Q,F,
             GeneratorsOfGroup(Q),GeneratorsOfGroup(F));
-          varX:=List(varX,x->Image(phi,x));
+          varX:=List(varX,x->ImagesRepresentative(phi,x));
           delta:=varX[1];
           sigma:=varX[2];
           varZ:=varX[3];
@@ -296,9 +295,9 @@ local lvarDelta,F,I,K,Presentation,Q,R,U,V,varX,varZ,d,delta,phi,q,sigma,
       if Length(V)>0 then
         Error("Relators don't hold");
       fi;
-      # TODO Lots of things to change here
       I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
       Size(I);
+
     od;
   od;
   return true;
@@ -325,6 +324,84 @@ local Presentation,Projective,d,f,q;
         f:=TestPlusOdd([d],[q]
          :Presentation:=Presentation,Projective:=Projective);
       fi;
+    od;
+  od;
+  return true;
+end;
+
+TestMinus:=function(list_a,list_b)
+local lvarDelta,F,I,K,Presentation,Projective,Q,R,U,V,varX,d,phi,q,
+  gens,sigma,tau,words,z;
+  Presentation:=ValueOption("Presentation");
+  if Presentation=fail then
+    Presentation:=true;
+  fi;
+  Projective:=ValueOption("Projective");
+  if Projective=fail then
+    Projective:=false;
+  fi;
+  if Projective then Print("Doing Projective\n");fi;
+  if Presentation then Print("Doing Presentation\n");fi;
+  for d in list_a do
+    Assert(1,IsEvenInt(d));
+    for q in list_b do
+      Print(" D = ",d,", q = ",q,"\n");
+      R:=ClassicalStandardPresentation("Omega-",d, q:
+        PresentationGenerators:=Presentation,Projective:=Projective);
+      Q:=FreeGroupOfFpGroup(R);
+      R:=RelatorsOfFpGroup(R);
+      F:=Q/R;
+      if d=4 then
+        K:=SubgroupNC(F,GeneratorsOfGroup(F){[2..5]});
+      else
+        if Presentation then
+          z:=F.1;
+          sigma:=F.3;
+          tau:=F.2;
+          U:=F.5;
+          lvarDelta:=F.4;
+          if d=6 then
+            V:=F.0;
+          else
+            V:=F.6;
+          fi;
+        else
+          words:=MinusStandardToPresentation@(d,q);
+          # was "varX:=Evaluate(words,List([1..Size(GeneratorsOfGroup(Q))],i->Q.i));"
+          gens:=GeneratorsOfGroup(FamilyObj(words)!.wholeGroup);
+          varX:=List(words,w-> MappedWord(w, gens, GeneratorsOfGroup(Q)));
+          phi:=GroupHomomorphismByImages(Q,F,
+            GeneratorsOfGroup(Q),GeneratorsOfGroup(F));
+          varX:=List(varX,x->ImagesRepresentative(phi,x));
+          z:=varX[1];
+          sigma:=varX[3];
+          tau:=varX[2];
+          U:=varX[5];
+          lvarDelta:=varX[4];
+          if d=6 then
+            V:=varX[1]^0;
+          else
+            V:=varX[6];
+          fi;
+        fi;
+        if d=6 then
+          K:=SubgroupNC(F,[lvarDelta,sigma,tau,lvarDelta^U,V*U^-1]);
+        else
+          K:=SubgroupNC(F,[lvarDelta,sigma,tau,lvarDelta^U,
+            z^U,tau^U,U^V,V*U^-1]);
+        fi;
+      fi;
+
+      # verify relators
+      U:=FreeGeneratorsOfFpGroup(F);
+      V:=List(RelatorsOfFpGroup(F),
+        x->MappedWord(x,FreeGeneratorsOfFpGroup(F),gens));
+      V:=Unique(Filtered(V,x->not IsOne(x)));
+      if Length(V)>0 then
+        Error("Relators don't hold");
+      fi;
+      I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
+      Size(I);
     od;
   od;
   return true;

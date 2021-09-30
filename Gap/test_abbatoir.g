@@ -111,7 +111,7 @@ local
           varX:=Evaluate(words,List([1..Size(GeneratorsOfGroup(Q))],i->Q.i));
           phi:=GroupHomomorphismByImages(Q,F,
             GeneratorsOfGroup(Q),List([1..7],i->F.i));
-          varX:=List(varX,x->Image(phi,x));
+          varX:=List(varX,x->ImagesRepresentative(phi,x));
         fi;
         lvarGamma:=varX[1];
         t:=varX[2];
@@ -271,7 +271,7 @@ local
           varX:=List(words,w-> MappedWord(w, WriteGenerators(words), List([1..Size(GeneratorsOfGroup(Q))],i->Q.i)));
           phi:=GroupHomomorphismByImages(Q,F,
             GeneratorsOfGroup(Q),List([1..Size(GeneratorsOfGroup(F))],i->F.i));
-          varX:=List(varX,x->Image(phi,x));
+          varX:=List(varX,x->ImagesRepresentative(phi,x));
           lvarDelta:=varX[1];
           varZ:=varX[2];
           tau:=varX[3];
@@ -292,77 +292,6 @@ local
           varZ,sigma,U,V);
       fi;
       # TODO Lots of things to change here
-      I:=CosetImage(F,K);
-      RandomSchreier(I);
-      CompositionFactors(I);
-    od;
-  od;
-  return true;
-end;
-
-TestMinus:=function(list_a,list_b)
-local
-   Delta,F,I,K,Presentation,Projective,Q,R,U,V,varX,d,phi,q,sigma,tau,words,z;
-  Presentation:=ValueOption("Presentation");
-  if Presentation=fail then
-    Presentation:=true;
-  fi;
-  Projective:=ValueOption("Projective");
-  if Projective=fail then
-    Projective:=false;
-  fi;
-  for d in list_a do
-    Assert(1,IsEvenInt(d));
-    for q in list_b do
-      R:=ClassicalStandardPresentation("Omega-",d,
-       q:PresentationGenerators:=Presentation,Projective:=Projective);
-      Q:=FreeGroupOfFpGroup(R);
-     R:=RelatorsOfFpGroup(R);
-      F:=Q/R;
-      if d=4 then
-          ## TODO SubStructure
-        K:=SubStructure(F,List([2..5],i->F.i));
-      else
-        if Presentation then
-          z:=F.1;
-          sigma:=F.3;
-          tau:=F.2;
-          U:=F.5;
-          lvarDelta:=F.4;
-          if d=6 then
-            V:=F.0;
-          else
-            V:=F.6;
-          fi;
-        else
-          words:=MinusStandardToPresentation(d,q);
-          # was "varX:=Evaluate(words,List([1..Size(GeneratorsOfGroup(Q))],i->Q.i));"
-          varX:=List(words,w-> MappedWord(w, WriteGenerators(words), List([1..Size(GeneratorsOfGroup(Q))],i->Q.i)));
-          phi:=GroupHomomorphismByImages(Q,F,
-            GeneratorsOfGroup(Q),List([1..Size(GeneratorsOfGroup(F))],i->F.i));
-          varX:=List(varX,x->Image(phi,x));
-          z:=varX[1];
-          sigma:=varX[3];
-          tau:=varX[2];
-          U:=varX[5];
-          lvarDelta:=varX[4];
-          if d=6 then
-            V:=varX[1]^0;
-          else
-            V:=varX[6];
-          fi;
-        fi;
-        if d=6 then
-            ## TODO SubStructure
-          K:=SubStructure(F,lvarDelta,#TODO CLOSURE
-            sigma,tau,lvarDelta^U,V*U^-1);
-        else
-            ## TODO SubStructure
-          K:=SubStructure(F,lvarDelta,#TODO CLOSURE
-            sigma,tau,lvarDelta^U,z^U,tau^U,U^V,V*U^-1);
-        fi;
-      fi;
-      # TODO Lots of things to change
       I:=CosetImage(F,K);
       RandomSchreier(I);
       CompositionFactors(I);

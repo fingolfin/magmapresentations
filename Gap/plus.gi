@@ -88,7 +88,7 @@ local F,R,R1,Rels,S,U,V,varZ,e,f,p,phi;
   S:=FreeGroupOfFpGroup(R1);
   R1:=RelatorsOfFpGroup(R1);
   phi:=GroupHomomorphismByImages(S,F,GeneratorsOfGroup(S),[U,V]);
-  R1:=List(R1,r->Image(phi,r));
+  R1:=List(R1,r->ImagesRepresentative(phi,r));
   R:=[];
   if n > 3 then
     Add(R,Comm(varZ,U^(V^2)));
@@ -126,7 +126,7 @@ local F,R,R1,Rels,S,U,V,varZ,delta,e,f,p,phi;
   S:=FreeGroupOfFpGroup(R1);
   R1:=RelatorsOfFpGroup(R1);
   phi:=GroupHomomorphismByImages(S,F,GeneratorsOfGroup(S),[U,V,varZ]);
-  R1:=List(R1,r->Image(phi,r));
+  R1:=List(R1,r->ImagesRepresentative(phi,r));
   R:=[];
   Add(R,Comm(delta,U^V));
   if n > 3 then
@@ -178,7 +178,7 @@ local lvarDelta,F,R1,R2,R3,R4,Rels,S,U,V,W,varZ,delta,e,f,n,p,phi,sigma,w;
     R1:=RelatorsOfFpGroup(R1);
     phi:=GroupHomomorphismByImages(S,F, GeneratorsOfGroup(S), [U,V,varZ,delta]);
   fi;
-  R1:=List(R1,r->Image(phi,r));
+  R1:=List(R1,r->ImagesRepresentative(phi,r));
   Rels:=[];
   R2:=PresentationForSL2@(p,e);
   S:=FreeGroupOfFpGroup(R2);
@@ -191,7 +191,7 @@ local lvarDelta,F,R1,R2,R3,R4,Rels,S,U,V,W,varZ,delta,e,f,n,p,phi,sigma,w;
     phi:=GroupHomomorphismByImages(S,F,GeneratorsOfGroup(S),
       [lvarDelta,sigma,U]);
   fi;
-  R2:=List(R2,r->Image(phi,r));
+  R2:=List(R2,r->ImagesRepresentative(phi,r));
   #   centraliser of sigma
   R3:=[];
   if e > 1 then
@@ -246,7 +246,7 @@ local F,R,R1,Rels,S,U,V,varZ,e,f,p,phi,w;
   S:=FreeGroupOfFpGroup(R);
   R:=RelatorsOfFpGroup(R);
   phi:=GroupHomomorphismByImages(S,F, GeneratorsOfGroup(S), [U,V]);
-  R:=List(R,r->Image(phi,r));
+  R:=List(R,r->ImagesRepresentative(phi,r));
   R1:=[];
   if n > 3 then
     Add(R1,Comm(varZ,U^(V^2)));
@@ -285,7 +285,7 @@ local lvarDelta,F,OMIT,R,R1,Rels,S,U,V,varZ,phi;
   phi:=GroupHomomorphismByImages(S,F,
     GeneratorsOfGroup(S),
     [varZ,U,V]);
-  R:=List(R,r->Image(phi,r));
+  R:=List(R,r->ImagesRepresentative(phi,r));
   R1:=[];
   if n > 3 then
     Add(R1,Comm(lvarDelta,U^(V^2)));
@@ -358,7 +358,7 @@ local lvarDelta,F,I,R1,R2,R3,R4,Rels,S,U,V,W,varZ,b,e,f,n,p,phi,sigma,w;
     phi:=GroupHomomorphismByImages(S,F,
       GeneratorsOfGroup(S), [lvarDelta,varZ,U,V]);
   fi;
-  R1:=List(R1,r->Image(phi,r));
+  R1:=List(R1,r->ImagesRepresentative(phi,r));
   R2:=PresentationForSL2@(p,e);
   S:=FreeGroupOfFpGroup(R2);
   R2:=RelatorsOfFpGroup(R2);
@@ -368,7 +368,7 @@ local lvarDelta,F,I,R1,R2,R3,R4,Rels,S,U,V,W,varZ,b,e,f,n,p,phi,sigma,w;
     phi:=GroupHomomorphismByImages(S,F,GeneratorsOfGroup(S),
       [lvarDelta,sigma,U]);
   fi;
-  R2:=List(R2,r->Image(phi,r));
+  R2:=List(R2,r->ImagesRepresentative(phi,r));
   #   centraliser of sigma
   R3:=[];
   if n > 3 then
@@ -475,7 +475,6 @@ local A,B,C,T,U,W,tau,gens;
   B:=PlusPresentationToStandard@(d,q);
   gens:=GeneratorsOfGroup(FamilyObj(B)!.wholeGroup);
   C:=List(B, w-> MappedWord(w, gens, A));
-  # TODO How to implement universe
   U:=FamilyObj(C)!.wholeGroup;
   W:=FamilyObj(Rels)!.wholeGroup;
   tau:=GroupHomomorphismByImages(U,W,GeneratorsOfGroup(U),GeneratorsOfGroup(W));

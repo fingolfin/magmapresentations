@@ -50,7 +50,7 @@ local lvarDelta,F,OMIT,R,Rels,S,U,V,tau;
     tau:=GroupHomomorphismByImages(S,F,
       GeneratorsOfGroup(S),
       [U,V]);
-    R:=List(R,r->Image(tau,r));
+    R:=List(R,r->ImagesRepresentative(tau,r));
     if n > 3 then
       Add(Rels,Comm(lvarDelta,U^(V^2)));
       Add(Rels,Comm(lvarDelta,lvarDelta^(V^2)));
@@ -95,7 +95,7 @@ local lvarDelta,F,OMIT,R,Rels,S,U,V,delta,tau;
       GeneratorsOfGroup(S),
       [lvarDelta,U,V]);
   fi;
-  R:=List(R,r->Image(tau,r));
+  R:=List(R,r->ImagesRepresentative(tau,r));
   OMIT:=true;
   if not OMIT then
     Add(Rels,delta^(q-1));
@@ -131,7 +131,7 @@ local lvarDelta,F,OMIT,R,Rels,S,U,V,varZ,delta,tau;
   tau:=GroupHomomorphismByImages(S,F,
     GeneratorsOfGroup(S),
     [lvarDelta,U,V,delta]);
-  R:=List(R,r->Image(tau,r));
+  R:=List(R,r->ImagesRepresentative(tau,r));
   Rels:=[];
   OMIT:=true;
   if not OMIT then
@@ -192,7 +192,7 @@ local
   eta:=GroupHomomorphismByImages(S,F,
     GeneratorsOfGroup(S),
     [lvarDelta,U,V,delta,varZ]);
-  R4:=List(R4,r->Image(eta,r));
+  R4:=List(R4,r->ImagesRepresentative(eta,r));
   #   centraliser of sigma
   if n > 3 then
     Add(R,Comm(U^(V^2),sigma));
@@ -254,7 +254,7 @@ local
       GeneratorsOfGroup(S),
       [delta,tau,varZ]);
   fi;
-  R1:=List(R1,r->Image(phi,r));
+  R1:=List(R1,r->ImagesRepresentative(phi,r));
   # rewritten select statement
   if IsEvenInt(q) then
     W:=U;
@@ -267,7 +267,7 @@ local
   phi:=GroupHomomorphismByImages(S,F,
     GeneratorsOfGroup(S),
     [lvarDelta,sigma,W]);
-  R2:=List(R2,r->Image(phi,r));
+  R2:=List(R2,r->ImagesRepresentative(phi,r));
   #   Steinberg relations
   R3:=[];
   Add(R3,Comm(sigma,tau));

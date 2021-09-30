@@ -316,11 +316,10 @@ local one,D,F,Gens,I,L,M,P,SpecialGroup,U,_,a,b,delta,gens,h,i,m,n,q,u,w,x,y;
   Add(Gens,u);
   if SpecialGroup then
     m:=IdentityMat(n,F);
-    # =v= MULTIASSIGN =v=
-    b:=Valuation(q-1,2);
-    _:=b.val1;
-    b:=b.val2;
-    # =^= MULTIASSIGN =^=
+    #_,b:=Valuation(q-1,2);
+    b:=q-1;
+    while IsEvenInt(NumeratorRat(b)) do b:=b/2;od;
+    while IsEvenInt(DenominatorRat(b)) do b:=b*2;od;
     m[n-2][n-2]:=w^b;
     m[n-1][n-1]:=w^-b;
     Add(Gens,m);
@@ -409,10 +408,10 @@ local
     if SpecialGroup then
       a:=IdentityMat(n,F);
       if IsOddInt(q) then
-        # =v= MULTIASSIGN =v=
-        b:=Valuation(q-1,2);
-        _:=b.val1;
-        b:=b.val2;
+        #_,b:=Valuation(q-1,2);
+        b:=q-1;
+        while IsEvenInt(NumeratorRat(b)) do b:=b/2;od;
+        while IsEvenInt(DenominatorRat(b)) do b:=b*2;od;
         # =^= MULTIASSIGN =^=
         a[1][1]:=w^b;
         a[2][2]:=w^-b;
