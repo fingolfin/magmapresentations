@@ -9,5 +9,6 @@ Reread("standard-generators.gi");
 Reread("plus.gi");
 Reread("minus.gi");
 Reread("omega.gi");
+Reread("su.gi");
 
 Reread("test.g");
