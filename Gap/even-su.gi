@@ -172,7 +172,7 @@ local
   sigma:=F.6;
   lvarDelta:=F.7;
   R:=[];
-  R4:=SU_PresentationForN(n,q);
+  R4:=SU_PresentationForN@(n,q);
   S:=FreeGroupOfFpGroup(R4);
   R4:=RelatorsOfFpGroup(R4);
   eta:=GroupHomomorphismByImages(S,F,
