@@ -1,15 +1,8 @@
 #  File converted from Magma code -- requires editing and checking
 #  Magma -> GAP converter, version 0.5, 11/5/18 by AH
 
-#  Global Variables used: Append, ClassicalStandardGenerators, Factorial, GF,
-#  Integers, IsEven, IsOdd, Log, PrimitiveElement, RHS,
-#  FreeGroup, SU_PresentationForN, Thm71, Thm72, eta, phi, tau
-
-#  Defines: EvenSUGenerators, EvenSUPresentation, OrderSU_N, OrderThm71,
-#  OrderThm72, SU_PresentationForN, Thm71, Thm72
-
 #   this agrees with paper definition of psi
-EvenSUGenerators:=function(d,q)
+BindGlobal("EvenSUGenerators@",function(d,q)
 local lvarDelta,S,T,U,V,varZ,delta,sigma,tau;
   Assert(1,IsEvenInt(d));
   S:=ClassicalStandardGenerators("SU",d,q:
@@ -28,28 +21,26 @@ local lvarDelta,S,T,U,V,varZ,delta,sigma,tau;
   lvarDelta:=lvarDelta^-1;
   T:=[varZ,V,tau,delta,U,sigma,lvarDelta];
   return T;
-end;
+end);
 
-Thm71:=function(n,q)
+BindGlobal("Thm71@",function(n,q)
 local lvarDelta,F,OMIT,R,Rels,S,U,V,tau;
   Rels:=[];
   if n=2 then
-    F:=FreeGroup(2);
+    F:=FreeGroup("Delta","U");
     lvarDelta:=F.1;
     U:=F.2;
     R:=[];
     Add(Rels,U^2);
   else
-    F:=FreeGroup(3);
+    F:=FreeGroup("Delta","U","V");
     lvarDelta:=F.1;
     U:=F.2;
     V:=F.3;
-    R:=PresentationForSn(n);
+    R:=PresentationForSn@(n);
     S:=FreeGroupOfFpGroup(R);
     R:=RelatorsOfFpGroup(R);
-    tau:=GroupHomomorphismByImages(S,F,
-      GeneratorsOfGroup(S),
-      [U,V]);
+    tau:=GroupHomomorphismByImages(S,F, GeneratorsOfGroup(S), [U,V]);
     R:=List(R,r->ImagesRepresentative(tau,r));
     if n > 3 then
       Add(Rels,Comm(lvarDelta,U^(V^2)));
@@ -58,42 +49,38 @@ local lvarDelta,F,OMIT,R,Rels,S,U,V,tau;
     if n > 4 then
       Add(Rels,Comm(lvarDelta,V*U*U^V));
     fi;
-    Add(Rels,lvarDelta*lvarDelta^V=lvarDelta^(V*U));
+    Add(Rels,lvarDelta*lvarDelta^V/(lvarDelta^(V*U)));
     Add(Rels,Comm(lvarDelta,lvarDelta^V));
   fi;
   OMIT:=true;
   if not OMIT then
-    Add(Rels,lvarDelta^U=lvarDelta^-1);
+    Add(Rels,lvarDelta^U/(lvarDelta^-1));
     Add(Rels,lvarDelta^(q^2-1));
   fi;
   Rels:=Concatenation(Rels,R);
   return F/Rels;
-end;
+end);
 
-OrderThm71:=function(n,q)
-return (q^2-1)^(n-1)*Factorial(n);
-end;
+#OrderThm71:=function(n,q)
+#return (q^2-1)^(n-1)*Factorial(n);
+#end;
 
-Thm72:=function(n,q)
+BindGlobal("Thm72@",function(n,q)
 local lvarDelta,F,OMIT,R,Rels,S,U,V,delta,tau;
-  F:=FreeGroup(4);
+  F:=FreeGroup("Delta","U","V","delta");
   lvarDelta:=F.1;
   U:=F.2;
   V:=F.3;
   delta:=F.4;
   Rels:=[];
-  R:=Thm71(n,q);
+  R:=Thm71@(n,q);
   S:=FreeGroupOfFpGroup(R);
   R:=RelatorsOfFpGroup(R);
   if n=2 then
     Add(Rels,U/V);
-    tau:=GroupHomomorphismByImages(S,F,
-      GeneratorsOfGroup(S),
-      [lvarDelta,U]);
+    tau:=GroupHomomorphismByImages(S,F, GeneratorsOfGroup(S), [lvarDelta,U]);
   else
-    tau:=GroupHomomorphismByImages(S,F,
-      GeneratorsOfGroup(S),
-      [lvarDelta,U,V]);
+    tau:=GroupHomomorphismByImages(S,F, GeneratorsOfGroup(S), [lvarDelta,U,V]);
   fi;
   R:=List(R,r->ImagesRepresentative(tau,r));
   OMIT:=true;
@@ -111,26 +98,25 @@ local lvarDelta,F,OMIT,R,Rels,S,U,V,delta,tau;
   Add(Rels,lvarDelta^(q+1)/(delta*(delta^-1)^U));
   Rels:=Concatenation(Rels,R);
   return F/Rels;
-end;
+end);
 
-OrderThm72:=function(n,q)
-return (q-1)*(q^2-1)^(n-1)*Factorial(n);
-end;
+#OrderThm72:=function(n,q)
+#return (q-1)*(q^2-1)^(n-1)*Factorial(n);
+#end;
 
-SU_PresentationForN:=function(n,q)
+BindGlobal("SU_PresentationForN@",function(n,q)
 local lvarDelta,F,OMIT,R,Rels,S,U,V,varZ,delta,tau;
-  F:=FreeGroup(5);
+  F:=FreeGroup("Delta","U","V","delta","Z");
   lvarDelta:=F.1;
   U:=F.2;
   V:=F.3;
   delta:=F.4;
   varZ:=F.5;
-  R:=Thm72(n,q);
+  R:=Thm72@(n,q);
   S:=FreeGroupOfFpGroup(R);
   R:=RelatorsOfFpGroup(R);
   tau:=GroupHomomorphismByImages(S,F,
-    GeneratorsOfGroup(S),
-    [lvarDelta,U,V,delta]);
+    GeneratorsOfGroup(S), [lvarDelta,U,V,delta]);
   R:=List(R,r->ImagesRepresentative(tau,r));
   Rels:=[];
   OMIT:=true;
@@ -156,16 +142,17 @@ local lvarDelta,F,OMIT,R,Rels,S,U,V,varZ,delta,tau;
   fi;
   Rels:=Concatenation(Rels,R);
   return F/Rels;
-end;
+end);
 
-OrderSU_N:=function(n,q)
-return 2^n*(q-1)*(q^2-1)^(n-1)*Factorial(n);
-end;
+#OrderSU_N:=function(n,q)
+#return 2^n*(q-1)*(q^2-1)^(n-1)*Factorial(n);
+#end;
 
-EvenSUPresentation:=function(d,q)
+BindGlobal("EvenSUPresentation@",function(d,q)
 local
    lvarDelta,varE,F,I,OMIT,R,R1,R2,R3,R4,Rels,S,U,V,W,varZ,a,delta,e,eta,f,m,n,p,
    phi,sigma,tau,w,w0,x,y;
+
   Assert(1,Size(DuplicateFreeList(q)) = 1);
   Assert(1,IsEvenInt(d) and d > 2);
   n:=QuoInt(d,2);
@@ -177,12 +164,11 @@ local
       p := e[1];
       e := Size(e);
   fi;
-  F:=FreeGroup(7);
+  F:=FreeGroup("Z","V","tau","delta","U","sigma","Delta");
   varZ:=F.1;
   V:=F.2;
   tau:=F.3;
-  delta:=F.4;
-  U:=F.5;
+  delta:=F.4; U:=F.5;
   sigma:=F.6;
   lvarDelta:=F.7;
   R:=[];
@@ -190,8 +176,8 @@ local
   S:=FreeGroupOfFpGroup(R4);
   R4:=RelatorsOfFpGroup(R4);
   eta:=GroupHomomorphismByImages(S,F,
-    GeneratorsOfGroup(S),
-    [lvarDelta,U,V,delta,varZ]);
+    GeneratorsOfGroup(S), [lvarDelta,U,V,delta,varZ]);
+
   R4:=List(R4,r->ImagesRepresentative(eta,r));
   #   centraliser of sigma
   if n > 3 then
@@ -241,18 +227,14 @@ local
   S:=FreeGroupOfFpGroup(R1);
   R1:=RelatorsOfFpGroup(R1);
   if e=1 then
-    phi:=GroupHomomorphismByImages(S,F,
-      GeneratorsOfGroup(S),
-      [tau,varZ]);
+    phi:=GroupHomomorphismByImages(S,F, GeneratorsOfGroup(S), [tau,varZ]);
     #   need to express delta as word in <tau, Z> = SL(2, p)
     w:=PrimitiveElement(GF(p));
     x:=Int(w^-1)-1;
     y:=Int(w^-2-w^-1);
     Add(R,delta/(tau^-1*(tau^x)^varZ*tau^(Int(w))*(tau^-y)^varZ));
   else
-    phi:=GroupHomomorphismByImages(S,F,
-      GeneratorsOfGroup(S),
-      [delta,tau,varZ]);
+    phi:=GroupHomomorphismByImages(S,F,GeneratorsOfGroup(S),[delta,tau,varZ]);
   fi;
   R1:=List(R1,r->ImagesRepresentative(phi,r));
   # rewritten select statement
@@ -264,9 +246,7 @@ local
   R2:=PresentationForSL2@(p,2*e);
   S:=FreeGroupOfFpGroup(R2);
   R2:=RelatorsOfFpGroup(R2);
-  phi:=GroupHomomorphismByImages(S,F,
-    GeneratorsOfGroup(S),
-    [lvarDelta,sigma,W]);
+  phi:=GroupHomomorphismByImages(S,F,GeneratorsOfGroup(S),[lvarDelta,sigma,W]);
   R2:=List(R2,r->ImagesRepresentative(phi,r));
   #   Steinberg relations
   R3:=[];
@@ -294,8 +274,7 @@ local
   #   additional relation needed for SU(6, 2) -- probably only #2 required
   if (n=3 and q=2) then
     Add(R3,Comm(sigma,sigma^(U^V*lvarDelta)));
-    Add(R3,Comm(sigma,sigma^(V*lvarDelta))/sigma^(V*U*lvarDelta^-1))
-     ;
+    Add(R3,Comm(sigma,sigma^(V*lvarDelta))/sigma^(V*U*lvarDelta^-1));
   fi;
   if n > 2 then
     Add(R3,Comm(sigma,sigma^(U^V)));
@@ -315,4 +294,4 @@ local
   fi;
   Rels:=Concatenation(R,R1,R2,R3,R4);
   return F/Rels;
-end;
+end);
