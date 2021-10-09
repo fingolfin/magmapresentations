@@ -1,13 +1,10 @@
-#  File converted from Magma code -- requires editing and checking
-#  Magma -> GAP converter, version 0.5, 11/5/18 by AH
-
 # Partially checked (up to line 409) MW 19/07/19
 
 #   Explicit version of presentation for SU(3, q)
 #   Last revised Ocotober 2018
 #   to get paper version V (alpha, beta)
 #   call V(alpha, beta - psi * alpha^(1+q))
-VMatrix:=function(q,alpha,gamma)
+BindGlobal("VMatrix@",function(q,alpha,gamma)
 local F,beta,psi,v,w;
   F:=GF(q^2);
   w:=PrimitiveElement(F);
@@ -19,29 +16,30 @@ local F,beta,psi,v,w;
     psi:=(-1/2)*w^0;
   fi;
   beta:=psi*alpha^(1+q)+gamma;
-  v:=[[1,alpha,beta],[0,1,-alpha^q],[0,0,1]]*IdentityMat(3, F);
+  v:=[[1,alpha,beta],[0,1,-alpha^q],[0,0,1]]*One(F);
   return v;
-end;
+end);
 
-DeltaMatrix:=function(q,alpha)
+BindGlobal("DeltaMatrix@",function(q,alpha)
 local delta;
-  delta:=DiagonalMat([alpha,alpha^(q-1),alpha^-q])*Z(q^2)^0;
+  delta:=DiagonalMat([alpha,alpha^(q-1),alpha^-q]*Z(q)^0);
   return delta;
-end;
+end);
 
-TauMatrix:=function(q,gamma)
+BindGlobal("TauMatrix@",function(q,gamma)
 local F,tau;
   F:=GF(q^2);
-  tau:=[1,0,gamma,0,1,0,0,0,1]*IdentityMat(3, F);
+  tau:=[[1,0,gamma],[0,1,0],[0,0,1]]*One(F);
   return tau;
-end;
+end);
 
-TMatrix:=function(q)
-local t;
-  t:=NullMat(3, 3, GF(q^2));
-  t[1][3]:=1;
-  t[2][2]:=-1;
-  t[3][1]:=1;
+BindTMatrix:=function(q)
+local t,f;
+  f:=GF(q^2);
+  t:=NullMat(3, 3, f);
+  t[1][3]:=One(f);
+  t[2][2]:=-One(f);
+  t[3][1]:=One(f);
   return t;
 end;
 
@@ -49,17 +47,17 @@ BorelGenerators:=function(q)
 local F,alpha,beta,delta,tau,v,w;
   F:=GF(q^2);
   w:=PrimitiveElement(F);
-  v:=VMatrix(q,1,0);
+  v:=VMatrix@(q,1,0);
   beta:=v[1][3];
   alpha:=v[1][2];
   Assert(1,Trace(F,GF(q),beta)=-alpha^(q+1));
   if IsEvenInt(q) then
-    tau:=TauMatrix(q,1);
+    tau:=TauMatrix@(q,1);
   else
-    tau:=TauMatrix(q,w^(QuoInt((q+1),2)));
+    tau:=TauMatrix@(q,w^(QuoInt((q+1),2)));
   fi;
 
-  delta:=DeltaMatrix(q,w);
+  delta:=DeltaMatrix@(q,w);
   return [v,tau,delta];
 end;
 
@@ -70,9 +68,9 @@ local lvarDelta,F,beta0,q,t,v,v1,w,w0;
   w:=PrimitiveElement(F);
   w0:=w^(q+1);
   beta0:=w^(1+QuoInt((q^2+q),2));
-  v:=VMatrix(q,1,0);
-  v1:=VMatrix(q,w^2,0);
-  lvarDelta:=DeltaMatrix(q,w);
+  v:=VMatrix@(q,1,0);
+  v1:=VMatrix@(q,w^2,0);
+  lvarDelta:=DeltaMatrix@(q,w);
   t:=TMatrix(q);
   return [v,v1,lvarDelta,t];
 end;
