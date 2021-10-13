@@ -33,7 +33,7 @@ local F,tau;
   return tau;
 end);
 
-BindTMatrix:=function(q)
+BindGlobal("TMatrix@",function(q)
 local t,f;
   f:=GF(q^2);
   t:=NullMat(3, 3, f);
@@ -41,9 +41,9 @@ local t,f;
   t[2][2]:=-One(f);
   t[3][1]:=One(f);
   return t;
-end;
+end);
 
-BorelGenerators:=function(q)
+BindGlobal("BorelGenerators@",function(q)
 local F,alpha,beta,delta,tau,v,w;
   F:=GF(q^2);
   w:=PrimitiveElement(F);
@@ -59,9 +59,9 @@ local F,alpha,beta,delta,tau,v,w;
 
   delta:=DeltaMatrix@(q,w);
   return [v,tau,delta];
-end;
+end);
 
-SU32Generators:=function()
+BindGlobal("SU32Generators@",function()
 local lvarDelta,F,beta0,q,t,v,v1,w,w0;
   q:=2;
   F:=GF(q^2);
@@ -71,24 +71,23 @@ local lvarDelta,F,beta0,q,t,v,v1,w,w0;
   v:=VMatrix@(q,1,0);
   v1:=VMatrix@(q,w^2,0);
   lvarDelta:=DeltaMatrix@(q,w);
-  t:=TMatrix(q);
+  t:=TMatrix@(q);
   return [v,v1,lvarDelta,t];
-end;
+end);
 
-SU3Generators:=function(q)
+BindGlobal("SU3Generators@",function(q)
 if q=2 then
-    return SU32Generators();
+    return SU32Generators@();
   fi;
-  return Concatenation(BorelGenerators(q),[TMatrix(q)]);
-end;
+  return Concatenation(BorelGenerators@(q),[TMatrix@(q)]);
+end);
 
 #   g is upper-triangular matrix with just one non-zero entry in top right
 #  corner;
 #  write as word in Borel subgroup generators
-SpecialSLPForElement:=function(g,q,W)
+BindGlobal("SpecialSLPForElement@",function(g,q,W)
 local lvarDelta,F,Gens,R,lvarTau,V,c,delta,entry,g,matrix,tau,theta,v,w,word,z;
   if g=g^0 then
-     ## TODO Not sure what is happening - clearly just the trivial case but what is g?
     return rec(val1:=Identity(W),
       val2:=g);
   fi;
@@ -98,6 +97,30 @@ local lvarDelta,F,Gens,R,lvarTau,V,c,delta,entry,g,matrix,tau,theta,v,w,word,z;
   delta:=W.3;
   F:=GF(q^2);
   w:=PrimitiveElement(F);
+  Gens:=SU3Generators(q);
+  V:=Gens[1];
+  lvarTau:=Gens[2];
+  lvarDelta:=Gens[3];
+  entry:=lvarTau[1][3];
+
+  z:=g[1][3];
+  if z<>0 then
+    theta:=w^-(q+1);
+    #R:=SubStructure(F,theta);
+    #c:=Eltseq((entry^-1*z)*FORCEOne(R));
+    R:=Basis();
+    c:=Coefficients(R,(entry^-1*z));
+    c:=List(c,Int);
+    word:=Product(List([1..Size(c)],i->(tau^(delta^(i-1)))^c[i]));
+    matrix:=Product(List([1..Size(c)],i->(lvarTau^(lvarDelta^(i-1)))^c[i]));
+    g:=matrix^-1*g;
+    Assert(1,g[1][3]=0);
+  fi;
+  return rec(val1:=word,
+    val2:=g);
+end);
+
+
 
 #   find solutions x and y to Lemma 4.1
 BindGlobal("FindSolutions@",function(q)
@@ -348,18 +371,12 @@ local Alpha,F,alpha,beta0,eta,gamma0,n,t,w,w0,zeta;
     val2:=gamma0);
 end);
 
-##############################
-###
-### Got up to here
-###
-#############################
-
-MatrixToTuple:=function(A)
+BindGlobal("MatrixToTuple@",function(A)
 local A,F,alpha,beta,psi,q,w;
   if Type(A)=AlgMatElt or Type(A)=GrpMatElt then
     A:=A[1];
   fi;
-  F:=BaseRing(Parent(A));
+  F:=DefaultFieldOfMatrixList([A]);
   q:=RootInt(Size(F));
   w:=PrimitiveElement(F);
   alpha:=A[2];
@@ -371,7 +388,7 @@ local A,F,alpha,beta,psi,q,w;
   fi;
   beta:=A[3]-psi*(alpha^(1+q));
   return [alpha,beta];
-end;
+end);
 
 BindGlobal("TupleToMatrix@",function(q,v)
   return VMatrix@(q,v[1],v[2]);
@@ -383,9 +400,9 @@ local V,m,r,s,t;
   r:=Reversed(Eltseq(U[1]))*FORCEOne(V);
   s:=Normalise(r);
   s[2]:=-s[2];
-  t:=MatrixToTuple(s);
+  t:=MatrixToTuple@(s);
   m:=TupleToMatrix@(q,t);
-  Assert(1,MatrixToTuple(m)=t);
+  Assert(1,MatrixToTuple@(m)=t);
   return rec(val1:=m,
     val2:=t);
 end;
@@ -404,7 +421,7 @@ local U,d,left,lv,q,rest,right,rv,t;
   d:=DiagonalMat(List([1..Length(rest)],i->rest[i][i]));
   left:=rest*d^-1;
   Assert(1,IsUpperTriangular(left));
-  lv:=MatrixToTuple(left);
+  lv:=MatrixToTuple@(left);
   Assert(1,t^-1*U*t=left*d*t*right);
   return rec(val1:=lv,
     val2:=rv,
@@ -491,7 +508,7 @@ local
   beta0:=w^(1+QuoInt((q^2+q),2));
   V:=VectorSpace(F,2);
   G:=SU(3,q);
-  L:=SU3Generators(q);
+  L:=SU3Generators@(q);
   v:=L[1];
   tau:=L[2];
   delta:=L[3];
@@ -520,7 +537,7 @@ local
   mats:=Concatenation(mats,List(mats,m->m*tau0));
   Add(mats,tau0);
   U:=List( # {@-list:
-    mats,m->MatrixToTuple(m));
+    mats,m->MatrixToTuple@(m));
   #   determine relation u^t = u_L * Delta^pow * t * u_r
   R:=[];
   for u in U do
@@ -674,86 +691,7 @@ local Q,R,R1,R2,Rels,W,delta,phi,t,tau,v;
   return rec(val1:=W,
     val2:=Rels);
 end;
-# Partially checked (up to line 409) MW 19/07/19
 
-#   Explicit version of presentation for SU(3, q)
-#   Last revised Ocotober 2018
-#   to get paper version V (alpha, beta)
-#   call V(alpha, beta - psi * alpha^(1+q))
-BindGlobal("VMatrix@",function(q,alpha,gamma)
-local F,beta,psi,v,w;
-  F:=GF(q^2);
-  w:=PrimitiveElement(F);
-  if IsEvenInt(q) then
-    # was "psi:=Trace(w,GF(q))^(-1)*w;"
-    psi:=Trace(F,GF(q),w)^(-1)*w;
-    Assert(1,psi=1/(1+w^(q-1)));
-  else
-    psi:=(-1/2)*w^0;
-  fi;
-  beta:=psi*alpha^(1+q)+gamma;
-  v:=[[1,alpha,beta],[0,1,-alpha^q],[0,0,1]]*One(F);
-  v:=ImmutableMatrix(F,v);
-  return v;
-end);
-
-BindGlobal("DeltaMatrix@",function(q,alpha)
-local delta;
-  delta:=DiagonalMat([alpha,alpha^(q-1),alpha^-q]);
-  return delta;
-end);
-
-BindGlobal("TauMatrix@",function(q,gamma)
-local F,tau;
-  F:=GF(q^2);
-  tau:=[[1,0,gamma],[0,1,0],[0,0,1]]*One(F);
-  tau:=ImmutableMatrix(F,tau);
-  return tau;
-end);
-
-BindGlobal("TMatrix@",function(q)
-local t,one;
-  one:=Z(q)^0;
-  t:=NullMat(3, 3, GF(q^2));
-  t[1][3]:=one;
-  t[2][2]:=-one;
-  t[3][1]:=one;
-  return t;
-end);
-
-BindGlobal("BorelGenerators@",function(q)
-local F,alpha,beta,delta,tau,v,w;
-  F:=GF(q^2);
-  w:=PrimitiveElement(F);
-  v:=VMatrix@(q,1,0);
-  beta:=v[1][3];
-  alpha:=v[1][2];
-  Assert(1,Trace(F,GF(q),beta)=-alpha^(q+1));
-  if IsEvenInt(q) then
-    tau:=TauMatrix@(q,1);
-  else
-    tau:=TauMatrix@(q,w^(QuoInt((q+1),2)));
-  fi;
-
-  delta:=DeltaMatrix@(q,w);
-  return [v,tau,delta];
-end);
-
-BindGlobal("SU32Generators@",function()
-local lvarDelta,F,beta0,q,t,v,v1,w,w0;
-  q:=2;
-  F:=GF(q^2);
-  w:=PrimitiveElement(F);
-  w0:=w^(q+1);
-  beta0:=w^(1+QuoInt((q^2+q),2));
-  v:=VMatrix@(q,1,0);
-  v1:=VMatrix@(q,w^2,0);
-  lvarDelta:=DeltaMatrix@(q,w);
-  t:=TMatrix@(q);
-  return [v,v1,lvarDelta,t];
-end);
-
-BindGlobal("SU3Generators@",function(q)
 #  S := Evaluate (R, X); assert #Set (S) eq 1;
 #  end if;
 #  end for;
