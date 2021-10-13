@@ -497,7 +497,7 @@ local A,B,a,b,m,wA,wB;
     val4:=B^-1);
 end;
 
-R2Relations:=function(q)
+R2Relations@:=function(q)
 local
    Alpha,F,G,L,R,U,V,W,a,a1,b,b1,beta0,d,delta,e,gamma0,i,left,lhs,lv,m,mats,
    pow,psi,rhs,right,rv,t,tau,tau0,u,v,w,w0,w1,wdelta,wlhs,wrhs,wt,wtau,wv,x,x1,
@@ -574,8 +574,7 @@ local
     wrhs:=(x*y)*wdelta^pow*wt*z*w;
     Add(R,wlhs=wrhs);
   od;
-  return rec(val1:=W,
-    val2:=R);
+  return W/R;
 end;
 
 #   presentation for SU(3, 2) on its standard generators
@@ -610,10 +609,10 @@ local F,Projective,Q,R,Rels,W,phi;
 end;
 
 #   presentation for SU(3, q) for q = 2, 3, 5 on presentation generators
-ExceptionalCase:=function(q)
+BindGlobal("ExceptionalCase@",function(q)
 local F,Gamma,R,T,a,b,t,tau,v,v1;
   if q=2 then
-    F:=SLPGroup(4);
+    F:=FreeGroup("v","v1","Gamma","t");
     # Implicit generator Assg from previous line.
     v:=F.1;
     v1:=F.2;
@@ -626,7 +625,7 @@ local F,Gamma,R,T,a,b,t,tau,v,v1;
      =lvarGamma^-1,a^v=b^-1,b^v=a*lvarGamma^1,a^v1=a*b*a,b^v1=a*b*lvarGamma^1,
      v^2=v1^2,v1^2=Comm(v,v1),t=v^2*a^2*b];
   elif q=3 then
-    F:=SLPGroup(4);
+    F:=FreeGroup("v","tau","Gamma","t");
     # Implicit generator Assg from previous line.
     v:=F.1;
     tau:=F.2;
@@ -638,7 +637,7 @@ local F,Gamma,R,T,a,b,t,tau,v,v1;
      ,F.2*F.4*F.3^-2*F.2*F.4*F.2*F.4=One(F)
      ,F.3*F.2^-1*F.1^-1*F.4*F.3*F.2^-1*F.1*F.3*F.4*F.1*F.2^-1*F.4=One(F)];
   elif q=5 then
-    F:=SLPGroup(4);
+    F:=FreeGroup(4);
     T:=[F.1^5=One(F),F.3^1*F.2^2*F.3^-1*F.2=One(F)
      ,F.3^2*F.1^2*F.3^-2*F.1^-1=One(F),F.3^5*F.4*F.3*F.4=One(F)
      ,F.3^-1*F.1*F.4*F.1^-2*F.4*F.1*F.3*F.4=One(F)
@@ -649,22 +648,15 @@ local F,Gamma,R,T,a,b,t,tau,v,v1;
 
        fi;
   R:=List(T,x->LHS(x)*RHS(x)^-1);
-  return rec(val1:=F,
-    val2:=R);
-end;
+  return F/R;
+end);
 
-SU3Presentation:=function(q)
+BindGlobal("SU3Presentation@",function(q)
 local Q,R,R1,R2,Rels,W,delta,phi,t,tau,v;
-  if q in Set([2,3,5]) then
-    # =v= MULTIASSIGN =v=
-    R:=ExceptionalCase(q);
-    Q:=R.val1;
-    R:=R.val2;
-    # =^= MULTIASSIGN =^=
-    return rec(val1:=Q,
-      val2:=R);
+  if q in [2,3,5] then
+    return ExceptionalCase@(q);
   fi;
-  W:=SLPGroup(4);
+  W:=FreeGroup("v","tau","delta","t");
   v:=W.1;
   tau:=W.2;
   delta:=W.3;
@@ -675,22 +667,21 @@ local Q,R,R1,R2,Rels,W,delta,phi,t,tau,v;
   R1:=RelatorsOfFpGroup(Q);
   phi:=GroupHomomorphismByImages(Q,W,
     GeneratorsOfGroup(Q),GeneratorsOfGroup(W){[1..3]});
-  Rels:=List(R1,r->phi(r));
+  Rels:=List(R1,r->ImagesRepresentative(phi,r));
   #   relations of type R2
-  # =v= MULTIASSIGN =v=
-  R2:=R2Relations(q);
-  Q:=R2.val1;
-  R2:=R2.val2;
-  # =^= MULTIASSIGN =^=
+  R2:=R2Relations@(q);
+  Q:=FreeGroupOfFpGroup(R2);
+  R2:=RelatorsOfFpGroup(R2);
   phi:=GroupHomomorphismByImages(Q,W,
-    GeneratorsOfGroup(Q),List([1..4],i->W.i));
-  Rels:=Concatenation(Rels,List(R2,r->phi(r)));
+     GeneratorsOfGroup(Q),GeneratorsOfGroup(W){[1..4]});
+  Rels:=Concatenation(Rels,List(R2,r->ImagesRepresentative(phi,r)));
   Add(Rels,t^2);
-  Add(Rels,delta^t=delta^-q);
-  Rels:=List(Rels,r->LHS(r)*RHS(r)^-1);
-  return rec(val1:=W,
-    val2:=Rels);
-end;
+  Add(Rels,delta^t/delta^-q);
+  return W/Rels;
+  #Rels:=List(Rels,r->LHS(r)*RHS(r)^-1);
+  #return rec(val1:=W,
+  #  val2:=Rels);
+end);
 
 #  S := Evaluate (R, X); assert #Set (S) eq 1;
 #  end if;
