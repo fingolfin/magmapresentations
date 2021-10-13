@@ -10,6 +10,7 @@ Reread("plus.gi");
 Reread("minus.gi");
 Reread("omega.gi");
 Reread("even-su.gi");
+Reread("odd-su.gi");
 Reread("su.gi");
 
 Reread("test.g");

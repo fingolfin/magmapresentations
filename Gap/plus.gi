@@ -17,16 +17,16 @@ local F,Projective,S,T,Y,d,d1,gens,rels,s,s1,t,t1,v,x,y;
   rels:=[F.7];
   #   sl2 presentation on s, t, d
   S:=ClassicalStandardPresentation("SL",2,q);
-  Y:=FreeGroupOfFpGroup(S);
+  Y:=FreeGeneratorsOfFpGroup(S);
   S:=RelatorsOfFpGroup(S);
   gens:=[s,s,t,d,s^0,s^0,s^0,s^0];
   # was "T:=Evaluate(S,gens);"
-  T:=List(S, w -> MappedWord(w, FreeGeneratorsOfFpGroup(S), gens));
+  T:=List(S, w -> MappedWord(w, Y, gens));
   rels:=Concatenation(rels,T);
   #   sl2 presentation on s1, t1, d1
   gens:=[s1,s1,t1,d1,s1^0,s1^0,s1^0,s1^0];
   # was "T:=Evaluate(S,gens);"
-  T:=List(S, w -> MappedWord(w, FreeGeneratorsOfFpGroup(S), gens));
+  T:=List(S, w -> MappedWord(w, Y, gens));
   rels:=Concatenation(rels,T);
   for x in [s,t,d] do
     for y in [s1,t1,d1] do

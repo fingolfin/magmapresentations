@@ -481,7 +481,5 @@ local B,varE,U,V,delta,gens,i,n,s,sigma,tau,w,z,one;
     V[i][i]:=one;
   od;
   gens:=List([z,tau,sigma,delta,U,V],x->x*Z(q)^0);
-  return rec(val1:=gens,
-    val2:=varE,
-    val3:=w);
+  return gens;
 end);

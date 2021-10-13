@@ -1,15 +1,7 @@
 #  File converted from Magma code -- requires editing and checking
 #  Magma -> GAP converter, version 0.5, 11/5/18 by AH
 
-#  Global Variables used: Append, ClassicalStandardGenerators, 
-#  Factorial, GF, GL, Identity, IsEven, IsOdd, LHS,
-#  Log, MatrixAlgebra, Odd_SU_PresentationForN, PrimitiveElement, RHS,
-#  FreeGroup, Trace, Zero, phi, tau
-
-#  Defines: OddSUGenerators, OddSUPresentation, Odd_SU_PresentationForN,
-#  Order_Odd_SU_N
-
-OddSUGenerators:=function(d,q)
+BindGlobal("OddSUGenerators@",function(d,q)
 local F,lvarGamma,S,U,V,alpha,gamma,i,phi,psi,sigma,t,tau,v,w,x;
   Assert(1,IsOddInt(d));
   F:=GF(q^2);
@@ -65,22 +57,20 @@ local F,lvarGamma,S,U,V,alpha,gamma,i,phi,psi,sigma,t,tau,v,w,x;
   sigma{[1..NrRows(x)]}{[1..NrCols(x)]}:=x;
   sigma[d][d]:=1;
   return [lvarGamma,t,U,V,sigma,tau,v];
-end;
+end);
 
-Odd_SU_PresentationForN:=function(n,q)
+BindGlobal("Odd_SU_PresentationForN@",function(n,q)
 local F,lvarGamma,OMIT,R,Rels,S,U,V,t,tau;
-  F:=FreeGroup(4);
+  F:=FreeGroup("Gamma","t","U","V");
   lvarGamma:=F.1;
   t:=F.2;
   U:=F.3;
   V:=F.4;
   Rels:=[];
-  R:=PresentationForSn(n);
+  R:=PresentationForSn@(n);
   S:=FreeGroupOfFpGroup(R);
   R:=RelatorsOfFpGroup(R);
-  tau:=GroupHomomorphismByImages(S,F,
-    GeneratorsOfGroup(S),
-    [U,V]);
+  tau:=GroupHomomorphismByImages(S,F, GeneratorsOfGroup(S), [U,V]);
   R:=List(R,r->ImagesRepresentative(tau,r));
   OMIT:=true;
   if not OMIT then
@@ -101,15 +91,15 @@ local F,lvarGamma,OMIT,R,Rels,S,U,V,t,tau;
   Add(Rels,Comm(lvarGamma,t^U));
   Rels:=Concatenation(Rels,R);
   return F/Rels;
-end;
+end);
 
-Order_Odd_SU_N:=function(n,q)
-local a;
-  a:=(q^2-1)*2;
-  return a^n*Factorial(n);
-end;
+#Order_Odd_SU_N:=function(n,q)
+#local a;
+#  a:=(q^2-1)*2;
+#  return a^n*Factorial(n);
+#end;
 
-OddSUPresentation:=function(d,q)
+BindGlobal("OddSUPresentation@",function(d,q)
 local
    lvarDelta,varE,F,lvarGamma,K,OMIT,Projective,Q,R,R3,R4,lvarR_N,R_SL2,R_SU3,Rels,U,V,W,
    varZ,a,e,f,m,n,p,phi,r,rhs,sigma,t,tau,v,w,w0;
@@ -160,9 +150,7 @@ local
     Add(R,Comm(t^U*lvarDelta^m,v));
   fi;
   if n=2 and q mod 3=1 then
-    # TODO What is <Tuple>?
-    # TODO Why is this an error?
-    Add(R,Comm(lvarGamma^(q-1)*(lvarGamma^U)^3*Tuple([t,lvarGamma^-1)^U,v]));
+    Add(R,Comm(lvarGamma^(q-1)*(lvarGamma^U)^3*Comm(t,lvarGamma^-1)^U,v));
   else
     Add(R,Comm(lvarGamma^(q-1)*(lvarGamma^U)^3,v));
   fi;
@@ -194,7 +182,7 @@ local
     Add(R,Comm(U^t*varZ^2,sigma));
   fi;
   Add(R,Comm(lvarGamma*lvarGamma^U,sigma));
-  lvarR_N:=Odd_SU_PresentationForN(n,q);
+  lvarR_N:=Odd_SU_PresentationForN@(n,q);
   Q:=FreeGroupOfFpGroup(lvarR_N);
   lvarR_N:= RelatorsOfFpGroup(lvarR_N);
   phi:=GroupHomomorphismByImages(Q,F,
@@ -238,14 +226,10 @@ local
   Add(R4,Comm(v,sigma));
   if IsOddInt(q) then
     a:=(w^(QuoInt(-(q+1),2)))/2;
-    ## TODO Not sure if it is right
-    # was "r:=Log(a);"
     r:=LogFFE(a,w);
     rhs:=sigma^(lvarGamma^r*varZ^U)*(v^-1)^U;
   else
     a:=w^q/(w+w^q);
-    ## TODO Not sure if it is right
-    # was "r:=Log(a);"
     r:=LogFFE(a,w);
     rhs:=sigma^(lvarGamma^r*varZ^U)*(v^U);
   fi;
@@ -283,8 +267,7 @@ local
   #   additional relation needed for SU(6, 2) -- probably only #2 required
   if (n=3 and q=2) then
     Add(R3,Comm(sigma,sigma^(U^V*lvarDelta)));
-    Add(R3,Comm(sigma,sigma^(V*lvarDelta))/sigma^(V*U*lvarDelta^-1))
-     ;
+    Add(R3,Comm(sigma,sigma^(V*lvarDelta))/sigma^(V*U*lvarDelta^-1));
   fi;
   if n > 2 then
     Add(R3,Comm(sigma,sigma^(U^V)));
@@ -301,4 +284,4 @@ local
   fi;
   Rels:=Concatenation(R,R3,R4,R_SU3,R_SL2,lvarR_N);
   return F/Rels;
-end;
+end);

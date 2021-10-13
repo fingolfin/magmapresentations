@@ -13,6 +13,7 @@ plus.g (AH, 9/27/21)
 minus.g (AH, 9/30/21)
 su.g (AH, 10/8/21)
 even-su.g (AH, 10/8/21)
+odd-su.g
 
 On the way:
 test.g, from test_abattoir.g
@@ -20,7 +21,6 @@ test.g, from test_abattoir.g
 Still to do:
 
 circle.g
-odd-su.g
 su3.g
 
 

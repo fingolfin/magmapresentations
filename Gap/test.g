@@ -361,7 +361,7 @@ local lvarDelta,F,I,K,Presentation,Projective,Q,R,U,V,varX,d,phi,q,
           U:=F.5;
           lvarDelta:=F.4;
           if d=6 then
-            V:=F.0;
+            V:=One(F);
           else
             V:=F.6;
           fi;
@@ -391,15 +391,85 @@ local lvarDelta,F,I,K,Presentation,Projective,Q,R,U,V,varX,d,phi,q,
             z^U,tau^U,U^V,V*U^-1]);
         fi;
       fi;
+      gens:=ClassicalStandardGenerators("Omega-",d,q:
+       PresentationGenerators:=Presentation);
 
       # verify relators
       U:=FreeGeneratorsOfFpGroup(F);
       V:=List(RelatorsOfFpGroup(F),
         x->MappedWord(x,FreeGeneratorsOfFpGroup(F),gens));
       V:=Unique(Filtered(V,x->not IsOne(x)));
-      if Length(V)>0 then
-        Error("Relators don't hold");
+      if Length(V)>0 then Error("Relators don't hold"); fi;
+
+      I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
+      Size(I);
+
+    od;
+  od;
+  return true;
+end;
+
+TestOmega:=function(list_a,list_b)
+local
+   lvarDelta,F,I,K,Presentation,Projective,Q,R,U,V,varX,varZ,d,phi,q,sigma,tau,
+   words,gens;
+  Presentation:=ValueOption("Presentation");
+  if Presentation=fail then
+    Presentation:=true;
+  fi;
+  Projective:=ValueOption("Projective");
+  if Projective=fail then
+    Projective:=false;
+  fi;
+  for d in list_a do
+    Assert(1,IsOddInt(d));
+    for q in list_b do
+      Assert(1,IsOddInt(q));
+      R:=ClassicalStandardPresentation("Omega",d,q:Projective:=Projective,
+       PresentationGenerators:=Presentation);
+      Q:=FreeGroupOfFpGroup(R);
+     R:=RelatorsOfFpGroup(R);
+      F:=Q/R;
+      if d=3 then
+          # TODO SubStructure
+        K:=Subgroup(F,[F.2, F.3]);
+      else
+        if Presentation=false then
+          words:=OmegaStandardToPresentation@(d,q);
+          # was "varX:=Evaluate(words,List([1..Size(GeneratorsOfGroup(Q))],i->Q.i));"
+          gens:=GeneratorsOfGroup(FamilyObj(words)!.wholeGroup);
+          varX:=List(words,w-> MappedWord(w, gens,GeneratorsOfGroup(Q)));
+          phi:=GroupHomomorphismByImages(Q,F,
+            GeneratorsOfGroup(Q),GeneratorsOfGroup(F));
+          varX:=List(varX,x->ImagesRepresentative(phi,x));
+          lvarDelta:=varX[1];
+          varZ:=varX[2];
+          tau:=varX[3];
+          sigma:=varX[4];
+          U:=varX[5];
+          V:=varX[6];
+        else
+          lvarDelta:=F.1;
+          varZ:=F.2;
+          tau:=F.3;
+          sigma:=F.4;
+          U:=F.5;
+          V:=F.6;
+        fi;
+        #   SOPlus (d - 1, q).2
+        # TODO SubStructure
+        K:=Subgroup(F,[lvarDelta, varZ,sigma,U,V]);
       fi;
+      gens:=ClassicalStandardGenerators("Omega",d,q:
+       PresentationGenerators:=Presentation);
+
+      # verify relators
+      U:=FreeGeneratorsOfFpGroup(F);
+      V:=List(RelatorsOfFpGroup(F),
+        x->MappedWord(x,FreeGeneratorsOfFpGroup(F),gens));
+      V:=Unique(Filtered(V,x->not IsOne(x)));
+      if Length(V)>0 then Error("Relators don't hold"); fi;
+
       I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
       Size(I);
     od;
