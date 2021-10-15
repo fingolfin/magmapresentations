@@ -9,6 +9,7 @@ Reread("standard-generators.gi");
 Reread("plus.gi");
 Reread("minus.gi");
 Reread("omega.gi");
+Reread("su3.gi");
 Reread("even-su.gi");
 Reread("odd-su.gi");
 Reread("circle.gi");
