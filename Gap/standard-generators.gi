@@ -210,7 +210,7 @@ local varE,F,P,a,alpha,b,d,delta,f,i,n,p,q,t,w,w0,x,y,one;
   if d >= 4 then
     b:=NullMat(d,d,varE);
     n:=QuoInt(d,2);
-    for i in [1,1+2..2*n-2] do
+    for i in [1,1+2..2*n-3] do
       b[i][i+2]:=one;
     od;
     b[2*n-1][1]:=one;
@@ -246,7 +246,7 @@ local varE,F,P,a,alpha,b,d,delta,f,i,n,p,q,t,w,w0,x,y,one;
     f:=IdentityMat(d,varE);
     f{[d-Length(x)+1..d]}{[d-Length(x)+1..d]}:=x;x:=f;
     f:=IdentityMat(d,varE);
-    f{[d-Length(x)+1..d]}{[d-Length(x)+1..d]}:=y;y:=f;
+    f{[d-Length(y)+1..d]}{[d-Length(y)+1..d]}:=y;y:=f;
   fi;
   x:=ImmutableMatrix(varE,x);
   y:=ImmutableMatrix(varE,y);
@@ -723,7 +723,8 @@ local PresentationGenerators,SpecialGroup,q;
   elif type="Sp" then
     return SpChosenElements@(SP(d,F));
   elif type="SU" then
-    return SUChosenElements@(SU(d,GF(F,2)));
+    # need to do `Size` as field not recognized by SU. And no extra 2 needed
+    return SUChosenElements@(SU(d,Size(F)));
   elif type="Omega" then
     return SOChosenElements@(Omega(d,F):SpecialGroup:=SpecialGroup);
   elif type="Omega+" then

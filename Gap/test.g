@@ -428,7 +428,7 @@ local
       R:=ClassicalStandardPresentation("Omega",d,q:Projective:=Projective,
        PresentationGenerators:=Presentation);
       Q:=FreeGroupOfFpGroup(R);
-     R:=RelatorsOfFpGroup(R);
+      R:=RelatorsOfFpGroup(R);
       F:=Q/R;
       if d=3 then
           # TODO SubStructure
@@ -472,6 +472,180 @@ local
 
       I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
       Size(I);
+    od;
+  od;
+  return true;
+end;
+
+TestSUEven:=function(list_a,list_b)
+local lvarDelta,F,I,K,Presentation,Projective,U,V,varZ,d,delta,n,q,sigma,tau;
+  Projective:=ValueOption("Projective");
+  if Projective=fail then
+    Projective:=false;
+  fi;
+  Presentation:=ValueOption("Presentation");
+  if Presentation=fail then
+    Presentation:=true;
+  fi;
+  for d in list_a do
+    Assert(1,IsEvenInt(d));
+    n:=QuoInt(d,2);
+    for q in list_b do
+      Print(" D = ",d,", q = ",q,"\n");
+      F:=ClassicalStandardPresentation("SU",d,q:Projective:=Projective,
+       PresentationGenerators:=Presentation);
+      varZ:=F.1;
+      V:=F.2;
+      tau:=F.3;
+      delta:=F.4;
+      U:=F.5;
+      sigma:=F.6;
+      lvarDelta:=F.7;
+      if d=4 then
+        #   K := sub < F | [Z, V, U, delta, sigma, tau]>;
+        #   maximal x^a y^b L(2, q^2)
+        K:=Subgroup(F,[V,tau,delta,sigma,lvarDelta]);
+      else
+        if Presentation then
+          if d=6 then
+            K:=Subgroup(F,[varZ,U,lvarDelta^(V^-2),sigma^(V^(n-2)),sigma]);
+          else
+            K:=Subgroup(F,[varZ,U,U^(V^-2)*V,lvarDelta,lvarDelta^(V^-2)
+             ,delta,tau,sigma^(V^(n-2)),sigma]);
+          fi;
+        else
+          K:=Subgroup(F,[varZ,U,U^(V^-2)
+           *V,lvarDelta,delta,tau,sigma^(V^(n-2)),sigma]);
+        fi;
+      fi;
+      gens:=ClassicalStandardGenerators("SU",d,q:
+       PresentationGenerators:=Presentation);
+
+      # verify relators
+      U:=FreeGeneratorsOfFpGroup(F);
+      V:=List(RelatorsOfFpGroup(F),
+        x->MappedWord(x,FreeGeneratorsOfFpGroup(F),gens));
+      V:=Filtered([1..Length(V)],x->not IsOne(V[x]));
+      if Length(V)>0 then Error("Relators ",V," don't hold"); fi;
+
+      I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
+      Size(I);
+
+    od;
+  od;
+  return true;
+end;
+
+TestSUOdd:=function(list_a,list_b)
+local lvarDelta,F,lvarGamma,I,K,Presentation,Projective,Q,R,U,V,varX,varZ,
+   d,n,phi,q,sigma,t,tau,v,words;
+
+  Projective:=ValueOption("Projective");
+  if Projective=fail then
+    Projective:=false;
+  fi;
+  Presentation:=ValueOption("Presentation");
+  if Presentation=fail then
+    Presentation:=true;
+  fi;
+  for d in list_a do
+    Assert(1,IsOddInt(d));
+    n:=QuoInt(d,2);
+    for q in list_b do
+      Print(" D = ",d,", q = ",q,"\n");
+      if d=3 then
+        R:=ClassicalStandardPresentation("SU",d,q:Projective:=Projective,
+         PresentationGenerators:=true);
+        Q:=R.FreeGroupOfFpGroup(R);
+        R:=RelatorsOfFpGroup(R);
+      else
+        R:=ClassicalStandardPresentation("SU",d,q:Projective:=Projective,
+         PresentationGenerators:=Presentation);
+        Q:=R.FreeGroupOfFpGroup(R);
+        R:=RelatorsOfFpGroup(R);
+      fi;
+      F:=Q/R;
+      if d > 3 then
+        varX:=GeneratorsOfGroup(F);
+        if not Presentation then
+          words:=SUStandardToPresentation@(d,q);
+          gens:=GeneratorsOfGroup(FamilyObj(words)!.wholeGroup);
+          varX:=List(words,x->MappedWord(x,gens,GeneratorsOfGroup(Q)));
+          phi:=GroupHomomorphismByImages(Q,F,
+            GeneratorsOfGroup(Q),GeneratorsOfGroup(F){[1..7]});
+          varX:=List(varX,x->ImagesRepresentative(phi,x));
+        fi;
+        lvarGamma:=varX[1];
+        t:=varX[2];
+        U:=varX[3];
+        V:=varX[4];
+        sigma:=varX[5];
+        tau:=varX[6];
+        v:=varX[7];
+        if IsEvenInt(q) then
+          varZ:=t;
+        else
+          varZ:=(lvarGamma^-1)^(QuoInt((q^2+q),2))*t;
+        fi;
+        lvarDelta:=lvarGamma*(lvarGamma^-1)^U;
+      fi;
+      if d=3 then
+        #   index q^3 + 1
+        #   standard? K := sub<F | F.3, F.6, F.7>;
+        ## TODO SubStructure
+        K:=Subgroup(F,[F.1,F.3]);
+      elif d=5 then
+        #   p^k * SU(d-2, q)
+        ## TODO SubStructure
+        K:=Subgroup(F,Concatenation([lvarGamma,V*(U^(V^-1))],
+          List([lvarGamma,t,tau,v],x->x^U),[sigma]));
+      else
+        #   d >= 7
+        #   SU(d-1, q)
+        #   K := sub < F | [ Z, V, U, Delta, sigma, Gamma ]>;
+        #   p^k * SU(d-2, q)
+        ## TODO SubStructure
+        K:=Subgroup(F,Concatenation([lvarGamma,V*U,U^V],
+          List([lvarGamma,t,tau,v],x->x^U),[sigma]));
+      fi;
+
+      gens:=ClassicalStandardGenerators("SU",d,q:
+       PresentationGenerators:=Presentation);
+
+      # verify relators
+      U:=FreeGeneratorsOfFpGroup(F);
+      V:=List(RelatorsOfFpGroup(F),
+        x->MappedWord(x,FreeGeneratorsOfFpGroup(F),gens));
+      V:=Filtered([1..Length(V)],x->not IsOne(V[x]));
+      if Length(V)>0 then Error("Relators ",V," don't hold"); fi;
+
+      I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
+      Size(I);
+
+    od;
+  od;
+  return true;
+end;
+
+TestSU:=function(list_a,list_b)
+local Presentation,Projective,d,f,q;
+  Presentation:=ValueOption("Presentation");
+  if Presentation=fail then
+    Presentation:=true;
+  fi;
+  Projective:=ValueOption("Projective");
+  if Projective=fail then
+    Projective:=false;
+  fi;
+  for d in list_a do
+    for q in list_b do
+      if IsEvenInt(d) then
+        f:=TestSUEven([d],[q]:Presentation:=Presentation,Projective:=Projective)
+         ;
+      else
+        f:=TestSUOdd([d],[q]:Presentation:=Presentation,Projective:=Projective)
+         ;
+      fi;
     od;
   od;
   return true;

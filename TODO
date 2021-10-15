@@ -11,16 +11,14 @@ sp.g (AH, 9/22/21)
 omega.g (AH, 9/27/21)
 plus.g (AH, 9/27/21)
 minus.g (AH, 9/30/21)
+circle.g (AH, 10/15/21)
 su.g (AH, 10/8/21)
 even-su.g (AH, 10/8/21)
 odd-su.g
-
-On the way:
-test.g, from test_abattoir.g
+test.g 
 
 Still to do:
 
-circle.g
 su3.g
 
 
