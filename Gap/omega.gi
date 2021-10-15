@@ -31,10 +31,11 @@ local Presentation,Projective,Type,q;
       if not IsOddInt(d) and d >= 3 then
       Error("Degree must be odd and at least 3");
     fi;
-      if not IsOddInt(q) then
+    if not IsOddInt(q) then
       Error("Field size must be odd");
     fi;
-    return OmegaPresentation@(d,q:Presentation:=Presentation);
+    return OmegaPresentation@(d,q:Projective:=Projective,
+      Presentation:=Presentation);
   elif Type="Omega+" then
       if not IsEvenInt(d) and d >= 4 then
       Error("Degree must be even and at least 4");

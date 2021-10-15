@@ -1,34 +1,9 @@
 #  File converted from Magma code -- requires editing and checking
 #  Magma -> GAP converter, version 0.5, 11/5/18 by AH
 
-# File checked and edited by MW 05/07/19
-# Some issues remain - marked with TODO
 
-#  Global Variables used: Append, Characteristic, ClassicalStandardGenerators,
-#  Degree, Eltseq, Evaluate, Factorial, GF, GL,
-#  Identity, Integers, IsOdd, IsPrime, LHS, MatrixAlgebra, Ngens,
-#  OmegaConvertToStandard, OmegaPresentationToStandard,
-#  OmegaStandardToPresentation, Omega_PresentationForN,
-#  Omega_PresentationForN1, PrimitiveElement, RHS, FreeGroup,
-#  Setup_OmegaPresentation, SpecialWordForDelta,
-#  Special_OmegaStandardToPresentation, Universe, WordForDelta, phi, tau
-
-#  Defines: OmegaConvertToStandard, OmegaGenerators, OmegaPresentation,
-#  OmegaPresentationToStandard, OmegaStandardToPresentation, Omega_OrderN,
-#  Omega_OrderN1, Omega_PresentationForN, Omega_PresentationForN1,
-#  Setup_OmegaPresentation, SpecialWordForDelta, WordForDelta
-
-DeclareGlobalFunction("OmegaConvertToStandard");
-
-DeclareGlobalFunction("OmegaStandardToPresentation");
-
-DeclareGlobalFunction("OmegaPresentationToStandard");
-
-#  Forward declaration of OmegaConvertToStandard
-#  Forward declaration of OmegaStandardToPresentation
-#  Forward declaration of OmegaPresentationToStandard
 InstallGlobalFunction(OmegaGenerators@,function(d,q)
-local lvarDelta,varE,F,MA,U,V,varZ,gens,n,sigma,tau,w;
+local lvarDelta,varE,F,MA,U,V,varZ,gens,n,sigma,tau,w,one;
   Assert(1,IsOddInt(d));
   Assert(1,IsOddInt(q));
   if d=3 then
@@ -38,31 +13,31 @@ local lvarDelta,varE,F,MA,U,V,varZ,gens,n,sigma,tau,w;
   n:=QuoInt(d,2);
   Assert(1,n > 1);
   F:=GF(q);
-  MA:=MatrixAlgebra(F,d);
-  varZ:=Identity(MA);
-  varZ[1][1]:=0;
-  varZ[1][2]:=1;
-  varZ[2][1]:=1;
-  varZ[2][2]:=0;
-  varZ[d][d]:=-1;
+  one:=One(F);
+  varZ:=IdentityMat(d,F);
+  varZ[1][1]:=0*one;
+  varZ[1][2]:=1*one;
+  varZ[2][1]:=1*one;
+  varZ[2][2]:=0*one;
+  varZ[d][d]:=-1*one;
   w:=PrimitiveElement(F);
-  lvarDelta:=Identity(MA);
+  lvarDelta:=IdentityMat(d,F);
   lvarDelta[1][1]:=w^-1;
   lvarDelta[2][2]:=w;
   lvarDelta[3][3]:=w^1;
   lvarDelta[4][4]:=w^-1;
-  lvarDelta:=lvarDelta*FORCEOne(GL(d,F)); ## TODO FORCE
-  tau:=Identity(MA);
-  tau[1][1]:=1;
-  tau[1][2]:=1;
-  tau[1][d]:=1;
-  tau[d][2]:=2;
-  tau[d][d]:=1;
-  sigma:=Identity(MA);
-  sigma[1][1]:=1;
-  sigma[1][3]:=1;
-  sigma[4][2]:=-1;
-  sigma[4][4]:=1;
+  #lvarDelta:=lvarDelta*FORCEOne(GL(d,F)); ## Not needed FORCE
+  tau:=IdentityMat(d,F);
+  tau[1][1]:=1*one;
+  tau[1][2]:=1*one;
+  tau[1][d]:=1*one;
+  tau[d][2]:=2*one;
+  tau[d][d]:=1*one;
+  sigma:=IdentityMat(d,F);
+  sigma[1][1]:=1*one;
+  sigma[1][3]:=1*one;
+  sigma[4][2]:=-1*one;
+  sigma[4][4]:=1*one;
   varE:=ClassicalStandardGenerators("Omega",d,q:
     PresentationGenerators:=false);
   U:=varE[5];
@@ -71,19 +46,17 @@ local lvarDelta,varE,F,MA,U,V,varZ,gens,n,sigma,tau,w;
   return gens;
 end);
 
-Omega_PresentationForN1:=function(n)
+BindGlobal("Omega_PresentationForN1@",function(n)
 local F,R,R1,Rels,S,U,V,varZ,phi;
   Assert(1,n > 1);
-  F:=FreeGroup(3);
+  F:=FreeGroup("Z","U","V");
   varZ:=F.1;
   U:=F.2;
   V:=F.3;
   R:=SignedPermutations@(n);
   S:=FreeGroupOfFpGroup(R);
   R:=RelatorsOfFpGroup(R);
-  phi:=GroupHomomorphismByImages(S,F,
-    GeneratorsOfGroup(S),
-    [U,V]);
+  phi:=GroupHomomorphismByImages(S,F, GeneratorsOfGroup(S), [U,V]);
   R:=List(R,r->ImagesRepresentative(phi,r));
   R1:=[];
   if n > 2 then
@@ -97,25 +70,23 @@ local F,R,R1,Rels,S,U,V,varZ,phi;
   Add(R1,Comm(varZ,varZ^U));
   R1 := Concatenation(R1, R);
   return F/R1;
-end;
+end);
 
-Omega_OrderN1:=function(n)
-return 2^(2*n-1)*Factorial(n);
-end;
+#Omega_OrderN1:=function(n)
+#return 2^(2*n-1)*Factorial(n);
+#end;
 
-Omega_PresentationForN:=function(n,q)
+BindGlobal("Omega_PresentationForN@",function(n,q)
 local lvarDelta,F,OMIT,R,R1,Rels,S,U,V,varZ,phi;
-  F:=FreeGroup(4);
+  F:=FreeGroup("Delta","Z","U","V");
   lvarDelta:=F.1;
   varZ:=F.2;
   U:=F.3;
   V:=F.4;
-  R:=Omega_PresentationForN1(n);
+  R:=Omega_PresentationForN1@(n);
   S:=FreeGroupOfFpGroup(R);
   R:=RelatorsOfFpGroup(R);
-  phi:=GroupHomomorphismByImages(S,F,
-    GeneratorsOfGroup(S),
-    [varZ,U,V]);
+  phi:=GroupHomomorphismByImages(S,F, GeneratorsOfGroup(S), [varZ,U,V]);
   R:=List(R,r->ImagesRepresentative(phi, r));
   R1:=[];
   if n > 3 then
@@ -142,15 +113,16 @@ local lvarDelta,F,OMIT,R,R1,Rels,S,U,V,varZ,phi;
   fi;
   Rels:=Concatenation(R1,R);
   return F/Rels;
-end;
+end);
 
-Omega_OrderN:=function(n,q)
-return (q-1)^n*2^(n-1)*Factorial(n);
-end;
+#Omega_OrderN:=function(n,q)
+#return (q-1)^n*2^(n-1)*Factorial(n);
+#end;
 
-Setup_OmegaPresentation:=function(d,q)
-local
-   lvarDelta,F,I,R1,R2,R3,R4,R5,R6,Rels,S,U,V,W,varZ,b,e,f,n,p,phi,sigma,tau,w,x;
+BindGlobal("Setup_OmegaPresentation@",function(d,q)
+local lvarDelta,F,I,R1,R2,R3,R4,R5,R6,Rels,S,U,V,W,varZ,b,e,f,n,p,phi,
+  sigma,tau,w,x;
+
   Assert(1,IsOddInt(d));
   Assert(1,IsOddInt(q));
   n:=QuoInt(d,2);
@@ -159,11 +131,11 @@ local
   w:=PrimitiveElement(F);
   e := Factors(q);
   if Size(DuplicateFreeList(e)) > 1 then
-      f := false;
+    f := false;
   else
-      f := true;
-      p := e[1];
-      e := Size(e);
+    f := true;
+    p := e[1];
+    e := Size(e);
   fi;
   F:=FreeGroup(6);
   lvarDelta:=F.1;
@@ -176,24 +148,21 @@ local
   #   additional relation needed for q = p to express Delta as word in sigma
   #  and U
   if IsPrimeInt(q) then
-    b:=Int(1/w); # TODO I think that this is correct ...
+    b:=Int(1/w); 
     w:=Int(w);
     Add(R3,lvarDelta/((sigma^U)^(w-w^2)*sigma^(b)*(sigma^U)^((w-1))
      *sigma^-1));
   fi;
   if e=1 then
-    R1:=Omega_PresentationForN1(n);
+    R1:=Omega_PresentationForN1@(n);
     S:=FreeGroupOfFpGroup(R1);
     R1:=RelatorsOfFpGroup(R1);
-    phi:=GroupHomomorphismByImages(S,F,
-      GeneratorsOfGroup(S),
-      [varZ,U,V]);
+    phi:=GroupHomomorphismByImages(S,F, GeneratorsOfGroup(S), [varZ,U,V]);
   else
-    R1:=Omega_PresentationForN(n,q);
+    R1:=Omega_PresentationForN@(n,q);
     S:=FreeGroupOfFpGroup(R1);
     R1:=RelatorsOfFpGroup(R1);
-    phi:=GroupHomomorphismByImages(S,F,
-      GeneratorsOfGroup(S),
+    phi:=GroupHomomorphismByImages(S,F,GeneratorsOfGroup(S),
       [lvarDelta,varZ,U,V]);
   fi;
   R1:=List(R1,r->ImagesRepresentative(phi, r));
@@ -201,12 +170,9 @@ local
   S:=FreeGroupOfFpGroup(R2);
   R2:=RelatorsOfFpGroup(R2);
   if e=1 then
-    phi:=GroupHomomorphismByImages(S,F,
-      GeneratorsOfGroup(S),
-      [sigma,U]);
+    phi:=GroupHomomorphismByImages(S,F, GeneratorsOfGroup(S), [sigma,U]);
   else
-    phi:=GroupHomomorphismByImages(S,F,
-      GeneratorsOfGroup(S),
+    phi:=GroupHomomorphismByImages(S,F, GeneratorsOfGroup(S),
       [lvarDelta,sigma,U]);
   fi;
   R2:=List(R2,r->ImagesRepresentative(phi, r));
@@ -259,83 +225,22 @@ local
   Add(R4,Comm(sigma,sigma^(varZ^U)));
   Add(R4,Comm(tau,tau^U)/(sigma^(varZ^U))^2);
   Add(R4,Comm(sigma,tau));
-  Add(R4,Comm(sigma^varZ,tau)/sigma*tau^(varZ*U));
+  Add(R4,Comm(sigma^varZ,tau)/(sigma*tau^(varZ*U)));
   #   Omega(7, 3) has multiplicator of order 6
   if d=7 and q=3 then
     Add(R3,Comm(tau,sigma^V));
   fi;
   Rels:=Concatenation(R1,R2,R3,R4,R5,R6);
   return F/Rels;
-end;
-
-InstallGlobalFunction(OmegaPresentation@,function(d,q)
-local gens,P,Presentation,Q,R,Rels,S;
-  Presentation:=ValueOption("Presentation");
-  if Presentation=fail then
-    Presentation:=false;
-  fi;
-  Assert(1,IsOddInt(d) and d > 1);
-  Assert(1,IsOddInt(q));
-  if d=3 then
-    R:=ClassicalStandardPresentation("SL",2,q:Projective:=true);
-    gens:=GeneratorsOfFpGroup(FreeGroupOfFpGroup(R));
-    R:=RelatorsOfFpGroup(R);
-    Q:=FreeGroup(5);
-    # was "R:=Evaluate(R,List([1,1,2,3],i->Q.i));" . This required the new variable "gens"
-    R:=List(R, w -> MappedWord(w, gens, List([1,1,2,3],i->Q.i)));
-    Add(R,Q.4);
-    Add(R,Q.5);
-    return Q/R;
-  fi;
-  R:=Setup_OmegaPresentation(d,q);
-  P:=FreeGroupOfFpGroup(R);
-  R:=RelatorsOfFpGroup(R);
-  if Presentation then
-    return P/R;
-  fi;
-  Rels:=OmegaConvertToStandard(d,q,R);
-  S:=FreeGroupOfFpGroup(Rels);
-  Rels:=RelatorsOfFpGroup(Rels);
-  Rels:=Filtered(Rels,w->w<>w^0);
-  return S/Rels;
-end);
-
-#  don't know if this is really necessary
-#  I need this function to get the list of letters of the words for MappedWord (see below)
-WriteGenerators:=function(R)
-local fam, F;
-  fam:=FamilyObj(R[1]);
-  F:=fam!.freeGroup;
-  return GeneratorsOfGroup(F);
-end;
-
-#   relations are on presentation generators;
-#  convert to relations on standard generators
-InstallGlobalFunction(OmegaConvertToStandard,
-function(d,q,Rels)
-local A,B,C,T,U,W,tau;
-  A:=OmegaStandardToPresentation(d,q);
-  # was "Rels:=Evaluate(Rels,A);"
-  Rels:=List(Rels, w-> MappedWord(w, WriteGenerators(Rels), A));
-  B:=OmegaPresentationToStandard(d,q);
-  # was "C:=Evaluate(B,A);"
-  C:=List(B, w-> MappedWord(w, WriteGenerators(B), A));
-  ## TODO Not sure how to translate <Universe>
-  U:=Universe(C);
-  W:=Universe(Rels);
-  tau:=GroupHomomorphismByImages(U,W,
-    GeneratorsOfGroup(U),List([1..Size(GeneratorsOfGroup(W))],i->W.i));
-  T:=List([1..Size(GeneratorsOfGroup(W))],i->W.i^-1*tau(C[i]));
-  Rels:=Concatenation(Rels,T);
-  return W/Rels;
 end);
 
 #   word for Delta in Sp(4, 9) generated by 5 specific elements
-SpecialWordForDelta:=function()
-local
-   G,w1,w10,w103,w104,w105,w106,w107,w108,w109,w11,w12,w13,w14,w15,w16,w17,w18,
-   w19,w2,w20,w21,w22,w23,w24,w25,w26,w27,w28,w29,w3,w30,w31,w32,w33,w34,w35,
-   w36,w37,w38,w39,w4,w45,w5,w52,w57,w58,w59,w6,w60,w61,w7,w8,w9;
+BindGlobal("SpecialWordForDelta@",function()
+local G,w1,w10,w103,w104,w105,w106,w107,w108,w109,w11,w12,w13,w14,w15,w16,
+   w17,w18,w19,w2,w20,w21,w22,w23,w24,w25,w26,w27,w28,w29,w3,w30,w31,w32,
+   w33,w34,w35, w36,w37,w38,w39,w4,w45,w5,w52,w57,w58,w59,w6,w60,w61,w7,
+   w8,w9;
+
   G:=FreeGroup(5);
   w10:=G.4*G.5;
   w103:=w10*G.5;
@@ -391,16 +296,16 @@ local
   w39:=w19*w38;
   w109:=w108*w39;
   return w109;
-end;
+end);
 
 #   word for Delta for q = 1 mod 4 and q not equal to 9
-WordForDelta:=function(d,q)
-local
-   A,B,C,Delta2,varE,F,I,Special_OmegaStandardToPresentation,U,V,W,varZ,a,b,c,e,
-   sigma,tau,w,w_Delta,words;
+BindGlobal("WordForDelta@",function(d,q)
+local A,B,C,Delta2,varE,F,I,Special_OmegaStandardToPresentation,
+   U,V,W,varZ,a,b,c,e,sigma,tau,w,w_Delta,words;
+
   Special_OmegaStandardToPresentation:=function(d,q)
   local U,V,W,varZ,delta,p,s,sigma,t,tau;
-    W:=FreeGroup(5);
+    W:=FreeGroup("s","t","delta","U","V");
     s:=W.1;
     t:=W.2;
     delta:=W.3;
@@ -418,7 +323,7 @@ local
     return [Comm(delta^V,U),varZ,tau,sigma,U,V];
   end;
 
-  W:=FreeGroup(6);
+  W:=FreeGroup("Delta2","Z","tau","sigma","U","V");
   #   Delta2 = Delta^2
   Delta2:=W.1;
   varZ:=W.2;
@@ -432,35 +337,36 @@ local
   ##
   ## TODO Need Magma documentation
   ##
-  varE:=SubStructure(F,w^4);
+  #varE:=SubStructure(F,w^4);
+  varE:=Basis(Field(w^4));
   # was "c:=Eltseq((-w^3)*FORCEOne(varE));"
-  c:=Coefficients(Basis(F), (-w^3)*FORCEOne(varE));
-  c:=List(c,x->x*FORCEOne(I));
-  b:=Coefficients(Basis(F), (1-w)*FORCEOne(varE));
-  b:=List(b,x->x*FORCEOne(I));
-  a:=Coefficients(Basis(F), (-w^-1+1)*FORCEOne(varE));
-  a:=List(a,x->x*FORCEOne(I));
+  c:=Coefficients(varE, (-w^3));
+  c:=List(c,Int);
+  b:=Coefficients(varE, (1-w));
+  b:=List(b,Int);
+  a:=Coefficients(varE, (-w^-1+1));
+  a:=List(a,Int);
+
   C:=Product(List([0..e-1],i->(sigma^(Delta2^i*U))^c[i+1]));
   B:=Product(List([0..e-1],i->(sigma^(Delta2^i*sigma^U))^b[i+1]));
   A:=Product(List([0..e-1],i->(sigma^(Delta2^i))^a[i+1]));
   w_Delta:=C*Delta2*sigma^U*B*A;
   words:=Special_OmegaStandardToPresentation(d,q);
   # was "w_Delta:=Evaluate(w_Delta,words);"
-  w_Delta:=List(w_Delta, w-> MappedWord(w, WriteGenerators(w_Delta), words));
+  w_Delta:=List(w_Delta, w-> MappedWord(w, GeneratorsOfGroup(W), words));
   return w_Delta;
-end;
+end);
 
 #   express presentation generators as words in standard generators
-InstallGlobalFunction(OmegaStandardToPresentation,
+InstallGlobalFunction(OmegaStandardToPresentation@,
 function(d,q)
-local lvarDelta,U,V,W,varZ,delta,gens,p,s,sigma,t,tau;
-  W:=FreeGroup(5);
+local lvarDelta,U,V,W,varZ,delta,gens,p,s,sigma,t,tau,fgens;
+  W:=FreeGroup("s","t","delta","U","V");
   s:=W.1;
   t:=W.2;
   delta:=W.3;
   U:=W.5;
   V:=W.4;
-  # rewritten select statement
   if d mod 4=3 then
     tau:=t^V;
   else
@@ -474,23 +380,26 @@ local lvarDelta,U,V,W,varZ,delta,gens,p,s,sigma,t,tau;
     lvarDelta:=U^2*Comm(delta^V,U)^(QuoInt((q+1),4));
   elif q=9 then
     gens:=[Comm(delta^V,U),s^V,U,tau,sigma];
-    lvarDelta:=SpecialWordForDelta();
+    lvarDelta:=SpecialWordForDelta@();
+    fgens:=GeneratorsOfGroup(FamilyObj(lvarDelta)!.wholeGroup);
     # was "lvarDelta:=Evaluate(lvarDelta,gens);"
-    lvarDelta:=List(lvarDelta, w-> MappedWord(w, WriteGenerators(lvarDelta), gens));
+    lvarDelta:=List(lvarDelta, w-> MappedWord(w, fgens, gens));
   else
-    lvarDelta:=WordForDelta(d,q);
+    lvarDelta:=WordForDelta@(d,q);
     #   ensure Delta is in the correct FreeGroup
+    fgens:=GeneratorsOfGroup(FamilyObj(lvarDelta)!.wholeGroup);
     # was "lvarDelta:=Evaluate(lvarDelta,List([1..5],i->W.i));"
-    lvarDelta:=List(lvarDelta, w-> MappedWord(w, WriteGenerators(lvarDelta), List([1..5],i->W.i)));
+    lvarDelta:=List(lvarDelta,w->MappedWord(w,fgens,
+       GeneratorsOfGroup(W){[1..5]}));
   fi;
   return [lvarDelta,varZ,tau,sigma,U,V];
 end);
 
 #   express standard generators as words in presentation generators
-InstallGlobalFunction(OmegaPresentationToStandard,
+BindGlobal("OmegaPresentationToStandard@",
 function(d,q)
 local lvarDelta,U,V,W,varZ,sigma,t,tau;
-  W:=FreeGroup(6);
+  W:=FreeGroup("Delta","Z","tau","sigma","U","V");
   lvarDelta:=W.1;
   varZ:=W.2;
   tau:=W.3;
@@ -505,4 +414,61 @@ local lvarDelta,U,V,W,varZ,sigma,t,tau;
   fi;
   #   return [s, t, delta, V, U]
   return [varZ^(V^-1),t,Comm(varZ,lvarDelta^-1)^(V^-1),V,U];
+end);
+
+#   relations are on presentation generators;
+#  convert to relations on standard generators
+BindGlobal("OmegaConvertToStandard@",
+function(d,q,Rels)
+local A,B,C,T,U,W,tau,gens;
+  A:=OmegaStandardToPresentation@(d,q);
+  # was "Rels:=Evaluate(Rels,A);"
+  gens:=GeneratorsOfGroup(FamilyObj(Rels)!.wholeGroup);
+  Rels:=List(Rels, w-> MappedWord(w, gens, A));
+  B:=OmegaPresentationToStandard@(d,q);
+  # was "C:=Evaluate(B,A);"
+  gens:=GeneratorsOfGroup(FamilyObj(B)!.wholeGroup);
+  C:=List(B, w-> MappedWord(w, gens, A));
+  #U:=Universe(C);
+  #W:=Universe(Rels);
+  U:=FamilyObj(C)!.wholeGroup;
+  W:=FamilyObj(Rels)!.wholeGroup;
+  tau:=GroupHomomorphismByImages(U,W,
+    GeneratorsOfGroup(U),GeneratorsOfGroup(W));
+  T:=List([1..Size(GeneratorsOfGroup(W))],i->W.i^-1*tau(C[i]));
+  Rels:=Concatenation(Rels,T);
+  return W/Rels;
+end);
+
+InstallGlobalFunction(OmegaPresentation@,function(d,q)
+local gens,P,Presentation,Q,R,Rels,S;
+  Presentation:=ValueOption("Presentation");
+  if Presentation=fail then
+    Presentation:=false;
+  fi;
+  Assert(1,IsOddInt(d) and d > 1);
+  Assert(1,IsOddInt(q));
+  if d=3 then
+    R:=ClassicalStandardPresentation("SL",2,q:Projective:=true,
+      PresentationGenerators:=false);
+    gens:=FreeGeneratorsOfFpGroup(R);
+    R:=RelatorsOfFpGroup(R);
+    Q:=FreeGroup(5);
+    # was "R:=Evaluate(R,List([1,1,2,3],i->Q.i));" . This required the new variable "gens"
+    R:=List(R, w -> MappedWord(w, gens, GeneratorsOfGroup(Q){[1,1,2,3]}));
+    Add(R,Q.4);
+    Add(R,Q.5);
+    return Q/R;
+  fi;
+  R:=Setup_OmegaPresentation@(d,q);
+  P:=FreeGroupOfFpGroup(R);
+  R:=RelatorsOfFpGroup(R);
+  if Presentation then
+    return P/R;
+  fi;
+  Rels:=OmegaConvertToStandard@(d,q,R);
+  S:=FreeGroupOfFpGroup(Rels);
+  Rels:=RelatorsOfFpGroup(Rels);
+  Rels:=Filtered(Rels,w->w<>w^0);
+  return S/Rels;
 end);

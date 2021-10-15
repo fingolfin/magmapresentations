@@ -291,10 +291,9 @@ local lvarDelta,F,I,K,Presentation,Q,R,U,V,varX,varZ,d,delta,phi,q,sigma,
       U:=FreeGeneratorsOfFpGroup(F);
       V:=List(RelatorsOfFpGroup(F),
         x->MappedWord(x,FreeGeneratorsOfFpGroup(F),gens));
-      V:=Unique(Filtered(V,x->not IsOne(x)));
-      if Length(V)>0 then
-        Error("Relators don't hold");
-      fi;
+      V:=Filtered([1..Length(V)],x->not IsOne(V[x]));
+      if Length(V)>0 then Error("Relators ",V," don't hold"); fi;
+
       I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
       Size(I);
 
@@ -398,8 +397,8 @@ local lvarDelta,F,I,K,Presentation,Projective,Q,R,U,V,varX,d,phi,q,
       U:=FreeGeneratorsOfFpGroup(F);
       V:=List(RelatorsOfFpGroup(F),
         x->MappedWord(x,FreeGeneratorsOfFpGroup(F),gens));
-      V:=Unique(Filtered(V,x->not IsOne(x)));
-      if Length(V)>0 then Error("Relators don't hold"); fi;
+      V:=Filtered([1..Length(V)],x->not IsOne(V[x]));
+      if Length(V)>0 then Error("Relators ",V," don't hold"); fi;
 
       I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
       Size(I);
@@ -424,6 +423,7 @@ local
   for d in list_a do
     Assert(1,IsOddInt(d));
     for q in list_b do
+      Print(" D = ",d,", q = ",q,"\n");
       Assert(1,IsOddInt(q));
       R:=ClassicalStandardPresentation("Omega",d,q:Projective:=Projective,
        PresentationGenerators:=Presentation);
@@ -467,8 +467,8 @@ local
       U:=FreeGeneratorsOfFpGroup(F);
       V:=List(RelatorsOfFpGroup(F),
         x->MappedWord(x,FreeGeneratorsOfFpGroup(F),gens));
-      V:=Unique(Filtered(V,x->not IsOne(x)));
-      if Length(V)>0 then Error("Relators don't hold"); fi;
+      V:=Filtered([1..Length(V)],x->not IsOne(V[x]));
+      if Length(V)>0 then Error("Relators ",V," don't hold"); fi;
 
       I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
       Size(I);
