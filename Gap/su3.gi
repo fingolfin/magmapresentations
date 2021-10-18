@@ -89,10 +89,10 @@ BindGlobal("SpecialSLPForElement@",function(g,q,W)
 local lvarDelta,F,Gens,R,lvarTau,V,c,delta,entry,matrix,tau,theta,v,w,word,z;
 
   if g=g^0 then
-    return rec(val1:=Identity(W),
-      val2:=g);
+    return Identity(W);
+    #return rec(val1:=Identity(W), val2:=g);
   fi;
-  Assert(1,g[1][1]=1 and g[1][2]=0 and g[2][3]=0);
+  Assert(1,IsOne(g[1][1]) and IsZero(g[1][2]) and IsZero(g[2][3]));
   v:=W.1;
   tau:=W.2;
   delta:=W.3;
@@ -109,16 +109,19 @@ local lvarDelta,F,Gens,R,lvarTau,V,c,delta,entry,matrix,tau,theta,v,w,word,z;
     theta:=w^-(q+1);
     #R:=SubStructure(F,theta);
     #c:=Eltseq((entry^-1*z)*FORCEOne(R));
-    R:=Basis();
+    R:=Field(theta);
+    c:=List([0..DegreeOverPrimeField(R)-1],x->theta^x);
+    R:=Basis(R,c);
+
     c:=Coefficients(R,(entry^-1*z));
     c:=List(c,Int);
     word:=Product(List([1..Size(c)],i->(tau^(delta^(i-1)))^c[i]));
     matrix:=Product(List([1..Size(c)],i->(lvarTau^(lvarDelta^(i-1)))^c[i]));
     g:=matrix^-1*g;
-    Assert(1,g[1][3]=0);
+    Assert(1,IsZero(g[1][3]));
   fi;
-  return rec(val1:=word,
-    val2:=g);
+  return word;
+  #return rec(val1:=word, val2:=g);
 end);
 
 
@@ -134,9 +137,9 @@ local F,c,d,found,m,n,psi,t,w,w0,x,y;
   if IsEvenInt(q) then
     x:=-(q+1) mod (q^2-1);
     # was "c:=Log(w0,(1-w0)^Z(q)^0);"
-    c:=Log((1-w0)*Z(q)^0,w0);
+    c:=LogFFE((1-w0)*Z(q)^0,w0);
     y:=-c*(q+1) mod (q^2-1);
-    Assert(1,w^(x*m)+w^(y*m)=1 and w^(-x*n)+w^(-y*n)=1);
+    Assert(1,IsOne(w^(x*m)+w^(y*m)) and IsOne(w^(-x*n)+w^(-y*n)));
     Assert(1,Size(Subfield(GF(q^2),[w^(x*m)]))=q 
      and Size(Subfield(GF(q^2),[w^(x*n)]))=q);
      # TODO Not sure what this func is returning but think this is fine
@@ -150,13 +153,13 @@ local F,c,d,found,m,n,psi,t,w,w0,x,y;
     fi;
     c:=t*(t^2+3*psi^2)*(t+psi)*(t^2-psi^2)^-2;
     d:=(c-c^(q-1));
-    if c=0 or d=0 then
+    if IsZero(c) or IsZero(d) then
       continue;
     fi;
     # was "x:=-Log(c) mod (q^2-1);"
     x:=-LogFFE(c,w) mod (q^2-1);
     y:=-LogFFE(d,w) mod (q^2-1);
-    if w^(x*m)+w^(y*m)=1 and w^(-x*n)+w^(-y*n)=1 then
+    if IsOne(w^(x*m)+w^(y*m)) and IsOne(w^(-x*n)+w^(-y*n)) then
       found:=Size(Subfield(GF(q^2),[w^(x*m)]))=q^2 and
        Size(Subfield(GF(q^2),[w^(x*n)]))=q;
       if found then
@@ -174,9 +177,9 @@ end);
 #   where r  = w^(x * (q - 2))
 BindGlobal("TwoPolynomials@",function(varE,F,p,q,w,x)
 local P,W,e,g,h,l,one,r,two,pair;
-  x:=IndeterminateOfUnivariateRationalFunction(F);
-  e:=Degree(F,x);
+  e:=DegreeOverPrimeField(F);
   r:=w^(x*(q-2));
+  W:=Field(r);
   one:=w^((q+1)*(q-2));
   two:=(w^(2*q-4)-one)*w^-(q-2);
   if one in W and two in W then
@@ -195,7 +198,9 @@ local P,W,e,g,h,l,one,r,two,pair;
   # was "g:=Eltseq(one*FORCEOne(W))*FORCEOne(P);"
   g:=Coefficients(Basis(F),one);
   h:=Coefficients(Basis(F),two);
-  Assert(1,w^(2*q-4)=ValuePol(g,r)+w^(q-2)*ValuePol(h,r));
+  g:=UnivariatePolynomial(F,g,1);
+  h:=UnivariatePolynomial(F,h,1);
+  Assert(1,w^(2*q-4)=Value(g,r)+w^(q-2)*Value(h,r));
   return rec(val1:=g,
     val2:=h);
 end);
@@ -238,26 +243,31 @@ local A,AddPower,B,lvarDelta,varE,F,Gens,I,K,L,R,Rels,
     Add(Rels,delta^(q^2-1));
   fi;
   if IsEvenInt(q) then
-    Add(Rels,v^2=tau);
+    Add(Rels,v^2/tau);
   else
     Add(Rels,v^p);
   fi;
   Add(Rels,tau^p);
   #   R2
-  Add(Rels,tau=tau^(a)*tau^(b));
+  Add(Rels,tau/(tau^(a)*tau^(b)));
   if IsOddInt(p) then
-    Add(Rels,tau=tau^(b)*tau^(a));
+    Add(Rels,tau/(tau^(b)*tau^(a)));
   fi;
   if e > 1 then
-    m1:=MinimalPolynomial(varE, w0^-x);
+    m1:=MinimalPolynomial(PrimeField(varE), w0^-x);
     b1:=CoefficientsOfUnivariatePolynomial(m1);
     b1:=List(b1,Int);
     Add(Rels,Product(List([1..Size(b1)],i->(tau^(a^(i-1)))^b1[i])));
   fi;
   if e=1 or Gcd(x,q^2-1) > 1 then
-     ## TODO not 100% sure that the field is varE in the fuction Coefficients below.
+
+    b2:=w0^-x;
+    K:=Field(b2);
+    b2:=List([0..DegreeOverPrimeField(K)-1],x->b2^x);
+    K:=Basis(K,b2);
+
     # was "b2:=Eltseq((w0^-1)*FORCEOne(K));"
-    b2:=Coefficients(Basis(varE),(w0^-1));
+    b2:=Coefficients(K,(w0^-1));
     b2:=List(b2,Int);
     Add(Rels,Product(List([1..Size(b2)],i->(tau^(a^(i-1)))^b2[i])
      /tau^(delta)));
@@ -289,8 +299,8 @@ local A,AddPower,B,lvarDelta,varE,F,Gens,I,K,L,R,Rels,
     Add(Rels,lhs/rhs);
   fi;
   #   (v)
-  m2:=MinimalPolynomial(w^(x*(q-2)));
-  b:=Coefficients(m2);
+  m2:=MinimalPolynomial(PrimeField(F),w^(x*(q-2)));
+  b:=CoefficientsOfUnivariatePolynomial(m2);
   b:=List(b,Int);
   lhs:=Product(List([1..Size(b)],i->(v^(a^(i-1)))^b[i]));
   matrix:=Product(List([1..Size(b)],i->(V^(A^(i-1)))^b[i]));
@@ -298,9 +308,15 @@ local A,AddPower,B,lvarDelta,varE,F,Gens,I,K,L,R,Rels,
   Add(Rels,lhs/rhs);
   #   (vi)
   if IsOddInt(q) and Gcd(x,q^2-1) > 1 then
-      ## not 100% sure the field is is varE
+
+    b:=w^(x * (q - 2));
+    K:=Field(b);
+    b:=List([0..DegreeOverPrimeField(K)-1],x->b^x);
+    K:=Basis(K,b);
+
     # was "b:=Eltseq((w^(q-2))*FORCEOne(K));"
-    b:=Coefficients(Basis(varE), (w^(q-2)));
+
+    b:=Coefficients(K, (w^(q-2)));
     b:=List(b,Int);
     L:=V^(lvarDelta);
     R:=Product(List([1..Size(b)],i->(V^(A^(i-1)))^b[i]));
@@ -313,9 +329,9 @@ local A,AddPower,B,lvarDelta,varE,F,Gens,I,K,L,R,Rels,
     m4:=TwoPolynomials@(varE,F,p,q,w,x);
     m3:=m4.val1;
     m4:=m4.val2;
-    b3:=Coefficients(m3);
+    b3:=CoefficientsOfUnivariatePolynomial(m3);
     b3:=List(b3,Int);
-    b4:=Coefficients(m4);
+    b4:=CoefficientsOfUnivariatePolynomial(m4);
     b4:=List(b4,Int);
     L:=V^(lvarDelta^2);
     R:=Product(List([1..Size(b3)],i->(V^(A^(i-1)))^b3[i])
@@ -337,7 +353,7 @@ local gamma,t,x;
   Assert(1,Trace(GF(q^2),GF(q),beta)<>0);
   t:=Trace(GF(q^2),GF(q),beta)*Trace(GF(q^2),GF(q),eta)^-1;
   gamma:=t*eta-beta;
-  Assert(1,Trace(GF(q^2),GF(q),gamma)=0);
+  Assert(1,IsZero(Trace(GF(q^2),GF(q),gamma)));
   x:=(w*zeta^-1)*(beta+gamma);
   Assert(1,x in GF(q) and x<>0);
   return gamma;
@@ -359,8 +375,10 @@ local lvarAlpha,F,alpha,beta0,eta,gamma0,n,t,w,w0,zeta;
   else
     lvarAlpha:=[alpha,alpha*w^(q-1),alpha*w^(2*(q-1))];
     ## TODO Aren't the last two conditions equivalent to : q not equal 2,4 ?
-    Assert(1,ForAll(lvarAlpha,a->a^(q+1)=-t) and IsPower(w^(q-1),3)=false and
-     IsPower(w^(2*(q-1)),3)=false);
+    #Assert(1,ForAll(lvarAlpha,a->a^(q+1)=-t) and IsPower(w^(q-1),3)=false and
+    # IsPower(w^(2*(q-1)),3)=false);
+    Assert(1,ForAll(lvarAlpha,a->a^(q+1)=-t) and [3]<>Set(Factors(w^(q-1))) and
+     [3]<>Set(Factors(w^(2*(q-1)))));
   fi;
   zeta:=-w^(QuoInt((q^2+q),2));
   Assert(1,zeta^2=w0);
@@ -370,13 +388,11 @@ local lvarAlpha,F,alpha,beta0,eta,gamma0,n,t,w,w0,zeta;
     val2:=gamma0);
 end);
 
-BindGlobal("MatrixToTuple@",function(A)
-local F,alpha,beta,psi,q,w;
-  if IsList(A) and IsMatrix(A[1]) then
-    A:=A[1];
-  fi;
-  F:=DefaultFieldOfMatrix(A);
-  q:=RootInt(Size(F));
+BindGlobal("MatrixToTuple@",function(F,A)
+local alpha,beta,psi,q,w;
+  #F:=DefaultFieldOfMatrix(A);
+  if IsMatrix(A) then A:=A[1];fi;
+  q:=RootInt(Size(F),2);
   w:=PrimitiveElement(F);
   alpha:=A[2];
   beta:=A[3];
@@ -394,20 +410,21 @@ BindGlobal("TupleToMatrix@",function(q,v)
 end);
 
 BindGlobal("ComputeRight@",function(q,U)
-local V,m,r,s,t;
-  V:=Parent(U[1]);
-  r:=Reversed(Eltseq(U[1]))*FORCEOne(V);
-  s:=Normalise(r);
+local F,V,m,r,s,t;
+  F:=DefaultFieldOfMatrix(U);
+  r:=Reversed(U[1]);
+  s:=ShallowCopy(NormedRowVector(r));
   s[2]:=-s[2];
-  t:=MatrixToTuple@(s);
+  t:=MatrixToTuple@(F,s);
   m:=TupleToMatrix@(q,t);
-  Assert(1,MatrixToTuple@(m)=t);
+  Assert(1,MatrixToTuple@(F,m)=t);
   return [m,t];
 end);
 
 BindGlobal("ProcessRelation@",function(G,v)
-local U,d,left,lv,q,rest,right,rv,t;
-  q:=RootInt(Size(BaseRing(G)),2);
+local F,U,d,left,lv,q,rest,right,rv,t;
+  F:=DefaultFieldOfMatrixGroup(G);
+  q:=RootInt(Size(F),2);
   t:=TMatrix@(q);
   U:=TupleToMatrix@(q,v);
   rv:=ComputeRight@(q,U);
@@ -417,7 +434,7 @@ local U,d,left,lv,q,rest,right,rv,t;
   d:=DiagonalMat(List([1..Length(rest)],i->rest[i][i]));
   left:=rest*d^-1;
   #Assert(1,IsUpperTriangular(left));
-  lv:=MatrixToTuple@(left);
+  lv:=MatrixToTuple@(F,left);
   Assert(1,t^-1*U*t=left*d*t*right);
   return rec(val1:=lv,
     val2:=rv,
@@ -441,9 +458,12 @@ local A,varE,F,I,m,n,nu,w,z;
   F:=GF(q^2);
   w:=PrimitiveElement(F);
   nu:=w^z;
+
   varE:=Field(nu);
+  varE:=Basis(varE,List([0..DegreeOverPrimeField(varE)-1],x->nu^x));
+
   # was "A:=Eltseq(power*FORCEOne(varE));"
-  A:=Coefficients(Basis(varE), power);
+  A:=Coefficients(varE, power);
   A:=List(A,Int);
   return Product(List([0..Length(A)-1],i->(v^(delta^(n*i)))^A[i+1]));
 end);
@@ -456,7 +476,7 @@ local A,varE,F,I,gamma,w,w0;
   F:=GF(q^2);
   w:=PrimitiveElement(F);
   w0:=w^(q+1);
-  varE:=SubStructure(F,w0);
+  varE:=Field(w0);
   if IsOddInt(q) then
     gamma:=power/w^(QuoInt((q+1),2));
   else
@@ -473,7 +493,7 @@ end);
 BindGlobal("SLPForElement@",function(q,delta,v,tau,mat_v,mat,wdelta,wv,wtau)
 local A,B,a,b,m,wA,wB;
   a:=mat_v[1];
-  if a<>0 then
+  if not IsZero(a) then
     A:=ConstructVMatrix@(q,delta,v,a);
     wA:=ConstructVMatrix@(q,wdelta,wv,a);
   else
@@ -501,7 +521,7 @@ local lvarAlpha,F,G,L,R,U,V,W,a,a1,b,b1,beta0,d,delta,e,gamma0,i,left,lhs,
   w:=PrimitiveElement(F);
   w0:=w^(q+1);
   beta0:=w^(1+QuoInt((q^2+q),2));
-  V:=VectorSpace(F,2);
+  V:=F^2;
   G:=SU(3,q);
   L:=SU3Generators@(q);
   v:=L[1];
@@ -531,8 +551,7 @@ local lvarAlpha,F,G,L,R,U,V,W,a,a1,b,b1,beta0,d,delta,e,gamma0,i,left,lhs,
   od;
   mats:=Concatenation(mats,List(mats,m->m*tau0));
   Add(mats,tau0);
-  U:=List( # {@-list:
-    mats,m->MatrixToTuple@(m));
+  U:=List( mats,m->MatrixToTuple@(F,m));
   #   determine relation u^t = u_L * Delta^pow * t * u_r
   R:=[];
   for u in U do
@@ -545,7 +564,7 @@ local lvarAlpha,F,G,L,R,U,V,W,a,a1,b,b1,beta0,d,delta,e,gamma0,i,left,lhs,
     t:=right.val5;
     right:=right.val6;
     # =^= MULTIASSIGN =^=
-    pow:=Log(d[1][1]);
+    pow:=LogFFE(d[1][1],PrimitiveElement(F));
     m:=TupleToMatrix@(q,u);
     b1:=SLPForElement@(q,delta,v,tau,u,m,wdelta,wv,wtau);
     a:=b1.val1;
@@ -564,7 +583,7 @@ local lvarAlpha,F,G,L,R,U,V,W,a,a1,b,b1,beta0,d,delta,e,gamma0,i,left,lhs,
     w1:=w1.val4;
     lhs:=t^-1*a1*b1*t;
     rhs:=(x1*y1)*delta^pow*t*z1*w1;
-    Assert(1,lhs/rhs);
+    Assert(1,lhs=rhs);
     wlhs:=wt^-1*a*b*wt;
     wrhs:=(x*y)*wdelta^pow*wt*z*w;
     Add(R,wlhs/wrhs);
@@ -592,8 +611,8 @@ local F,Projective,Q,R,Rels,W,phi;
     F.1*F.6^-1*F.1*F.4^-1*F.1*F.4*F.6^-1*F.7/One(F)];
   W:=FreeGroup(7);
   Rels:=RelatorsOfFpGroup(Q);
-  phi:=GroupHomomorphismByImages(Q,W,
-    GeneratorsOfGroup(Q),GeneratorsOfGroup(W));
+  phi:=GroupHomomorphismByImages(FreeGroupOfFpGroup(Q),W,
+    FreeGeneratorsOfFpGroup(Q),GeneratorsOfGroup(W));
   Rels:=List(Rels,r->ImagesRepresentative(phi,r));
   if Projective then
     Add(Rels,W.7^2);
@@ -614,10 +633,11 @@ local F,lvarGamma,R,T,a,b,t,tau,v,v1;
     t:=F.4;
     a:=Comm(v,t);
     b:=(a^2)^v;
-    T:=[a/Comm(v,t),b/(a^2)^v,a^3,b^3,lvarGamma^3,Tuple([a,lvarGamma)
-     ,Comm(b,lvarGamma]),Tuple([a,b)
-     =lvarGamma^-1,a^v=b^-1,b^v=a*lvarGamma^1,a^v1=a*b*a,b^v1=a*b*lvarGamma^1,
-     v^2=v1^2,v1^2=Comm(v,v1),t=v^2*a^2*b];
+    T:=[a/Comm(v,t),b/(a^2)^v,a^3,b^3,lvarGamma^3,
+    Comm(a,lvarGamma),Comm(b,lvarGamma),
+    Comm(a,b)*lvarGamma,a^v*b,b^v/(a*lvarGamma^1),a^v1/(a*b*a),
+    b^v1=(a*b*lvarGamma^1),
+    v^2/v1^2,v1^2/Comm(v,v1),t/(v^2*a^2*b)];
   elif q=3 then
     F:=FreeGroup("v","tau","Gamma","t");
     # Implicit generator Assg from previous line.
@@ -625,24 +645,22 @@ local F,lvarGamma,R,T,a,b,t,tau,v,v1;
     tau:=F.2;
     lvarGamma:=F.3;
     t:=F.4;
-    T:=[F.1^3,F.4^2
-     ,F.3^-1*F.1^-1*F.3^-1*F.2^-1*F.1*F.3^2*F.1^-1
+    T:=[F.1^3,F.4^2,F.3^-1*F.1^-1*F.3^-1*F.2^-1*F.1*F.3^2*F.1^-1
      ,F.3^-1*F.1*F.3^-1*F.2^-1*F.1^-1*F.3^2*F.1
      ,F.2*F.4*F.3^-2*F.2*F.4*F.2*F.4
      ,F.3*F.2^-1*F.1^-1*F.4*F.3*F.2^-1*F.1*F.3*F.4*F.1*F.2^-1*F.4];
   elif q=5 then
     F:=FreeGroup(4);
-    T:=[F.1^5=One(F),F.3^1*F.2^2*F.3^-1*F.2
-     ,F.3^2*F.1^2*F.3^-2*F.1^-1=One(F),F.3^5*F.4*F.3*F.4
-     ,F.3^-1*F.1*F.4*F.1^-2*F.4*F.1*F.3*F.4=One(F)
-     ,F.3*F.1*F.3^-1*F.2^-1*F.1^-1*F.3*F.1^-1*F.3^-1*F.1=One(F)
+    T:=[F.1^5,F.3^1*F.2^2*F.3^-1*F.2
+     ,F.3^2*F.1^2*F.3^-2*F.1^-1,
+     F.3^5*F.4*F.3*F.4
+     ,F.3^-1*F.1*F.4*F.1^-2*F.4*F.1*F.3*F.4
+     ,F.3*F.1*F.3^-1*F.2^-1*F.1^-1*F.3*F.1^-1*F.3^-1*F.1
      ,
-     F.1^-1*F.4*F.2^-1*F.1^-1*F.4*F.3^-1*F.1^2*F.4*F.3*F.1^-1*F.4*F.3*F.2^-1=One\
-(F)];
+     F.1^-1*F.4*F.2^-1*F.1^-1*F.4*F.3^-1*F.1^2*F.4*F.3*F.1^-1*F.4*F.3*F.2^-1];
 
        fi;
-  R:=List(T,x->LHS(x)*RHS(x)^-1);
-  return F/R;
+  return F/T;
 end);
 
 BindGlobal("SU3Presentation@",function(q)
@@ -658,7 +676,7 @@ local Q,R,R1,R2,Rels,W,delta,phi,t,tau,v;
   #   relations of type R1
   R1:=BorelPresentation@(q);
   Q:=FreeGroupOfFpGroup(R1);
-  R1:=RelatorsOfFpGroup(Q);
+  R1:=RelatorsOfFpGroup(R1);
   phi:=GroupHomomorphismByImages(Q,W,
     GeneratorsOfGroup(Q),GeneratorsOfGroup(W){[1..3]});
   Rels:=List(R1,r->ImagesRepresentative(phi,r));
