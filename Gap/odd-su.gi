@@ -111,9 +111,9 @@ local
   n:=QuoInt(d,2);
   if d=3 then
     if q=2 then
-      return SU32Presentation(:Projective:=Projective);
+      return SU32Presentation@(:Projective:=Projective);
     else
-      return SU3Presentation(q);
+      return SU3Presentation@(q);
     fi;
   fi;
   e := Factors(q);
@@ -190,7 +190,7 @@ local
     [lvarGamma,t,U,V]);
   lvarR_N:=List(lvarR_N,r->ImagesRepresentative(phi,r));
   #   tau = tau^-1 in char 2
-  R_SU3:=SU3Presentation(q);
+  R_SU3:=SU3Presentation@(q);
   Q:=FreeGroupOfFpGroup(R_SU3);
   R_SU3:=RelatorsOfFpGroup(R_SU3);
   if q=2 then

@@ -556,7 +556,7 @@ local lvarDelta,F,lvarGamma,I,K,Presentation,Projective,Q,R,U,V,varX,varZ,
       if d=3 then
         R:=ClassicalStandardPresentation("SU",d,q:Projective:=Projective,
          PresentationGenerators:=true);
-        Q:=R.FreeGroupOfFpGroup(R);
+        Q:=FreeGroupOfFpGroup(R);
         R:=RelatorsOfFpGroup(R);
       else
         R:=ClassicalStandardPresentation("SU",d,q:Projective:=Projective,
@@ -619,6 +619,7 @@ local lvarDelta,F,lvarGamma,I,K,Presentation,Projective,Q,R,U,V,varX,varZ,
       V:=Filtered([1..Length(V)],x->not IsOne(V[x]));
       if Length(V)>0 then Error("Relators ",V," don't hold"); fi;
 
+      if not IsPerfectGroup(F) then Error("perf!");fi;
       I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
       Size(I);
 
