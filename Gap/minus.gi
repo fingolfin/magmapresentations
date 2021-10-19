@@ -384,7 +384,7 @@ local gens,P,Presentation,Projective,Q,R,Rels,S,n,z;
       Add(R,(Q.1*Q.1^Q.2*Q.1)*Q.2^-1);
     else
       # was "R:=Evaluate(R,List([1,1,2,3],i->Q.i));"
-      R:=List(R, w -> MappedWord(w, gens, List([1,1,2,3],i->Q.i)));
+      R:=List(R, w -> MappedWord(w, gens, GeneratorsOfGroup(Q){[1,1,2,3]}));
     fi;
     Add(R,Q.4);
     Add(R,Q.5);

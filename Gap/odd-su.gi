@@ -2,32 +2,33 @@
 #  Magma -> GAP converter, version 0.5, 11/5/18 by AH
 
 BindGlobal("OddSUGenerators@",function(d,q)
-local F,lvarGamma,S,U,V,alpha,gamma,i,phi,psi,sigma,t,tau,v,w,x;
+local F,lvarGamma,S,U,V,alpha,gamma,i,phi,psi,sigma,t,tau,v,w,x,one;
   Assert(1,IsOddInt(d));
   F:=GF(q^2);
+  one:=One(F);
   w:=PrimitiveElement(F);
   #   define tau
   tau:=IdentityMat(d, F);
   # rewritten select statement
   if IsEvenInt(q) then
-    psi:=1;
+    psi:=one;
   else
     psi:=w^(QuoInt((q+1),2));
   fi;
   tau[1][2]:=-psi;
   #   define Gamma
-  lvarGamma:=Concatenation([w^-1,w^q],List([3..d-1],i->1),[w^(1-q)]);
+  lvarGamma:=Concatenation([w^-1,w^q],List([3..d-1],i->one),[w^(1-q)]);
   lvarGamma:=DiagonalMat(lvarGamma);
   #   define t
   t:=NullMat(d,d,F);
-  t[1][2]:=1;
-  t[2][1]:=1;
-  t[d][d]:=-1;
+  t[1][2]:=one;
+  t[2][1]:=one;
+  t[d][d]:=-one;
   for i in [3..d-1] do
-    t[i][i]:=1;
+    t[i][i]:=one;
   od;
   #   define v
-  alpha:=1;
+  alpha:=one;
   if IsEvenInt(q) then
     # was "phi:=Trace(w,GF(q))^(-1)*w;"
     phi:=Trace(F,GF(q),w)^(-1)*w;
@@ -37,11 +38,11 @@ local F,lvarGamma,S,U,V,alpha,gamma,i,phi,psi,sigma,t,tau,v,w,x;
   fi;
   gamma:=phi*alpha^(1+q);
   v:=NullMat(d,d,F);;
-  v[1][1]:=1;
+  v[1][1]:=one;
   v[1][2]:=gamma;
   v[1][d]:=alpha;
   for i in [2..d] do
-    v[i][i]:=1;
+    v[i][i]:=one;
   od;
   v[d][2]:=-alpha^q;
   #   U and V
@@ -55,7 +56,7 @@ local F,lvarGamma,S,U,V,alpha,gamma,i,phi,psi,sigma,t,tau,v,w,x;
   sigma:=NullMat(d,d,F);
   # was "InsertBlock(TILDEsigma,x,1,1);"
   sigma{[1..NrRows(x)]}{[1..NrCols(x)]}:=x;
-  sigma[d][d]:=1;
+  sigma[d][d]:=one;
   return [lvarGamma,t,U,V,sigma,tau,v];
 end);
 
@@ -253,7 +254,7 @@ local
   if (q<>3) then
     varE:=GF(q^2);
     # Implicit generator Assg from previous line.
-    w:=varE.1;
+    w:=PrimitiveElement(varE);
     w0:=w^(q+1);
     a:=w^(2*q)+w^2;
     # was "m:=Log(w0,a);"

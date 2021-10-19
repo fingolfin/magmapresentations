@@ -147,7 +147,7 @@ local EvenCase,I,J,M,d,gamma,phi,q,one;
     J:=DiagonalMat([gamma,gamma^-q,gamma^-1,gamma^q]);
   else
     if IsEvenInt(q) then
-      phi:=(Trace(GF(q),gamma))^-1*gamma;
+      phi:=(Trace(F,GF(q),gamma))^-1*gamma;
     else
       phi:=-1/2*one;
     fi;
@@ -676,7 +676,7 @@ InstallGlobalFunction(ClassicalStandardGenerators,function(type,d,F)
 #  -> ,]  return the Leedham - Green and O ' Brien standard generators for the
 #  quasisimple classical group of specified type in dimension d and defining
 #  field F ; the string type := one of SL , Sp , SU , Omega , Omega + , Omega -
-local PresentationGenerators,SpecialGroup,q;
+local PresentationGenerators,SpecialGroup,q,l;
   SpecialGroup:=ValueOption("SpecialGroup");
   if SpecialGroup=fail then
     SpecialGroup:=false;
@@ -716,19 +716,18 @@ local PresentationGenerators,SpecialGroup,q;
     fi;
   fi;
   if PresentationGenerators=true then
-    return Internal_PresentationGenerators@(type,d,Size(F));
-  fi;
-  if type="SL" then
-    return SLChosenElements@(SL(d,F));
+    l := Internal_PresentationGenerators@(type,d,Size(F));
+  elif type="SL" then
+    l := SLChosenElements@(SL(d,F));
   elif type="Sp" then
-    return SpChosenElements@(SP(d,F));
+    l := SpChosenElements@(SP(d,F));
   elif type="SU" then
     # need to do `Size` as field not recognized by SU. And no extra 2 needed
-    return SUChosenElements@(SU(d,Size(F)));
+    l := SUChosenElements@(SU(d,Size(F)));
   elif type="Omega" then
-    return SOChosenElements@(Omega(d,F):SpecialGroup:=SpecialGroup);
+    l := SOChosenElements@(Omega(d,F):SpecialGroup:=SpecialGroup);
   elif type="Omega+" then
-    return PlusChosenElements@(OmegaPlus(d,Size(F))
+    l := PlusChosenElements@(OmegaPlus(d,Size(F))
      :SpecialGroup:=SpecialGroup);
     #   avoid OmegaMinus -- it sets order, too hard for large d, q
   elif type="Omega-" then
@@ -736,5 +735,8 @@ local PresentationGenerators,SpecialGroup,q;
 #    return MinusChosenElements@(ChevalleyGroup("2D",QuoInt(d,2),F)
 #     :SpecialGroup:=SpecialGroup);
   fi;
+  if type="SU" then F:=GF(F,2);fi;
+  l:=List(l,x->ImmutableMatrix(F,x));
+  return l;
 end);
 

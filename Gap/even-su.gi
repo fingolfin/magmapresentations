@@ -153,7 +153,7 @@ local
    lvarDelta,varE,F,I,OMIT,R,R1,R2,R3,R4,Rels,S,U,V,W,varZ,a,delta,e,eta,f,m,n,p,
    phi,sigma,tau,w,w0,x,y;
 
-  Assert(1,Size(DuplicateFreeList(q)) = 1);
+  Assert(1,Size(DuplicateFreeList(Factors(q))) = 1);
   Assert(1,IsEvenInt(d) and d > 2);
   n:=QuoInt(d,2);
   e := Factors(q);

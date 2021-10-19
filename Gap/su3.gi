@@ -637,7 +637,7 @@ local F,lvarGamma,R,T,a,b,t,tau,v,v1;
     T:=[a/Comm(v,t),b/(a^2)^v,a^3,b^3,lvarGamma^3,
     Comm(a,lvarGamma),Comm(b,lvarGamma),
     Comm(a,b)*lvarGamma,a^v*b,b^v/(a*lvarGamma^1),a^v1/(a*b*a),
-    b^v1=(a*b*lvarGamma^1),
+    b^v1/(a*b*lvarGamma^1),
     v^2/v1^2,v1^2/Comm(v,v1),t/(v^2*a^2*b)];
   elif q=3 then
     F:=FreeGroup("v","tau","Gamma","t");

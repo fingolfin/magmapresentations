@@ -4,6 +4,10 @@
 LoadPackage("ace");
 TCENUM:=ACETCENUM;
 
+DeclareInfoClass("InfoPresTest");
+SetInfoLevel(InfoPresTest,1);
+SetAssertionLevel(1);
+
 dim_limit:=20;
 #   max dimension
 field_limit:=100;
@@ -14,7 +18,7 @@ field_limit:=100;
 #   do matrices satisfy presentation?
 #   coset enumerations
 TestSL:=function(a_list,b_list)
-local DD,F,I,K,Presentation,Projective,QQ,U,V,d,delta,e,f,p,q,tau,gens;
+local DD,F,I,K,Presentation,Projective,QQ,U,V,d,delta,e,f,p,q,tau,gens,noenum;
   Projective:=ValueOption("Projective");
   if Projective=fail then
     Projective:=false;
@@ -23,13 +27,14 @@ local DD,F,I,K,Presentation,Projective,QQ,U,V,d,delta,e,f,p,q,tau,gens;
   if Presentation=fail then
     Presentation:=true;
   fi;
-  if Projective then Print("Doing Projective\n");fi;
-  if Presentation then Print("Doing Presentation\n");fi;
+  noenum:=ValueOption("noenum");
+  if Projective then Info(InfoPresTest,1,"Doing Projective");fi;
+  if Presentation then Info(InfoPresTest,1,"Doing Presentation");fi;
   for d in a_list do
     for q in b_list do
       DD:=d;
       QQ:=q;
-      Print(" D = ",d,", q = ",q,"\n");
+      Info(InfoPresTest,1,"SL:  D = ",d,", q = ",q,", enum:",noenum<>true);
       if d=2 then
         F:=ClassicalStandardPresentation("SL",d,q:Projective:=Projective,
          PresentationGenerators:=false);
@@ -64,34 +69,34 @@ local DD,F,I,K,Presentation,Projective,QQ,U,V,d,delta,e,f,p,q,tau,gens;
       tau:=F.3;
       delta:=F.4;
       if d=2 then
-          ## TODO SubStructure
         K:=Subgroup(F,[tau,delta]);
       else
-          ## TODO SubStructure
         #   max? subgroup containing SL(d - 1, q)
         K:=Subgroup(F,[U,tau,V*U^(V^-1),delta,delta^(V^-1),tau^(V^-1)]);
       fi;
-      ## TODO Lots of this to change here
-      I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
-      if NrMovedPoints(I) < 10^7 then
-        Size(I);
-        if d=2 then
-          Assert(1,NrMovedPoints(I)=q+1);
-        else
-          Assert(1,(q^d-1) mod NrMovedPoints(I)=0);
-          #   else assert Degree (I) eq (q^d - 1);
+
+      Assert(1,IsPerfectGroup(F));
+      if noenum<>true then
+        I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
+        if NrMovedPoints(I) < 10^7 then
+          Size(I);
+          if d=2 then
+            Assert(1,NrMovedPoints(I)=q+1);
+          else
+            Assert(1,(q^d-1) mod NrMovedPoints(I)=0);
+            #   else assert Degree (I) eq (q^d - 1);
+          fi;
         fi;
       fi;
-      ## TODO Up to here
+
     od;
   od;
   return true;
 end;
 
 TestSp:=function(list_a,list_b)
-local
-   F,I,K,Presentation,Projective,Q,R,U,V,varX,varZ,d,delta,e,f,m,p,phi,q,sigma,
-   tau,words,gens;
+local F,I,K,Presentation,Projective,Q,R,U,V,varX,varZ,d,delta,e,f,m,p,phi,q,
+   sigma,tau,words,gens,noenum;
   Projective:=ValueOption("Projective");
   if Projective=fail then
     Projective:=false;
@@ -100,11 +105,12 @@ local
   if Presentation=fail then
     Presentation:=true;
   fi;
-  if Projective then Print("Doing Projective\n");fi;
-  if Presentation then Print("Doing Presentation\n");fi;
+  noenum:=ValueOption("noenum");
+  if Projective then Info(InfoPresTest,1,"Doing Projective");fi;
+  if Presentation then Info(InfoPresTest,1,"Doing Presentation");fi;
   for d in list_a do
     for q in list_b do
-      Print(" D = ",d,", q = ",q,"\n");
+      Info(InfoPresTest,1,"Sp:  D = ",d,", q = ",q,", enum:",noenum<>true);
         e := Factors(q);
         if Size(DuplicateFreeList(e)) > 1 then
             f := false;
@@ -153,20 +159,22 @@ local
         sigma:=varX[6];
       fi;
       if d=4 then
-          # TODO SubStructure
         K:=SubgroupNC(F,[varZ,tau,delta,delta^(V),sigma]);
       else
-          # TODO SubStructure
         m:=(QuoInt(d,2))-1;
         K:=SubgroupNC(F,
           [U,(V*U)^(V^-1),varZ,tau,delta,delta^(V^(m)),sigma,sigma^(V^(m))]);
       fi;
-      ## TODO Lots of things to change here
-      I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
-      if NrMovedPoints(I) < 10^7 then
-        Size(I);
-        Assert(1,Size(I)=Size(SP(d,q)) or Size(I)=QuoInt(Size(SP(d,q)),2));
+
+      Assert(1,IsPerfectGroup(F));
+      if noenum<>true then
+        I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
+        if NrMovedPoints(I) < 10^7 then
+          Size(I);
+          Assert(1,Size(I)=Size(SP(d,q)) or Size(I)=QuoInt(Size(SP(d,q)),2));
+        fi;
       fi;
+
     od;
   od;
   return true;
@@ -175,7 +183,7 @@ end;
 
 TestPlusOdd:=function(list_a,list_b)
 local lvarDelta,F,I,K,Presentation,Projective,Q,R,U,V,varX,varZ,d,phi,q,
-  sigma,words,gens;
+  sigma,words,gens,noenum;
 
   Presentation:=ValueOption("Presentation");
   if Presentation=fail then
@@ -185,9 +193,11 @@ local lvarDelta,F,I,K,Presentation,Projective,Q,R,U,V,varX,varZ,d,phi,q,
   if Projective=fail then
     Projective:=false;
   fi;
+  noenum:=ValueOption("noenum");
   for d in list_a do
     Assert(1,IsEvenInt(d));
     for q in list_b do
+      Info(InfoPresTest,1,"OplusOdd:  D = ",d,", q = ",q,", enum:",noenum<>true);
       Assert(1,IsOddInt(q));
       R:=ClassicalStandardPresentation("Omega+",d,
        q:PresentationGenerators:=Presentation,Projective:=Projective);
@@ -195,7 +205,6 @@ local lvarDelta,F,I,K,Presentation,Projective,Q,R,U,V,varX,varZ,d,phi,q,
       R:=RelatorsOfFpGroup(R);
       F:=Q/R;
       if d=4 then
-          # TODO SubStructure
         K:=Subgroup(F,GeneratorsOfGroup(F){[1,3,5,6,7]});
       else
         if Presentation then
@@ -234,8 +243,11 @@ local lvarDelta,F,I,K,Presentation,Projective,Q,R,U,V,varX,varZ,d,phi,q,
         Error("Relators don't hold");
       fi;
 
-      I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
-      Size(I);
+      Assert(1,IsPerfectGroup(F));
+      if noenum<>true then
+        I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
+        Size(I);
+      fi;
     od;
   od;
   return true;
@@ -243,14 +255,17 @@ end;
 
 TestPlusEven:=function(list_a,list_b)
 local lvarDelta,F,I,K,Presentation,Q,R,U,V,varX,varZ,d,delta,phi,q,sigma,
-  gens,words;
+  gens,words,noenum;
   Presentation:=ValueOption("Presentation");
   if Presentation=fail then
     Presentation:=true;
   fi;
+  noenum:=ValueOption("noenum");
   for d in list_a do
     Assert(1,IsEvenInt(d));
     for q in list_b do
+      Info(InfoPresTest,1,"OplusEven:  D = ",d,", q = ",q,", enum:",
+        noenum<>true);
       Assert(1,IsEvenInt(q));
       R:=ClassicalStandardPresentation("Omega+",d,
        q:PresentationGenerators:=Presentation);
@@ -294,8 +309,11 @@ local lvarDelta,F,I,K,Presentation,Q,R,U,V,varX,varZ,d,delta,phi,q,sigma,
       V:=Filtered([1..Length(V)],x->not IsOne(V[x]));
       if Length(V)>0 then Error("Relators ",V," don't hold"); fi;
 
-      I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
-      Size(I);
+      Assert(1,IsPerfectGroup(F));
+      if noenum<>true then
+        I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
+        Size(I);
+      fi;
 
     od;
   od;
@@ -312,11 +330,10 @@ local Presentation,Projective,d,f,q;
   if Projective=fail then
     Projective:=false;
   fi;
-  if Projective then Print("Doing Projective\n");fi;
-  if Presentation then Print("Doing Presentation\n");fi;
+  if Projective then Info(InfoPresTest,1,"Doing Projective");fi;
+  if Presentation then Info(InfoPresTest,1,"Doing Presentation");fi;
   for d in list_a do
     for q in list_b do
-      Print(" D = ",d,", q = ",q,"\n");
       if IsEvenInt(q) then
         f:=TestPlusEven([d],[q]:Presentation:=Presentation);
       else
@@ -330,7 +347,7 @@ end;
 
 TestMinus:=function(list_a,list_b)
 local lvarDelta,F,I,K,Presentation,Projective,Q,R,U,V,varX,d,phi,q,
-  gens,sigma,tau,words,z;
+  gens,sigma,tau,words,z,noenum;
   Presentation:=ValueOption("Presentation");
   if Presentation=fail then
     Presentation:=true;
@@ -339,12 +356,13 @@ local lvarDelta,F,I,K,Presentation,Projective,Q,R,U,V,varX,d,phi,q,
   if Projective=fail then
     Projective:=false;
   fi;
-  if Projective then Print("Doing Projective\n");fi;
-  if Presentation then Print("Doing Presentation\n");fi;
+  noenum:=ValueOption("noenum");
+  if Projective then Info(InfoPresTest,1,"Doing Projective");fi;
+  if Presentation then Info(InfoPresTest,1,"Doing Presentation");fi;
   for d in list_a do
     Assert(1,IsEvenInt(d));
     for q in list_b do
-      Print(" D = ",d,", q = ",q,"\n");
+      Info(InfoPresTest,1,"O-:  D = ",d,", q = ",q,", enum:",noenum<>true);
       R:=ClassicalStandardPresentation("Omega-",d, q:
         PresentationGenerators:=Presentation,Projective:=Projective);
       Q:=FreeGroupOfFpGroup(R);
@@ -400,8 +418,11 @@ local lvarDelta,F,I,K,Presentation,Projective,Q,R,U,V,varX,d,phi,q,
       V:=Filtered([1..Length(V)],x->not IsOne(V[x]));
       if Length(V)>0 then Error("Relators ",V," don't hold"); fi;
 
-      I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
-      Size(I);
+      Assert(1,IsPerfectGroup(F));
+      if noenum<>true then
+        I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
+        Size(I);
+      fi;
 
     od;
   od;
@@ -411,7 +432,7 @@ end;
 TestOmega:=function(list_a,list_b)
 local
    lvarDelta,F,I,K,Presentation,Projective,Q,R,U,V,varX,varZ,d,phi,q,sigma,tau,
-   words,gens;
+   words,gens,noenum;
   Presentation:=ValueOption("Presentation");
   if Presentation=fail then
     Presentation:=true;
@@ -420,10 +441,11 @@ local
   if Projective=fail then
     Projective:=false;
   fi;
+  noenum:=ValueOption("noenum");
   for d in list_a do
     Assert(1,IsOddInt(d));
     for q in list_b do
-      Print(" D = ",d,", q = ",q,"\n");
+      Info(InfoPresTest,1,"Omega:  D = ",d,", q = ",q,", enum:",noenum<>true);
       Assert(1,IsOddInt(q));
       R:=ClassicalStandardPresentation("Omega",d,q:Projective:=Projective,
        PresentationGenerators:=Presentation);
@@ -431,7 +453,6 @@ local
       R:=RelatorsOfFpGroup(R);
       F:=Q/R;
       if d=3 then
-          # TODO SubStructure
         K:=Subgroup(F,[F.2, F.3]);
       else
         if Presentation=false then
@@ -457,7 +478,6 @@ local
           V:=F.6;
         fi;
         #   SOPlus (d - 1, q).2
-        # TODO SubStructure
         K:=Subgroup(F,[lvarDelta, varZ,sigma,U,V]);
       fi;
       gens:=ClassicalStandardGenerators("Omega",d,q:
@@ -470,8 +490,11 @@ local
       V:=Filtered([1..Length(V)],x->not IsOne(V[x]));
       if Length(V)>0 then Error("Relators ",V," don't hold"); fi;
 
-      I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
-      Size(I);
+      Assert(1,IsPerfectGroup(F));
+      if noenum<>true then
+        I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
+        Size(I);
+      fi;
     od;
   od;
   return true;
@@ -479,7 +502,7 @@ end;
 
 TestSUEven:=function(list_a,list_b)
 local lvarDelta,F,I,K,Presentation,Projective,U,V,varZ,d,delta,n,q,sigma,
-  tau,gens;
+  tau,gens,noenum;
 
   Projective:=ValueOption("Projective");
   if Projective=fail then
@@ -489,11 +512,12 @@ local lvarDelta,F,I,K,Presentation,Projective,U,V,varZ,d,delta,n,q,sigma,
   if Presentation=fail then
     Presentation:=true;
   fi;
+  noenum:=ValueOption("noenum");
   for d in list_a do
     Assert(1,IsEvenInt(d));
     n:=QuoInt(d,2);
     for q in list_b do
-      Print(" D = ",d,", q = ",q,"\n");
+      Info(InfoPresTest,1,"SUeven:  D = ",d,", q = ",q,", enum:",noenum<>true);
       F:=ClassicalStandardPresentation("SU",d,q:Projective:=Projective,
        PresentationGenerators:=Presentation);
       varZ:=F.1;
@@ -530,8 +554,11 @@ local lvarDelta,F,I,K,Presentation,Projective,U,V,varZ,d,delta,n,q,sigma,
       V:=Filtered([1..Length(V)],x->not IsOne(V[x]));
       if Length(V)>0 then Error("Relators ",V," don't hold"); fi;
 
-      I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
-      Size(I);
+      Assert(1,IsPerfectGroup(F));
+      if noenum<>true then
+        I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
+        Size(I);
+      fi;
 
     od;
   od;
@@ -540,7 +567,7 @@ end;
 
 TestSUOdd:=function(list_a,list_b)
 local lvarDelta,F,lvarGamma,I,K,Presentation,Projective,Q,R,U,V,varX,varZ,
-   d,n,phi,q,sigma,t,tau,v,words,gens;
+   d,n,phi,q,sigma,t,tau,v,words,gens,noenum;
 
   Projective:=ValueOption("Projective");
   if Projective=fail then
@@ -550,11 +577,12 @@ local lvarDelta,F,lvarGamma,I,K,Presentation,Projective,Q,R,U,V,varX,varZ,
   if Presentation=fail then
     Presentation:=true;
   fi;
+  noenum:=ValueOption("noenum");
   for d in list_a do
     Assert(1,IsOddInt(d));
     n:=QuoInt(d,2);
     for q in list_b do
-      Print(" D = ",d,", q = ",q,"\n");
+      Info(InfoPresTest,1,"SUodd:  D = ",d,", q = ",q,", enum:",noenum<>true);
       if d=3 then
         R:=ClassicalStandardPresentation("SU",d,q:Projective:=Projective,
          PresentationGenerators:=true);
@@ -563,7 +591,7 @@ local lvarDelta,F,lvarGamma,I,K,Presentation,Projective,Q,R,U,V,varX,varZ,
       else
         R:=ClassicalStandardPresentation("SU",d,q:Projective:=Projective,
          PresentationGenerators:=Presentation);
-        Q:=R.FreeGroupOfFpGroup(R);
+        Q:=FreeGroupOfFpGroup(R);
         R:=RelatorsOfFpGroup(R);
       fi;
       F:=Q/R;
@@ -594,11 +622,9 @@ local lvarDelta,F,lvarGamma,I,K,Presentation,Projective,Q,R,U,V,varX,varZ,
       if d=3 then
         #   index q^3 + 1
         #   standard? K := sub<F | F.3, F.6, F.7>;
-        ## TODO SubStructure
         K:=Subgroup(F,[F.1,F.3]);
       elif d=5 then
         #   p^k * SU(d-2, q)
-        ## TODO SubStructure
         K:=Subgroup(F,Concatenation([lvarGamma,V*(U^(V^-1))],
           List([lvarGamma,t,tau,v],x->x^U),[sigma]));
       else
@@ -606,7 +632,6 @@ local lvarDelta,F,lvarGamma,I,K,Presentation,Projective,Q,R,U,V,varX,varZ,
         #   SU(d-1, q)
         #   K := sub < F | [ Z, V, U, Delta, sigma, Gamma ]>;
         #   p^k * SU(d-2, q)
-        ## TODO SubStructure
         K:=Subgroup(F,Concatenation([lvarGamma,V*U,U^V],
           List([lvarGamma,t,tau,v],x->x^U),[sigma]));
       fi;
@@ -621,9 +646,11 @@ local lvarDelta,F,lvarGamma,I,K,Presentation,Projective,Q,R,U,V,varX,varZ,
       V:=Filtered([1..Length(V)],x->not IsOne(V[x]));
       if Length(V)>0 then Error("Relators ",V," don't hold"); fi;
 
-      if not IsPerfectGroup(F) then Error("perf!");fi;
-      I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
-      Size(I);
+      Assert(1,IsPerfectGroup(F));
+      if noenum<>true then
+        I:=Range(FactorCosetAction(F,K:max:=10^7,Wo:=10^8,Hard:=true));
+        Size(I);
+      fi;
 
     od;
   od;
@@ -640,6 +667,8 @@ local Presentation,Projective,d,f,q;
   if Projective=fail then
     Projective:=false;
   fi;
+  if Projective then Info(InfoPresTest,1,"Doing Projective");fi;
+  if Presentation then Info(InfoPresTest,1,"Doing Presentation");fi;
   for d in list_a do
     for q in list_b do
       if IsEvenInt(d) then
@@ -654,3 +683,46 @@ local Presentation,Projective,d,f,q;
   return true;
 end;
 
+BigTest:=function()
+  TestSL([2],Filtered([5..15],IsPrimePowerInt):noenum);
+  TestSL([3..20],Filtered([1..101],IsPrimePowerInt):noenum);
+  TestSL([3..20],Filtered([2..15],IsPrimePowerInt));
+  TestSL([3,4],Filtered([2..25],IsPrimePowerInt));
+  TestSL([5..8],[2..5]);
+
+  TestSp([6,8..20],Filtered([1..101],IsPrimePowerInt):noenum);
+  TestSp([6],[2,3,4,5,7]);
+  TestSp([8,10],[2,3,4]);
+
+  TestPlus([6,8..20],Filtered([1..101],IsPrimePowerInt):noenum);
+  TestMinus([6,8..20],Filtered([1..101],IsPrimePowerInt):noenum);
+
+  TestPlus([6],Filtered([1..15],IsPrimePowerInt));
+  TestPlus([8,10],[2,3,4]);
+  TestMinus([6],Filtered([1..11],IsPrimePowerInt));
+  TestMinus([8,10],[2,3,4]);
+
+  TestOmega([3],Filtered([5,7..101],IsPrimePowerInt):noenum);
+  TestOmega([5,7..19],Filtered([1,3..101],IsPrimePowerInt):noenum);
+  TestOmega([3],Filtered([5,7..45],IsPrimePowerInt));
+  TestOmega([5,7],Filtered([1,3..11],IsPrimePowerInt));
+  TestOmega([9,11],[3]);
+
+  TestSU([3],Filtered([3..100],IsPrimePowerInt):noenum);
+  TestSU([4..10],Filtered([2..100],IsPrimePowerInt):noenum);
+  TestSU([11..20],Filtered([2..15],IsPrimePowerInt):noenum);
+  TestSU([3],Filtered([3..12],IsPrimePowerInt));
+  TestSU([4],Filtered([2..10],IsPrimePowerInt));
+  TestSU([5],[2,3,4,5,7]);
+  TestSU([6..8],[2,3]);
+end;
+
+LittleTest:=function()
+  SetInfoLevel(InfoPresTest,0);
+  TestSL([3..10],Filtered([1..15],IsPrimePowerInt):noenum);
+  TestSp([6,8],Filtered([1..10],IsPrimePowerInt):noenum);
+  TestPlus([6,8..20],Filtered([1..10],IsPrimePowerInt):noenum);
+  TestMinus([6,8..20],Filtered([1..10],IsPrimePowerInt):noenum);
+  TestOmega([3,5,7],Filtered([5,7..11],IsPrimePowerInt):noenum);
+  TestSU([3,4],Filtered([3..10],IsPrimePowerInt):noenum);
+end;
