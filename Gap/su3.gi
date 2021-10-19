@@ -176,16 +176,17 @@ end);
 #      w^(2*q - 4) = g(r) + w^(q - 2) * h(r)
 #   where r  = w^(x * (q - 2))
 BindGlobal("TwoPolynomials@",function(varE,F,p,q,w,x)
-local P,W,e,g,h,l,one,r,two,pair;
+local P,W,e,g,h,l,one,r,two,pair,Wb;
   e:=DegreeOverPrimeField(F);
   r:=w^(x*(q-2));
   W:=Field(r);
+  Wb:=List([0..DegreeOverPrimeField(W)-1],x->r^x);
   one:=w^((q+1)*(q-2));
   two:=(w^(2*q-4)-one)*w^-(q-2);
   if one in W and two in W then
     # was "g:=Eltseq(one*FORCEOne(W))*FORCEOne(P);"
-    g:=Coefficients(Basis(F),one);
-    h:=Coefficients(Basis(F),two);
+    g:=Coefficients(Wb,one);
+    h:=Coefficients(Wb,two);
     if w^(2*q-4)=ValuePol(g,r)+w^(q-2)*ValuePol(h,r) then
       return rec(val1:=g,
         val2:=h);
@@ -196,8 +197,8 @@ local P,W,e,g,h,l,one,r,two,pair;
   one:=pair[1];
   two:=pair[2];
   # was "g:=Eltseq(one*FORCEOne(W))*FORCEOne(P);"
-  g:=Coefficients(Basis(F),one);
-  h:=Coefficients(Basis(F),two);
+  g:=Coefficients(Wb,one);
+  h:=Coefficients(Wb,two);
   g:=UnivariatePolynomial(F,g,1);
   h:=UnivariatePolynomial(F,h,1);
   Assert(1,w^(2*q-4)=Value(g,r)+w^(q-2)*Value(h,r));
@@ -323,7 +324,7 @@ local A,AddPower,B,lvarDelta,varE,F,Gens,I,K,L,R,Rels,
     matrix:=R^-1*L;
     word:=SpecialSLPForElement@(matrix,q,W);
     lhs:=v^delta;
-    rhs:=Product(List([1..Size(b)],i->(v^(a^(i-1)))^b[i])*word);
+    rhs:=Product(List([1..Size(b)],i->(v^(a^(i-1)))^b[i]))*word;
     Add(Rels,lhs/rhs);
   elif IsEvenInt(q) then
     m4:=TwoPolynomials@(varE,F,p,q,w,x);
@@ -339,8 +340,8 @@ local A,AddPower,B,lvarDelta,varE,F,Gens,I,K,L,R,Rels,
     matrix:=R^-1*L;
     word:=SpecialSLPForElement@(matrix,q,W);
     lhs:=v^(delta^2);
-    rhs:=Product(List([1..Size(b3)],i->(v^(a^(i-1)))^b3[i])
-     *Product(List([1..Size(b4)],i->(v^(delta*a^(i-1)))^b4[i])*word));
+    rhs:=Product(List([1..Size(b3)],i->(v^(a^(i-1)))^b3[i]))
+     *Product(List([1..Size(b4)],i->(v^(delta*a^(i-1)))^b4[i]))*word;
     Add(Rels,lhs/rhs);
   fi;
   return W/Rels;
@@ -472,11 +473,13 @@ end);
 #  tau = TauMatrix (a) where a = w^((q+ 1) div 2) or 1 and
 #  delta = Delta (w), where w is primitive element for GF(q^2)
 BindGlobal("ConstructTauMatrix@",function(q,delta,tau,power)
-local A,varE,F,I,gamma,w,w0;
+local A,varE,Eb,F,I,gamma,w,w0;
   F:=GF(q^2);
   w:=PrimitiveElement(F);
   w0:=w^(q+1);
   varE:=Field(w0);
+  Eb:=List([0..DegreeOverPrimeField(varE)-1],x->w0^x);
+  Eb:=Basis(varE,Eb);
   if IsOddInt(q) then
     gamma:=power/w^(QuoInt((q+1),2));
   else
@@ -484,7 +487,7 @@ local A,varE,F,I,gamma,w,w0;
   fi;
   Assert(1,gamma in varE);
   # was "A:=Eltseq(gamma*FORCEOne(varE));"
-  A:=Coefficients(Basis(varE),gamma);
+  A:=Coefficients(Eb,gamma);
   A:=List(A,Int);
   return Product(List([0..Size(A)-1],i->(tau^(delta^(-i)))^A[i+1]));
 end);
@@ -680,6 +683,7 @@ local Q,R,R1,R2,Rels,W,delta,phi,t,tau,v;
   phi:=GroupHomomorphismByImages(Q,W,
     GeneratorsOfGroup(Q),GeneratorsOfGroup(W){[1..3]});
   Rels:=List(R1,r->ImagesRepresentative(phi,r));
+#Print("L=",Length(Rels),"\n");
   #   relations of type R2
   R2:=R2Relations@(q);
   Q:=FreeGroupOfFpGroup(R2);
@@ -687,6 +691,7 @@ local Q,R,R1,R2,Rels,W,delta,phi,t,tau,v;
   phi:=GroupHomomorphismByImages(Q,W,
      GeneratorsOfGroup(Q),GeneratorsOfGroup(W){[1..4]});
   Rels:=Concatenation(Rels,List(R2,r->ImagesRepresentative(phi,r)));
+#Print("L=",Length(Rels),"\n");
   Add(Rels,t^2);
   Add(Rels,delta^t/delta^-q);
   return W/Rels;
@@ -720,4 +725,4 @@ end);
 #  RandomSchreier (I);
 #  "Comp factors", CompositionFactors (I);
 #  end if;
-#  end for;
+#/  end for;
