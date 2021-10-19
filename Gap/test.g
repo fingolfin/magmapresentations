@@ -478,7 +478,9 @@ local
 end;
 
 TestSUEven:=function(list_a,list_b)
-local lvarDelta,F,I,K,Presentation,Projective,U,V,varZ,d,delta,n,q,sigma,tau;
+local lvarDelta,F,I,K,Presentation,Projective,U,V,varZ,d,delta,n,q,sigma,
+  tau,gens;
+
   Projective:=ValueOption("Projective");
   if Projective=fail then
     Projective:=false;
@@ -538,7 +540,7 @@ end;
 
 TestSUOdd:=function(list_a,list_b)
 local lvarDelta,F,lvarGamma,I,K,Presentation,Projective,Q,R,U,V,varX,varZ,
-   d,n,phi,q,sigma,t,tau,v,words;
+   d,n,phi,q,sigma,t,tau,v,words,gens;
 
   Projective:=ValueOption("Projective");
   if Projective=fail then
