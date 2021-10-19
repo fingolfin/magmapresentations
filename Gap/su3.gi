@@ -188,7 +188,9 @@ local P,W,e,g,h,l,one,r,two,pair,Wb;
     # was "g:=Eltseq(one*FORCEOne(W))*FORCEOne(P);"
     g:=Coefficients(Wb,one);
     h:=Coefficients(Wb,two);
-    if w^(2*q-4)=ValuePol(g,r)+w^(q-2)*ValuePol(h,r) then
+    g:=UnivariatePolynomial(F,g,1);
+    h:=UnivariatePolynomial(F,h,1);
+    if w^(2*q-4)=Value(g,r)+w^(q-2)*Value(h,r) then
       return rec(val1:=g,
         val2:=h);
     fi;
@@ -271,14 +273,15 @@ local A,AddPower,B,lvarDelta,varE,F,Gens,I,K,L,R,Rels,
     # was "b2:=Eltseq((w0^-1)*FORCEOne(K));"
     b2:=Coefficients(K,(w0^-1));
     b2:=List(b2,Int);
-    Add(Rels,Product(List([1..Size(b2)],i->(tau^(a^(i-1)))^b2[i])
-     /tau^(delta)));
+    Add(Rels,Product(List([1..Size(b2)],i->(tau^(a^(i-1)))^b2[i]))
+     /tau^(delta));
   fi;
   #   R3
   #   (i)
   lhs:=v;
   rhs:=v^a*v^b*SpecialSLPForElement@((V^A*V^B)^-1*V,q,W);
   Add(Rels,lhs/rhs);
+#Print("L1=",Length(Rels),"\n");
   if IsOddInt(p) then
     lhs:=v;
     rhs:=v^b*v^a*SpecialSLPForElement@((V^B*V^A)^-1*V,q,W);
@@ -336,8 +339,8 @@ local A,AddPower,B,lvarDelta,varE,F,Gens,I,K,L,R,Rels,
     b4:=CoefficientsOfUnivariatePolynomial(m4);
     b4:=List(b4,Int);
     L:=V^(lvarDelta^2);
-    R:=Product(List([1..Size(b3)],i->(V^(A^(i-1)))^b3[i])
-     *Product(List([1..Size(b4)],i->(V^(lvarDelta*A^(i-1)))^b4[i])));
+    R:=Product(List([1..Size(b3)],i->(V^(A^(i-1)))^b3[i]))
+     *Product(List([1..Size(b4)],i->(V^(lvarDelta*A^(i-1)))^b4[i]));
     matrix:=R^-1*L;
     word:=SpecialSLPForElement@(matrix,q,W);
     lhs:=v^(delta^2);
@@ -392,14 +395,13 @@ end);
 
 BindGlobal("MatrixToTuple@",function(F,A)
 local alpha,beta,psi,q,w;
-  #F:=DefaultFieldOfMatrix(A);
   if IsMatrix(A) then A:=A[1];fi;
   q:=RootInt(Size(F),2);
   w:=PrimitiveElement(F);
   alpha:=A[2];
   beta:=A[3];
   if IsEvenInt(q) then
-    psi:=Trace(w,GF(q))^(-1)*w;
+    psi:=Trace(F,GF(q),w)^(-1)*w;
   else
     psi:=-1/2;
   fi;
@@ -413,7 +415,7 @@ end);
 
 BindGlobal("ComputeRight@",function(q,U)
 local F,V,m,r,s,t;
-  F:=DefaultFieldOfMatrix(U);
+  F:=GF(q^2);
   r:=Reversed(U[1]);
   s:=ShallowCopy(NormedRowVector(r));
   s[2]:=-s[2];
@@ -516,16 +518,15 @@ local A,B,a,b,m,wA,wB;
 end);
 
 BindGlobal("R2Relations@",function(q)
-local lvarAlpha,F,G,L,R,U,V,W,a,a1,b,b1,beta0,d,delta,e,gamma0,i,left,lhs,
+local lvarAlpha,F,G,L,R,U,W,a,a1,b,b1,beta0,d,delta,e,gamma0,i,left,lhs,
    lv,m,mats,
    pow,psi,rhs,right,rv,t,tau,tau0,u,v,w,w0,w1,wdelta,wlhs,wrhs,wt,wtau,wv,x,x1,
    y,y1,z,z1;
 
-  F:=GF(q^2);
+  F:=GF(GF(q),2);
   w:=PrimitiveElement(F);
   w0:=w^(q+1);
   beta0:=w^(1+QuoInt((q^2+q),2));
-  V:=F^2;
   G:=SU(3,q);
   L:=SU3Generators@(q);
   v:=L[1];
@@ -537,13 +538,11 @@ local lvarAlpha,F,G,L,R,U,V,W,a,a1,b,b1,beta0,d,delta,e,gamma0,i,left,lhs,
   wtau:=W.2;
   wdelta:=W.3;
   wt:=W.4;
-  # =v= MULTIASSIGN =v=
   gamma0:=DefineU0@(q);
   lvarAlpha:=gamma0.val1;
   gamma0:=gamma0.val2;
-  # =^= MULTIASSIGN =^=
   if IsEvenInt(q) then
-    psi:=Trace(w,GF(q))^(-1)*w;
+    psi:=Trace(F,w)^(-1)*w;
   else
     psi:=-1/2;
   fi;
@@ -559,7 +558,6 @@ local lvarAlpha,F,G,L,R,U,V,W,a,a1,b,b1,beta0,d,delta,e,gamma0,i,left,lhs,
   #   determine relation u^t = u_L * Delta^pow * t * u_r
   R:=[];
   for u in U do
-    # =v= MULTIASSIGN =v=
     right:=ProcessRelation@(G,u);
     lv:=right.val1;
     rv:=right.val2;
@@ -567,7 +565,6 @@ local lvarAlpha,F,G,L,R,U,V,W,a,a1,b,b1,beta0,d,delta,e,gamma0,i,left,lhs,
     d:=right.val4;
     t:=right.val5;
     right:=right.val6;
-    # =^= MULTIASSIGN =^=
     pow:=LogFFE(d[1][1],PrimitiveElement(F));
     m:=TupleToMatrix@(q,u);
     b1:=SLPForElement@(q,delta,v,tau,u,m,wdelta,wv,wtau);
