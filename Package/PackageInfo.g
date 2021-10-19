@@ -13,7 +13,7 @@ Version := "0.1",
 License := "GPL-2.0 OR GPL-3.0", # SPDX ID, see https://spdx.org
 
 ##  Release date of the current version in dd/mm/yyyy format.
-Date := "01/10/2021",
+Date := "01/11/2021",
 
 ##  URL of the archive(s) of the current package release, but *without*
 ##  the format extension(s), like '.zoo', which are given next.
@@ -201,8 +201,7 @@ Autoload := false,
 ##  If the default banner does not suffice then provide a string that is
 ##  printed when the package is loaded (not when it is autoloaded or if
 ##  command line options `-b' or `-q' are given).
-BannerString := "Classical Group Presentations\n\
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n",
+BannerString := "Classical Group Presentations by Leedham-Green, OBrien",
 
 TestFile := "tst/testall.g",
 

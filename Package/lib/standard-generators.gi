@@ -147,7 +147,7 @@ local EvenCase,I,J,M,d,gamma,phi,q,one;
     J:=DiagonalMat([gamma,gamma^-q,gamma^-1,gamma^q]);
   else
     if IsEvenInt(q) then
-      phi:=(Trace(GF(q),gamma))^-1*gamma;
+      phi:=(Trace(F,GF(q),gamma))^-1*gamma;
     else
       phi:=-1/2*one;
     fi;
@@ -210,7 +210,7 @@ local varE,F,P,a,alpha,b,d,delta,f,i,n,p,q,t,w,w0,x,y,one;
   if d >= 4 then
     b:=NullMat(d,d,varE);
     n:=QuoInt(d,2);
-    for i in [1,1+2..2*n-2] do
+    for i in [1,1+2..2*n-3] do
       b[i][i+2]:=one;
     od;
     b[2*n-1][1]:=one;
@@ -246,7 +246,7 @@ local varE,F,P,a,alpha,b,d,delta,f,i,n,p,q,t,w,w0,x,y,one;
     f:=IdentityMat(d,varE);
     f{[d-Length(x)+1..d]}{[d-Length(x)+1..d]}:=x;x:=f;
     f:=IdentityMat(d,varE);
-    f{[d-Length(x)+1..d]}{[d-Length(x)+1..d]}:=y;y:=f;
+    f{[d-Length(y)+1..d]}{[d-Length(y)+1..d]}:=y;y:=f;
   fi;
   x:=ImmutableMatrix(varE,x);
   y:=ImmutableMatrix(varE,y);
@@ -293,34 +293,33 @@ local one,D,F,Gens,I,L,M,P,SpecialGroup,U,_,a,b,delta,gens,h,i,m,n,q,u,w,x,y;
       x:=(i-1)*2+1;
       y:=x+2;
       #InsertBlock(TILDEh,I,x,y);
-      h{[x,x+1]}{[y,y+1]}:=delta;
+      h{[x..x+1]}{[y..y+1]}:=I;
     od;
     #InsertBlock(TILDEh,(-1)^(QuoInt(n,2)-1)*I,m-1,1);
-    h{[m-1..m-1+Length(delta)-1]}{[1..Length(delta)]}:=(-1)^(QuoInt(n,2)-1)*I;
-    h[n][n]:=1;
+    h{[m-1..m-1+Length(I)-1]}{[1..Length(I)]}:=(-1)^(QuoInt(n,2)-1)*I;
+    h[n][n]:=One(F);
   fi;
   Add(Gens,h);
   #   EOB -- add additional generator u Oct 2012
   if n > 3 then
     u:=NullMat(n,n,F);
     for i in [5..n] do
-      u[i][i]:=1;
+      u[i][i]:=One(F);
     od;
-    u[1][3]:=1;
-    u[2][4]:=1;
-    u[3][1]:=-1;
-    u[4][2]:=-1;
+    u[1][3]:=One(F);
+    u[2][4]:=One(F);
+    u[3][1]:=-One(F);
+    u[4][2]:=-One(F);
   else
     u:=IdentityMat(n,F);
   fi;
   Add(Gens,u);
   if SpecialGroup then
     m:=IdentityMat(n,F);
-    # =v= MULTIASSIGN =v=
-    b:=Valuation(q-1,2);
-    _:=b.val1;
-    b:=b.val2;
-    # =^= MULTIASSIGN =^=
+    #_,b:=Valuation(q-1,2);
+    b:=q-1;
+    while IsEvenInt(NumeratorRat(b)) do b:=b/2;od;
+    while IsEvenInt(DenominatorRat(b)) do b:=b*2;od;
     m[n-2][n-2]:=w^b;
     m[n-1][n-1]:=w^-b;
     Add(Gens,m);
@@ -409,10 +408,10 @@ local
     if SpecialGroup then
       a:=IdentityMat(n,F);
       if IsOddInt(q) then
-        # =v= MULTIASSIGN =v=
-        b:=Valuation(q-1,2);
-        _:=b.val1;
-        b:=b.val2;
+        #_,b:=Valuation(q-1,2);
+        b:=q-1;
+        while IsEvenInt(NumeratorRat(b)) do b:=b/2;od;
+        while IsEvenInt(DenominatorRat(b)) do b:=b*2;od;
         # =^= MULTIASSIGN =^=
         a[1][1]:=w^b;
         a[2][2]:=w^-b;
@@ -525,10 +524,10 @@ local
     fi;
     if SpecialGroup then
       a:=List(One(Gens[1]),ShallowCopy);
-      a[1][1]:=0;
-      a[2][2]:=0;
-      a[1][2]:=1;
-      a[2][1]:=1;
+      a[1][1]:=0*one;
+      a[2][2]:=0*one;
+      a[1][2]:=1*one;
+      a[2][1]:=1*one;
       Add(Gens,a);
     fi;
   fi;
@@ -594,11 +593,11 @@ local
   c:=[[0,1],[0,0]]*one;
   d:=[[1,0],[0,1]]*one;
   U:=IdentityMat(n,F);
-  U[n-3][n-3]:=0;
-  U[n-3][n-2]:=1;
-  U[n-2][n-3]:=1;
-  U[n-2][n-2]:=0;
-  U[n-1][n-1]:=-1;
+  U[n-3][n-3]:=0*one;
+  U[n-3][n-2]:=1*one;
+  U[n-2][n-3]:=1*one;
+  U[n-2][n-2]:=0*one;
+  U[n-1][n-1]:=-1*one;
   a:=[[1,0],[1,1]]*one;
   b:=[[0,0],[2,0]]*one;
   c:=[[1,0],[0,0]]*one;
@@ -677,7 +676,7 @@ InstallGlobalFunction(ClassicalStandardGenerators,function(type,d,F)
 #  -> ,]  return the Leedham - Green and O ' Brien standard generators for the
 #  quasisimple classical group of specified type in dimension d and defining
 #  field F ; the string type := one of SL , Sp , SU , Omega , Omega + , Omega -
-local PresentationGenerators,SpecialGroup,q;
+local PresentationGenerators,SpecialGroup,q,l;
   SpecialGroup:=ValueOption("SpecialGroup");
   if SpecialGroup=fail then
     SpecialGroup:=false;
@@ -717,18 +716,18 @@ local PresentationGenerators,SpecialGroup,q;
     fi;
   fi;
   if PresentationGenerators=true then
-    return Internal_PresentationGenerators@(type,d,Size(F));
-  fi;
-  if type="SL" then
-    return SLChosenElements@(SL(d,F));
+    l := Internal_PresentationGenerators@(type,d,Size(F));
+  elif type="SL" then
+    l := SLChosenElements@(SL(d,F));
   elif type="Sp" then
-    return SpChosenElements@(SP(d,F));
+    l := SpChosenElements@(SP(d,F));
   elif type="SU" then
-    return SUChosenElements@(SU(d,GF(F,2)));
+    # need to do `Size` as field not recognized by SU. And no extra 2 needed
+    l := SUChosenElements@(SU(d,Size(F)));
   elif type="Omega" then
-    return SOChosenElements@(Omega(d,F):SpecialGroup:=SpecialGroup);
+    l := SOChosenElements@(Omega(d,F):SpecialGroup:=SpecialGroup);
   elif type="Omega+" then
-    return PlusChosenElements@(OmegaPlus(d,Size(F))
+    l := PlusChosenElements@(OmegaPlus(d,Size(F))
      :SpecialGroup:=SpecialGroup);
     #   avoid OmegaMinus -- it sets order, too hard for large d, q
   elif type="Omega-" then
@@ -736,5 +735,8 @@ local PresentationGenerators,SpecialGroup,q;
 #    return MinusChosenElements@(ChevalleyGroup("2D",QuoInt(d,2),F)
 #     :SpecialGroup:=SpecialGroup);
   fi;
+  if type="SU" then F:=GF(F,2);fi;
+  l:=List(l,x->ImmutableMatrix(F,x));
+  return l;
 end);
 
