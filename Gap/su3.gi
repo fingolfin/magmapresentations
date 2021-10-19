@@ -181,6 +181,7 @@ local P,W,e,g,h,l,one,r,two,pair,Wb;
   r:=w^(x*(q-2));
   W:=Field(r);
   Wb:=List([0..DegreeOverPrimeField(W)-1],x->r^x);
+  Wb:=Basis(W,Wb);
   one:=w^((q+1)*(q-2));
   two:=(w^(2*q-4)-one)*w^-(q-2);
   if one in W and two in W then
