@@ -307,7 +307,9 @@ local lvarDelta,F,I,K,Presentation,Q,R,U,V,varX,varZ,d,delta,phi,q,sigma,
       V:=List(RelatorsOfFpGroup(F),
         x->MappedWord(x,FreeGeneratorsOfFpGroup(F),gens));
       V:=Filtered([1..Length(V)],x->not IsOne(V[x]));
-      if Length(V)>0 then Error("Relators ",V," don't hold"); fi;
+      if Length(V)>0 then
+        Error("Relators don't hold");
+      fi;
 
       Assert(1,IsPerfectGroup(F));
       if noenum<>true then
@@ -415,8 +417,10 @@ local lvarDelta,F,I,K,Presentation,Projective,Q,R,U,V,varX,d,phi,q,
       U:=FreeGeneratorsOfFpGroup(F);
       V:=List(RelatorsOfFpGroup(F),
         x->MappedWord(x,FreeGeneratorsOfFpGroup(F),gens));
-      V:=Filtered([1..Length(V)],x->not IsOne(V[x]));
-      if Length(V)>0 then Error("Relators ",V," don't hold"); fi;
+      I:=Filtered([1..Length(V)],x->not IsOne(V[x]));
+      if Length(I)>0 and (Projective=false or ForAny(V{I},x->x<>x^0*x[1][1])) then
+        Error("Relators don't hold");
+      fi;
 
       Assert(1,IsPerfectGroup(F));
       if noenum<>true then
@@ -488,7 +492,9 @@ local
       V:=List(RelatorsOfFpGroup(F),
         x->MappedWord(x,FreeGeneratorsOfFpGroup(F),gens));
       V:=Filtered([1..Length(V)],x->not IsOne(V[x]));
-      if Length(V)>0 then Error("Relators ",V," don't hold"); fi;
+      if Length(V)>0 and (Projective=false or ForAny(V,x->x<>x^0*x[1][1])) then
+        Error("Relators don't hold");
+      fi;
 
       Assert(1,IsPerfectGroup(F));
       if noenum<>true then
@@ -552,7 +558,9 @@ local lvarDelta,F,I,K,Presentation,Projective,U,V,varZ,d,delta,n,q,sigma,
       V:=List(RelatorsOfFpGroup(F),
         x->MappedWord(x,FreeGeneratorsOfFpGroup(F),gens));
       V:=Filtered([1..Length(V)],x->not IsOne(V[x]));
-      if Length(V)>0 then Error("Relators ",V," don't hold"); fi;
+      if Length(V)>0 and (Projective=false or ForAny(V,x->x<>x^0*x[1][1])) then
+        Error("Relators don't hold");
+      fi;
 
       Assert(1,IsPerfectGroup(F));
       if noenum<>true then
@@ -644,7 +652,9 @@ local lvarDelta,F,lvarGamma,I,K,Presentation,Projective,Q,R,U,V,varX,varZ,
       V:=List(RelatorsOfFpGroup(F),
         x->MappedWord(x,FreeGeneratorsOfFpGroup(F),gens));
       V:=Filtered([1..Length(V)],x->not IsOne(V[x]));
-      if Length(V)>0 then Error("Relators ",V," don't hold"); fi;
+      if Length(V)>0 and (Projective=false or ForAny(V,x->x<>x^0*x[1][1])) then
+        Error("Relators don't hold");
+      fi;
 
       Assert(1,IsPerfectGroup(F));
       if noenum<>true then

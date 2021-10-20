@@ -78,7 +78,7 @@ local lvarDelta,lvarGamma,P,S,U,V,W,varZ,delta,sigma,t,tau,v;
     fi;
   fi;
   W:=FreeGroup("Z","V","tau","delta","U","sigma","Delta");
-  GeneratorsOfGroup(W);
+  P:=GeneratorsOfGroup(W);
   if IsEvenInt(d) then
     varZ:=P[1];
     varZ:=varZ^-1;
@@ -219,11 +219,11 @@ local P,Presentation,Projective,R,Rels,S,z,q;
   if d=3 and q=2 then
     return SU32Presentation@(:Projective:=Projective);
   elif IsOddInt(d) then
-    R:=OddSUPresentation@(d,q);
+    R:=OddSUPresentation@(d,q:Projective:=false);
     P:=FreeGroupOfFpGroup(R);
     R:=RelatorsOfFpGroup(R);
   else
-    R:=EvenSUPresentation@(d,q);
+    R:=EvenSUPresentation@(d,q:Projective:=false);
     P:=FreeGroupOfFpGroup(R);
     R:=RelatorsOfFpGroup(R);
   fi;
