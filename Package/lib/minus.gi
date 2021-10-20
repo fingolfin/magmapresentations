@@ -353,7 +353,7 @@ local A,B,C,T,U,W,tau,gens;
   W:=FamilyObj(Rels)!.wholeGroup;
   tau:=GroupHomomorphismByImages(U,W,GeneratorsOfGroup(U),GeneratorsOfGroup(W));
   T:=List([1..Length(GeneratorsOfGroup(W))],
-    i->W.i^-1*ImagesRepresentative(tau,C[i]));
+    i->W.(i)^-1*ImagesRepresentative(tau,C[i]));
   Rels:=Concatenation(Rels,T);
   return W/Rels;
 end);

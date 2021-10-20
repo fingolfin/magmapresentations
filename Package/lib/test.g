@@ -686,9 +686,9 @@ end;
 BigTest:=function()
   TestSL([2],Filtered([5..15],IsPrimePowerInt):noenum);
   TestSL([3..20],Filtered([1..101],IsPrimePowerInt):noenum);
-  TestSL([3..20],Filtered([2..15],IsPrimePowerInt));
   TestSL([3,4],Filtered([2..25],IsPrimePowerInt));
-  TestSL([5..8],[2..5]);
+  TestSL([5,6],[2..5]);
+  TestSL([7,8],[2,3,4]);
 
   TestSp([6,8..20],Filtered([1..101],IsPrimePowerInt):noenum);
   TestSp([6],[2,3,4,5,7]);

@@ -3,7 +3,8 @@
 # metadata in PackageInfo.g.
 #
 LoadPackage("classicpres");
-d := DirectoriesPackageLibrary("classicpres", "tst");
+ReadPackage("classicpres","lib/test.g");
+LittleTest();
 
 #TestDirectory(d[1], rec(exitGAP := true,compareFunction:="uptowhitespace"));
 #
