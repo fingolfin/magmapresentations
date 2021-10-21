@@ -223,7 +223,7 @@ local
   fi;
   Add(R,Comm(varZ^U,tau));
   Add(R,Comm(lvarDelta^2*delta^-1,tau));
-  R1:=PresentationForSL2@(p,e);
+  R1:=PresentationForSL2@(p,e:Projective:=false);
   S:=FreeGroupOfFpGroup(R1);
   R1:=RelatorsOfFpGroup(R1);
   if e=1 then
@@ -243,7 +243,7 @@ local
   else
     W:=U*varZ^2;
   fi;
-  R2:=PresentationForSL2@(p,2*e);
+  R2:=PresentationForSL2@(p,2*e:Projective:=false);
   S:=FreeGroupOfFpGroup(R2);
   R2:=RelatorsOfFpGroup(R2);
   phi:=GroupHomomorphismByImages(S,F,GeneratorsOfGroup(S),[lvarDelta,sigma,W]);

@@ -30,9 +30,13 @@ local B,bas,I,K,Projective,Q,Rels,U,c,delta,f,i,m,q,tau,tau1,w,gens;
   w:=PrimitiveElement(K);
 
   Q:=FreeGroup("delta","tau","U");
-  delta:=Q.1;
-  tau:=Q.2;
-  U:=Q.3;
+  gens:=GeneratorsOfGroup(Q);
+  if p^e>1000 then
+    gens:=StraightLineProgGens(gens);
+  fi;
+  delta:=gens[1];
+  tau:=gens[2];
+  U:=gens[3];
   Rels:=[];
 
   # write w as linear combination of powers of w^2
@@ -80,7 +84,7 @@ end);
 
 #   special presentation for SL(2, p^e) when p^e mod 4 = 3
 BindGlobal("SL2_special@",function(p,e)
-local B,bas,I,K,Projective,Q,Rels,U,c,delta,f,i,m,q,r,tau,tau1,w;
+local B,bas,I,K,Projective,Q,Rels,U,c,delta,f,i,m,q,r,tau,tau1,w,gens;
   Projective:=ValueOption("Projective");
   if Projective=fail then
     Projective:=false;
@@ -100,10 +104,14 @@ local B,bas,I,K,Projective,Q,Rels,U,c,delta,f,i,m,q,r,tau,tau1,w;
     r:=QuoInt((q-3),4);
   fi;
   Q:=FreeGroup("delta","tau","U");
-  # Implicit generator Assg from previous line.
-  delta:=Q.1;
-  tau:=Q.2;
-  U:=Q.3;
+  gens:=GeneratorsOfGroup(Q);
+  if p^e>1000 then
+    gens:=StraightLineProgGens(gens);
+  fi;
+  delta:=gens[1];
+  tau:=gens[2];
+  U:=gens[3];
+
   Rels:=[Comm(tau,tau^(delta^(QuoInt((q+1),4)))),
     tau^(delta^m)/Comm(tau^-1,delta^r)];
   if Projective then
@@ -140,16 +148,19 @@ end);
 
 #   presentation for SL(2, 2^e) where e > 1 
 BindGlobal("SL2_even@",function(p,e)
-local B,varE,F,I,Rels,U,c,delta,f,i,m,q,tau,u,w;
+local B,varE,F,I,Rels,U,c,delta,f,i,m,q,tau,u,w,gens;
   Assert(1,p=2);
   q:=2^e;
   varE:=GF(2,e);
   w:=PrimitiveElement(varE);
   F:=FreeGroup("delta","tau","U");
-  # Implicit generator Assg from previous line.
-  delta:=F.1;
-  tau:=F.2;
-  U:=F.3;
+  gens:=GeneratorsOfGroup(F);
+  if p^e>1000 then
+    gens:=StraightLineProgGens(gens);
+  fi;
+  delta:=gens[1];
+  tau:=gens[2];
+  U:=gens[3];
   B:=[tau];
   for i in [1..e] do
     B[i+1]:=B[i]^delta;
