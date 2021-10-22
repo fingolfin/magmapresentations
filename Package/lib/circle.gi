@@ -166,7 +166,7 @@ local lvarDelta,F,I,R1,R2,R3,R4,R5,R6,Rels,S,U,V,W,varZ,b,e,f,n,p,phi,
       [lvarDelta,varZ,U,V]);
   fi;
   R1:=List(R1,r->ImagesRepresentative(phi, r));
-  R2:=PresentationForSL2@(p,e);
+  R2:=PresentationForSL2@(p,e:Projective:=false);
   S:=FreeGroupOfFpGroup(R2);
   R2:=RelatorsOfFpGroup(R2);
   if e=1 then

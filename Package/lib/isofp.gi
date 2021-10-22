@@ -9,21 +9,28 @@ local type,d,q,h,maz,hom,iso,fp,p;
   if d.idSimple.series="L" then
     type:="SL";d:=d.idSimple.parameter;
     q:=d[2];d:=d[1];
-  elif d.idSimple.series="S" then
+  elif d.idSimple.series="C" then
     type:="Sp";d:=d.idSimple.parameter;
-    q:=d[2];d:=d[1];
-  elif d.idSimple.series="U" then
+    q:=d[2];d:=2*d[1];
+  elif d.idSimple.series="2A" then
     type:="SU";d:=d.idSimple.parameter;
-    q:=d[2];d:=d[1];
-  elif d.idSimple.series="O+" then
+    q:=d[2];d:=d[1]+1;
+  elif d.idSimple.series="D" then
     type:="Omega+";d:=d.idSimple.parameter;
-    q:=d[2];d:=d[1];
-  elif d.idSimple.series="O-" then
+    q:=d[2];d:=2*d[1];
+  elif d.idSimple.series="2D" then
     type:="Omega-";d:=d.idSimple.parameter;
-    q:=d[2];d:=d[1];
-  elif d.idSimple.series="O" then
+    q:=d[2];d:=2*d[1];
+  elif d.idSimple.series="B" then
     type:="Omega";d:=d.idSimple.parameter;
-    q:=d[2];d:=d[1];
+    q:=d[2];
+    if IsEvenInt(q) then
+      # write symplectic
+      type:="Sp";
+      d:=2*d[1];
+    else
+      d:=2*d[1]+1;
+    fi;
   else
     TryNextMethod();
   fi;

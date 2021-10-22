@@ -16,7 +16,8 @@ local F,Projective,S,T,Y,d,d1,gens,rels,s,s1,t,t1,v,x,y;
   #   one of the standard generators is the identity
   rels:=[F.7];
   #   sl2 presentation on s, t, d
-  S:=ClassicalStandardPresentation("SL",2,q);
+  S:=ClassicalStandardPresentation("SL",2,q:Projective:=false,
+    PresentationGenerators:=false);
   Y:=FreeGeneratorsOfFpGroup(S);
   S:=RelatorsOfFpGroup(S);
   gens:=[s,s,t,d,s^0,s^0,s^0,s^0];
@@ -61,7 +62,7 @@ local lvarDelta,varE,F,U,V,varZ,gens,sigma,w,one;
   lvarDelta[3][3]:=w^1;
   lvarDelta[4][4]:=w^-1;
   varE:=ClassicalStandardGenerators("Omega+",d,q:
-    PresentationGenerators:=false);
+    PresentationGenerators:=false,Projective:=false);
   U:=varE[4];
   sigma:=varE[5];
   V:=varE[8];
@@ -359,7 +360,7 @@ local lvarDelta,F,I,R1,R2,R3,R4,Rels,S,U,V,W,varZ,b,e,f,n,p,phi,sigma,w;
       GeneratorsOfGroup(S), [lvarDelta,varZ,U,V]);
   fi;
   R1:=List(R1,r->ImagesRepresentative(phi,r));
-  R2:=PresentationForSL2@(p,e);
+  R2:=PresentationForSL2@(p,e:Projective:=false);
   S:=FreeGroupOfFpGroup(R2);
   R2:=RelatorsOfFpGroup(R2);
   if e=1 then
@@ -545,7 +546,8 @@ end);
 InstallGlobalFunction(PlusGenerators@,function(d,q)
 local varE,F,MA,U,V,varZ,delta,gens,sigma,w;
   if d=4 then
-    return ClassicalStandardGenerators("Omega+",d,q:PresentationGenerators:=false);
+    return ClassicalStandardGenerators("Omega+",d,q:
+      PresentationGenerators:=false,Projective:=false);
   fi;
   if IsOddInt(q) then
     return OddPlusGenerators@(d,q);

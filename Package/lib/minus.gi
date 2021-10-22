@@ -38,7 +38,7 @@ end);
 BindGlobal("Minus6Presentation@",function(q)
 local N,Q,R,S,U,d,delta,eta,images,sigma,tau,z;
   d:=4;
-  R:=Internal_StandardPresentationForSU@(d,q:Presentation:=true);
+  R:=Internal_StandardPresentationForSU@(d,q:Presentation:=true,Projective:=false);
   Q:=FreeGroupOfFpGroup(R);
   R:=RelatorsOfFpGroup(R);
   N:=FreeGroup("z","tau","sigma","delta","U");
@@ -247,8 +247,6 @@ local V,delta,n,z;
     fi;
     z:=V^(n-1)*delta^(QuoInt((q^2-1),4));
   else
-    # TODO Not sure if this is right
-    # WAS: z:=F.0;
     z:=Identity(F);
   fi;
   return z;
@@ -392,7 +390,7 @@ local gens,P,Presentation,Projective,Q,R,Rels,S,n,z;
   fi;
   R:=Setup_MinusPresentation@(d,q);
   P:=FreeGroupOfFpGroup(R);
-  R:=RelatorsOfFpGroup(R);
+  R:=ShallowCopy(RelatorsOfFpGroup(R));
   if Projective and IsOddInt(n) and q mod 4=3 then
     z:=MinusGeneratorOfCentre@(d,q,P);
     Add(R,z);

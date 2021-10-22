@@ -101,9 +101,10 @@ end);
 #end;
 
 BindGlobal("OddSUPresentation@",function(d,q)
-local
-   lvarDelta,varE,F,lvarGamma,K,OMIT,Projective,Q,R,R3,R4,lvarR_N,R_SL2,R_SU3,Rels,U,V,W,
-   varZ,a,e,f,m,n,p,phi,r,rhs,sigma,t,tau,v,w,w0;
+local lvarDelta,varE,F,lvarGamma,K,OMIT,Projective,Q,R,R3,R4,lvarR_N,
+   R_SL2,R_SU3,Rels,U,V,W,
+   varZ,a,e,f,m,n,p,phi,r,rhs,sigma,t,tau,v,w,w0,gens;
+
   Projective:=ValueOption("Projective");
   if Projective=fail then
     Projective:=false;
@@ -127,14 +128,16 @@ local
   fi;
   K:=GF(q^2);
   w:=PrimitiveElement(K);
-  F:=FreeGroup(7);
-  lvarGamma:=F.1;
-  t:=F.2;
-  U:=F.3;
-  V:=F.4;
-  sigma:=F.5;
-  tau:=F.6;
-  v:=F.7;
+  F:=FreeGroup("Gamma","t","U","V","sigma","tau","v");
+  # we het high powers, so use SLPs
+  gens:=StraightLineProgGens(GeneratorsOfGroup(F));
+  lvarGamma:=gens[1];
+  t:=gens[2];
+  U:=gens[3];
+  V:=gens[4];
+  sigma:=gens[5];
+  tau:=gens[6];
+  v:=gens[7];
   lvarDelta:=lvarGamma*(lvarGamma^-1)^U;
   R:=[];
   #   centraliser of v
@@ -204,7 +207,7 @@ local
       [v,tau^-1,lvarGamma^-1,t]);
   fi;
   R_SU3:=List(R_SU3,r->ImagesRepresentative(phi,r));
-  R_SL2:=PresentationForSL2@(p,2*e);
+  R_SL2:=PresentationForSL2@(p,2*e:Projective:=false);
   Q:=FreeGroupOfFpGroup(R_SL2);
   R_SL2:=RelatorsOfFpGroup(R_SL2);
   # rewritten select statement
