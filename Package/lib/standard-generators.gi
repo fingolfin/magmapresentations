@@ -676,7 +676,7 @@ InstallGlobalFunction(ClassicalStandardGenerators,function(type,d,F)
 #  -> ,]  return the Leedham - Green and O ' Brien standard generators for the
 #  quasisimple classical group of specified type in dimension d and defining
 #  field F ; the string type := one of SL , Sp , SU , Omega , Omega + , Omega -
-local PresentationGenerators,SpecialGroup,q,l;
+local PresentationGenerators,SpecialGroup,q,l,w,gens;
   SpecialGroup:=ValueOption("SpecialGroup");
   if SpecialGroup=fail then
     SpecialGroup:=false;
@@ -731,9 +731,14 @@ local PresentationGenerators,SpecialGroup,q,l;
      :SpecialGroup:=SpecialGroup);
     #   avoid OmegaMinus -- it sets order, too hard for large d, q
   elif type="Omega-" then
-     Error("Uses ChevalleyGroup");
+#    Cannot do so, as we don't have ChevalleyGroup command
 #    return MinusChosenElements@(ChevalleyGroup("2D",QuoInt(d,2),F)
 #     :SpecialGroup:=SpecialGroup);
+    # just use the presentation generators and translate
+    l := Internal_PresentationGenerators@(type,d,Size(F));
+    w:=MinusPresentationToStandard@classicpres(d,Size(F));
+    gens:=GeneratorsOfGroup(FamilyObj(w)!.wholeGroup);
+    l:=List(w,x->MappedWord(x,gens,l));
   fi;
   if type="SU" then F:=GF(F,2);fi;
   l:=List(l,x->ImmutableMatrix(F,x));

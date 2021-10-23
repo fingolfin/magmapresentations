@@ -255,21 +255,26 @@ end);
 #   express presentation generators as words in standard generators
 BindGlobal("MinusStandardToPresentation@",
 function(d,q)
-local lvarDelta,F,U,V,W,delta,m,p,s,sigma,t,tau,w,w0,x,z;
+local lvarDelta,F,U,V,W,delta,m,p,s,sigma,t,tau,w,w0,x,z,gens;
   Assert(1,IsEvenInt(d) and d > 4);
-  W:=FreeGroup(5);
   if IsOddInt(q) then
-    s:=W.1;
-    t:=W.2;
+    W:=FreeGroup("s","t","delta","U","V");
+    gens:=GeneratorsOfGroup(W);
+    gens:=StraightLineProgGens(gens);
+    s:=gens[1];
+    t:=gens[2];
   else
-    t:=W.1;
-    s:=W.2;
+    W:=FreeGroup("t","es","delta","U","V");
+    gens:=GeneratorsOfGroup(W);
+    gens:=StraightLineProgGens(gens);
+    t:=gens[1];
+    s:=gens[2];
     #   correct discrepancy between published s and code s
     s:=s^t;
   fi;
-  delta:=W.3;
-  U:=W.4;
-  V:=W.5;
+  delta:=gens[3];
+  U:=gens[4];
+  V:=gens[5];
   z:=s^V;
   # rewritten select statement
   if d mod 4=2 then
