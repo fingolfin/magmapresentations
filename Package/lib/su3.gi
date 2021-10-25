@@ -142,7 +142,6 @@ local F,c,d,found,m,n,psi,t,w,w0,x,y;
     Assert(1,IsOne(w^(x*m)+w^(y*m)) and IsOne(w^(-x*n)+w^(-y*n)));
     Assert(1,Size(Subfield(GF(q^2),[w^(x*m)]))=q 
      and Size(Subfield(GF(q^2),[w^(x*n)]))=q);
-     # TODO Not sure what this func is returning but think this is fine
     return rec(val1:=x,
       val2:=y);
   fi;
@@ -163,7 +162,6 @@ local F,c,d,found,m,n,psi,t,w,w0,x,y;
       found:=Size(Subfield(GF(q^2),[w^(x*m)]))=q^2 and
        Size(Subfield(GF(q^2),[w^(x*n)]))=q;
       if found then
-          # TODO Not sure what this func is returning but think this is fine
         return rec(val1:=x,
           val2:=y);
       fi;
@@ -379,7 +377,7 @@ local lvarAlpha,F,alpha,beta0,eta,gamma0,n,t,w,w0,zeta;
     lvarAlpha:=[alpha];
   else
     lvarAlpha:=[alpha,alpha*w^(q-1),alpha*w^(2*(q-1))];
-    ## TODO Aren't the last two conditions equivalent to : q not equal 2,4 ?
+
     #Assert(1,ForAll(lvarAlpha,a->a^(q+1)=-t) and IsPower(w^(q-1),3)=false and
     # IsPower(w^(2*(q-1)),3)=false);
     Assert(1,ForAll(lvarAlpha,a->a^(q+1)=-t) and [3]<>Set(Factors(w^(q-1))) and

@@ -8,7 +8,7 @@ Subtitle := "Classical Group Presentations",
 
 ##  See '?Extending: Version Numbers' in GAP help for an explanation
 ##  of valid version numbers.
-Version := "0.1",
+Version := "1.0",
 
 License := "GPL-2.0 OR GPL-3.0", # SPDX ID, see https://spdx.org
 
@@ -201,7 +201,7 @@ Autoload := false,
 ##  If the default banner does not suffice then provide a string that is
 ##  printed when the package is loaded (not when it is autoloaded or if
 ##  command line options `-b' or `-q' are given).
-BannerString := "Classical Group Presentations by Leedham-Green, OBrien",
+BannerString := "Classical Group Presentations\n",
 
 TestFile := "tst/testall.g",
 

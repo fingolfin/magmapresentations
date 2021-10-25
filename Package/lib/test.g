@@ -1,8 +1,8 @@
-#   usually subgroups chosen for coset enumeration are maximal of smallest index ## TODO Don't know what this does
+#   usually subgroups chosen for coset enumeration are maximal of smallest index
 
 #SetGlobalTCParameters(:CosetLimit:=10^7,Hard:=true,Print:=10^6);
-LoadPackage("ace");
-TCENUM:=ACETCENUM;
+#LoadPackage("ace");
+#TCENUM:=ACETCENUM;
 
 DeclareInfoClass("InfoPresTest");
 SetInfoLevel(InfoPresTest,1);

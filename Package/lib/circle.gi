@@ -334,10 +334,6 @@ local A,B,C,Delta2,varE,F,I,Special_OmegaStandardToPresentation,
   F:=GF(q);
   e:=Size(F);
   w:=PrimitiveElement(F);
-  ##
-  ## TODO Need Magma documentation
-  ##
-  #varE:=SubStructure(F,w^4);
   varE:=Basis(Field(w^4));
   # was "c:=Eltseq((-w^3)*FORCEOne(varE));"
   c:=Coefficients(varE, (-w^3));
