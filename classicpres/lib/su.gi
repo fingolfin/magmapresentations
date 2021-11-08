@@ -16,6 +16,7 @@ BindGlobal("SUStandardToPresentation@",
 function(d,q)
 local lvarDelta,lvarGamma,P,S,U,V,W,varZ,delta,rest,s,sigma,t,tau,v,x,y;
   W:=FreeGroup("Z","V","tau","delta","U","sigma","Delta");
+  W:=Group(StraightLineProgGens(GeneratorsOfGroup(W)));
   S:=GeneratorsOfGroup(W);
   if IsEvenInt(d) then
     varZ:=S[1];
@@ -69,6 +70,7 @@ function(d,q)
 local lvarDelta,lvarGamma,P,S,U,V,W,varZ,delta,sigma,t,tau,v;
   if d=3 then
     W:=FreeGroup(4);
+    W:=Group(StraightLineProgGens(GeneratorsOfGroup(W)));
     P:=GeneratorsOfGroup(W);
     if IsOddInt(q) then
       return [P[3]^(QuoInt((q+1),2))*P[4],P[1]^0,P[2],P[3]^(q+1),P[1]^0,P[1]
@@ -78,6 +80,7 @@ local lvarDelta,lvarGamma,P,S,U,V,W,varZ,delta,sigma,t,tau,v;
     fi;
   fi;
   W:=FreeGroup("Z","V","tau","delta","U","sigma","Delta");
+  W:=Group(StraightLineProgGens(GeneratorsOfGroup(W)));
   P:=GeneratorsOfGroup(W);
   if IsEvenInt(d) then
     varZ:=P[1];

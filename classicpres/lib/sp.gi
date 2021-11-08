@@ -15,6 +15,7 @@ BindGlobal("Sp_PresentationForN1@",function(n,q)
 local F,OMIT,R1,Rels,S,U,V,varZ,m,phi;
   #was: F:=SLPGroup(3);
   F:=FreeGroup("U","V","Z"); # deal with SLP later
+  F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
   U:=F.1;
   V:=F.2;
   varZ:=F.3;
@@ -67,6 +68,7 @@ local F,OMIT,R1,Rels,S,U,V,varZ,delta,e,f,p,phi;
   f:=Set(f)=[p];
   #was: F:=SLPGroup(4);
   F:=FreeGroup("U","V","Z","delta"); # deal with SLP later
+  F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
   U:=F.1;
   V:=F.2;
   varZ:=F.3;
@@ -131,6 +133,7 @@ local lDelta,F,I,R1,R2,R3,Rels,S,U,V,W,varZ,a,b,delta,e,f,n,p,phi,
   f:=Set(f)=[p];
   #was: F:=SLPGroup(6);
   F:=FreeGroup("Z","V","tau","delta","U","sigma"); # deal with SLP later
+  F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
   varZ:=F.1;
   V:=F.2;
   tau:=F.3;
@@ -283,8 +286,8 @@ end);
 BindGlobal("SpStandardToPresentation@",
 function(d,q)
 local W;
-  #was: W:=SLPGroup(6);
   W:=FreeGroup("Z","V","tau","delta","U","sigma"); # deal with SLP later
+  W:=Group(StraightLineProgGens(GeneratorsOfGroup(W)));
   #   sequence [Z, V, tau, delta, U, sigma]
   return [W.1,W.2,W.3,W.4^-1,W.5,(W.6^(W.2^2))^(W.1^-1)];
 end);
@@ -295,6 +298,7 @@ function(d,q)
 local W;
   #was: W:=SLPGroup(6);
   W:=FreeGroup("s","V","t","delta","U","x"); # deal with SLP later
+  W:=Group(StraightLineProgGens(GeneratorsOfGroup(W)));
   #   [s, V, t, delta, U, x]
   return [W.1,W.2,W.3,W.4^-1,W.5,(W.6^W.1)^(W.2^-2)];
 end);

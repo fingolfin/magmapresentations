@@ -30,10 +30,8 @@ local B,bas,I,K,Projective,Q,Rels,U,c,delta,f,i,m,q,tau,tau1,w,gens;
   w:=PrimitiveElement(K);
 
   Q:=FreeGroup("delta","tau","U");
+  Q:=Group(StraightLineProgGens(GeneratorsOfGroup(Q)));
   gens:=GeneratorsOfGroup(Q);
-  if p^e>1000 then
-    gens:=StraightLineProgGens(gens);
-  fi;
   delta:=gens[1];
   tau:=gens[2];
   U:=gens[3];
@@ -104,10 +102,8 @@ local B,bas,I,K,Projective,Q,Rels,U,c,delta,f,i,m,q,r,tau,tau1,w,gens;
     r:=QuoInt((q-3),4);
   fi;
   Q:=FreeGroup("delta","tau","U");
+  Q:=Group(StraightLineProgGens(GeneratorsOfGroup(Q)));
   gens:=GeneratorsOfGroup(Q);
-  if p^e>1000 then
-    gens:=StraightLineProgGens(gens);
-  fi;
   delta:=gens[1];
   tau:=gens[2];
   U:=gens[3];
@@ -154,10 +150,8 @@ local B,varE,F,I,Rels,U,c,delta,f,i,m,q,tau,u,w,gens;
   varE:=GF(2,e);
   w:=PrimitiveElement(varE);
   F:=FreeGroup("delta","tau","U");
+  F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
   gens:=GeneratorsOfGroup(F);
-  if p^e>1000 then
-    gens:=StraightLineProgGens(gens);
-  fi;
   delta:=gens[1];
   tau:=gens[2];
   U:=gens[3];
@@ -210,6 +204,7 @@ local F,Projective,Rels,a,b,k,r;
     Projective:=false;
   fi;
   F:=FreeGroup("a","b");
+  F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
   # Implicit generator Assg from previous line.
   a:=F.1;
   b:=F.2;

@@ -27,7 +27,8 @@ end);
 #   d - 1 copies of Z_{q - 1} by a copy of Sym (d)
 BindGlobal("PresentationForN@",function(d,q)
 local F,OMIT,R,Rels,S,U,V,delta,tau;
-  F:=FreeGroup(3);
+  F:=FreeGroup("U","V","delta");
+  F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
   U:=F.1;
   V:=F.2;
   delta:=F.3;
@@ -78,7 +79,8 @@ local F,I,R1,R2,Rels,S,U,V,a,b,delta,e,f,p,phi,tau,w,wm1;
   p:=PrimeBase(q);
   e:=LogInt(q,p);
   if q<>p^e then Error("<q> is not a prime power");fi;
-  F:=FreeGroup(4);
+  F:=FreeGroup("U","V","tau","delta");
+  F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
   U:=F.1;
   V:=F.2;
   tau:=F.3;
@@ -181,7 +183,8 @@ end);
 BindGlobal("SLStandardToPresentation@",
 function(d,q)
 local P,S,U,V,V_p,delta,tau;
-  S:=FreeGroup(4);
+  S:=FreeGroup("U","V","tau","delta");
+  S:=Group(StraightLineProgGens(GeneratorsOfGroup(S)));
   if d=2 then
     if IsPrimeInt(q) then
       P:=[S.3,S.2,One(S),One(S)];
@@ -209,6 +212,7 @@ local I,P,S,U,V,V_s,delta,tau,w,x,y;
   if d=2 then
     if IsPrimeInt(q) then
       P:=FreeGroup(2);
+      P:=Group(StraightLineProgGens(GeneratorsOfGroup(P)));
       w:=PrimitiveElement(GF(q));
       x:=Int(w^-1)-1;
       y:=Int(w^-2-w^-1);
@@ -218,11 +222,13 @@ local I,P,S,U,V,V_s,delta,tau,w,x,y;
       S:=[P.2,P.2,P.1,delta];
     else
       P:=FreeGroup(3);
+      P:=Group(StraightLineProgGens(GeneratorsOfGroup(P)));
       S:=[P.3,P.3,P.2,P.1^-1];
     fi;
     return S;
   fi;
   P:=FreeGroup(4);
+  P:=Group(StraightLineProgGens(GeneratorsOfGroup(P)));
   U:=P.1;
   V:=P.2;
   tau:=P.3;

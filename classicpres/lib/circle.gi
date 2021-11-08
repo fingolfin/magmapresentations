@@ -50,6 +50,7 @@ BindGlobal("Omega_PresentationForN1@",function(n)
 local F,R,R1,Rels,S,U,V,varZ,phi;
   Assert(1,n > 1);
   F:=FreeGroup("Z","U","V");
+  F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
   varZ:=F.1;
   U:=F.2;
   V:=F.3;
@@ -79,6 +80,7 @@ end);
 BindGlobal("Omega_PresentationForN@",function(n,q)
 local lvarDelta,F,OMIT,R,R1,Rels,S,U,V,varZ,phi;
   F:=FreeGroup("Delta","Z","U","V");
+  F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
   lvarDelta:=F.1;
   varZ:=F.2;
   U:=F.3;
@@ -137,7 +139,8 @@ local lvarDelta,F,I,R1,R2,R3,R4,R5,R6,Rels,S,U,V,W,varZ,b,e,f,n,p,phi,
     p := e[1];
     e := Size(e);
   fi;
-  F:=FreeGroup(6);
+  F:=FreeGroup("Delta","Z","tau","sigma","U","V");
+  F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
   lvarDelta:=F.1;
   varZ:=F.2;
   tau:=F.3;
@@ -242,6 +245,7 @@ local G,w1,w10,w103,w104,w105,w106,w107,w108,w109,w11,w12,w13,w14,w15,w16,
    w8,w9;
 
   G:=FreeGroup(5);
+  G:=Group(StraightLineProgGens(GeneratorsOfGroup(G)));
   w10:=G.4*G.5;
   w103:=w10*G.5;
   w7:=G.3*G.1;
@@ -306,6 +310,7 @@ local A,B,C,Delta2,varE,F,I,Special_OmegaStandardToPresentation,
   Special_OmegaStandardToPresentation:=function(d,q)
   local U,V,W,varZ,delta,p,s,sigma,t,tau;
     W:=FreeGroup("s","t","delta","U","V");
+    W:=Group(StraightLineProgGens(GeneratorsOfGroup(W)));
     s:=W.1;
     t:=W.2;
     delta:=W.3;
@@ -324,6 +329,7 @@ local A,B,C,Delta2,varE,F,I,Special_OmegaStandardToPresentation,
   end;
 
   W:=FreeGroup("Delta2","Z","tau","sigma","U","V");
+  W:=Group(StraightLineProgGens(GeneratorsOfGroup(W)));
   #   Delta2 = Delta^2
   Delta2:=W.1;
   varZ:=W.2;
@@ -358,6 +364,7 @@ InstallGlobalFunction(OmegaStandardToPresentation@,
 function(d,q)
 local lvarDelta,U,V,W,varZ,delta,gens,p,s,sigma,t,tau,fgens;
   W:=FreeGroup("s","t","delta","U","V");
+  W:=Group(StraightLineProgGens(GeneratorsOfGroup(W)));
   s:=W.1;
   t:=W.2;
   delta:=W.3;
@@ -396,6 +403,7 @@ BindGlobal("OmegaPresentationToStandard@",
 function(d,q)
 local lvarDelta,U,V,W,varZ,sigma,t,tau;
   W:=FreeGroup("Delta","Z","tau","sigma","U","V");
+  W:=Group(StraightLineProgGens(GeneratorsOfGroup(W)));
   lvarDelta:=W.1;
   varZ:=W.2;
   tau:=W.3;
@@ -450,6 +458,7 @@ local gens,P,Presentation,Q,R,Rels,S;
     gens:=FreeGeneratorsOfFpGroup(R);
     R:=RelatorsOfFpGroup(R);
     Q:=FreeGroup(5);
+    Q:=Group(StraightLineProgGens(GeneratorsOfGroup(Q)));
     # was "R:=Evaluate(R,List([1,1,2,3],i->Q.i));" . This required the new variable "gens"
     R:=List(R, w -> MappedWord(w, gens, GeneratorsOfGroup(Q){[1,1,2,3]}));
     Add(R,Q.4);

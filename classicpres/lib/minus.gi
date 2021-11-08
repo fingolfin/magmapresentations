@@ -42,6 +42,7 @@ local N,Q,R,S,U,d,delta,eta,images,sigma,tau,z;
   Q:=FreeGroupOfFpGroup(R);
   R:=RelatorsOfFpGroup(R);
   N:=FreeGroup("z","tau","sigma","delta","U");
+  N:=Group(StraightLineProgGens(GeneratorsOfGroup(N)));
   z:=N.1;
   tau:=N.2;
   sigma:=N.3;
@@ -62,7 +63,8 @@ end);
 
 BindGlobal("Minus_PresentationForN1@",function(d,q)
 local F,OMIT,R,R1,Rels,S,U,V,m,n,phi,z;
-  F:=FreeGroup(3);
+  F:=FreeGroup("z","U","V");
+  F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
   z:=F.1;
   U:=F.2;
   V:=F.3;
@@ -111,6 +113,7 @@ end);
 BindGlobal("Minus_PresentationForN@",function(d,q)
 local F,OMIT,R,R1,Rels,S,U,V,delta,n,phi,z;
   F:=FreeGroup("delta","z","U","V");
+  F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
   delta:=F.1;
   z:=F.2;
   U:=F.3;
@@ -163,6 +166,7 @@ local F,OMIT,R,R1,R2,R3,R4,R5,Rels,S,U,V,W,delta,e,f,n,p,phi,sigma,tau,z;
     return Minus6Presentation@(q);
   fi;
   F:=FreeGroup("z","tau","sigma","delta","U","V");
+  F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
   z:=F.1;
   tau:=F.2;
   sigma:=F.3;
@@ -259,12 +263,14 @@ local lvarDelta,F,U,V,W,delta,m,p,s,sigma,t,tau,w,w0,x,z,gens;
   Assert(1,IsEvenInt(d) and d > 4);
   if IsOddInt(q) then
     W:=FreeGroup("s","t","delta","U","V");
+    W:=Group(StraightLineProgGens(GeneratorsOfGroup(W)));
     gens:=GeneratorsOfGroup(W);
     gens:=StraightLineProgGens(gens);
     s:=gens[1];
     t:=gens[2];
   else
     W:=FreeGroup("t","es","delta","U","V");
+    W:=Group(StraightLineProgGens(GeneratorsOfGroup(W)));
     gens:=GeneratorsOfGroup(W);
     gens:=StraightLineProgGens(gens);
     t:=gens[1];
@@ -311,6 +317,7 @@ function(d,q)
 local lvarDelta,U,V,W,delta,s,sigma,t,tau,z;
   Assert(1,IsEvenInt(d) and d > 4);
   W:=FreeGroup("z","tau","sigma","Delta","U","V");
+  W:=Group(StraightLineProgGens(GeneratorsOfGroup(W)));
   z:=W.1;
   tau:=W.2;
   sigma:=W.3;
@@ -381,6 +388,7 @@ local gens,P,Presentation,Projective,Q,R,Rels,S,n,z;
     gens:=GeneratorsOfGroup(FreeGroupOfFpGroup(R));
     R:=RelatorsOfFpGroup(R);
     Q:=FreeGroup(5);
+    Q:=Group(StraightLineProgGens(GeneratorsOfGroup(Q)));
     if IsEvenInt(q) then
       # was "R:=Evaluate(R,[Q.1^Q.2,Q.1^Q.2,Q.1,Q.3]);"
       R:=List(R, w -> MappedWord(w, gens, [Q.1^Q.2,Q.1^Q.2,Q.1,Q.3]));
