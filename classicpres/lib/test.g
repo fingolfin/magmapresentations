@@ -750,6 +750,9 @@ LittleTest:=function()
   TestSp([6,8],Filtered([1..10],IsPrimePowerInt):noenum);
   TestPlus([6,8..20],Filtered([1..10],IsPrimePowerInt):noenum);
   TestMinus([6,8..20],Filtered([1..10],IsPrimePowerInt):noenum);
-  TestOmega([3,5,7],Filtered([5,7..11],IsPrimePowerInt):noenum);
+  # do not test Omega in 4.11 -- the `Omega` function does not work
+  if CompareVersionNumbers(GAPInfo.Version,"4.12") then
+    TestOmega([3,5,7],Filtered([5,7..11],IsPrimePowerInt):noenum);
+  fi;
   TestSU([3,4],Filtered([3..10],IsPrimePowerInt):noenum);
 end;
