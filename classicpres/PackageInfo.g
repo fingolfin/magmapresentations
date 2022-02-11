@@ -8,12 +8,12 @@ Subtitle := "Classical Group Presentations",
 
 ##  See '?Extending: Version Numbers' in GAP help for an explanation
 ##  of valid version numbers.
-Version := "1.2",
+Version := "1.20",
 
 License := "GPL-2.0 OR GPL-3.0", # SPDX ID, see https://spdx.org
 
 ##  Release date of the current version in dd/mm/yyyy format.
-Date := "02/05/2022",
+Date := "02/06/2022",
 
 ##  URL of the archive(s) of the current package release, but *without*
 ##  the format extension(s), like '.zoo', which are given next.
