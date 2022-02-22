@@ -3,6 +3,7 @@ BindGlobal("PresentationForSn@",function(d)
 local F,Rels,S,U,V,i,tau;
   # note that SLP option does not make sense here
   F:=FreeGroup("U","V");
+  F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
   U:=F.1; #   (1, 2)
   V:=F.2; #   (1,2, ..., d)
   Rels:=[];
@@ -29,6 +30,7 @@ end);
 BindGlobal("PresentationForAn@",function(n)
 local F,a,b,A,Rels,S,tau;
   F:=FreeGroup("a","b");
+  F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
   a:=F.1;b:=F.2;
   if IsOddInt(n) then
     #   n odd: a=(1,2,3), b=(1,2,...,n), 

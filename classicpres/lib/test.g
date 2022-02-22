@@ -1,8 +1,8 @@
-#   usually subgroups chosen for coset enumeration are maximal of smallest index ## TODO Don't know what this does
+#   usually subgroups chosen for coset enumeration are maximal of smallest index
 
 #SetGlobalTCParameters(:CosetLimit:=10^7,Hard:=true,Print:=10^6);
-LoadPackage("ace");
-TCENUM:=ACETCENUM;
+#LoadPackage("ace");
+#TCENUM:=ACETCENUM;
 
 DeclareInfoClass("InfoPresTest");
 SetInfoLevel(InfoPresTest,1);
@@ -750,6 +750,9 @@ LittleTest:=function()
   TestSp([6,8],Filtered([1..10],IsPrimePowerInt):noenum);
   TestPlus([6,8..20],Filtered([1..10],IsPrimePowerInt):noenum);
   TestMinus([6,8..20],Filtered([1..10],IsPrimePowerInt):noenum);
-  TestOmega([3,5,7],Filtered([5,7..11],IsPrimePowerInt):noenum);
+  # do not test Omega in 4.11 -- the `Omega` function does not work
+  if CompareVersionNumbers(GAPInfo.Version,"4.12") then
+    TestOmega([3,5,7],Filtered([5,7..11],IsPrimePowerInt):noenum);
+  fi;
   TestSU([3,4],Filtered([3..10],IsPrimePowerInt):noenum);
 end;

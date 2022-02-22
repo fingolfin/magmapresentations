@@ -42,7 +42,6 @@ local type,d,q,h,maz,hom,iso,fp,p;
   p:=List(maz,x->ImagesRepresentative(hom,x));
   h:=Group(p);
   IsSimpleGroup(h);
-  Print("build classical group\n");
   iso:=IsomorphismGroups(h,g);
   SetSize(fp,Size(g));
   iso:=GroupHomomorphismByImages(fp,g,GeneratorsOfGroup(fp),

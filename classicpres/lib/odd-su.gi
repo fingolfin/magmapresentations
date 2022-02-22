@@ -63,6 +63,7 @@ end);
 BindGlobal("Odd_SU_PresentationForN@",function(n,q)
 local F,lvarGamma,OMIT,R,Rels,S,U,V,t,tau;
   F:=FreeGroup("Gamma","t","U","V");
+  F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
   lvarGamma:=F.1;
   t:=F.2;
   U:=F.3;
@@ -129,6 +130,7 @@ local lvarDelta,varE,F,lvarGamma,K,OMIT,Projective,Q,R,R3,R4,lvarR_N,
   K:=GF(q^2);
   w:=PrimitiveElement(K);
   F:=FreeGroup("Gamma","t","U","V","sigma","tau","v");
+  F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
   # we het high powers, so use SLPs
   gens:=StraightLineProgGens(GeneratorsOfGroup(F));
   lvarGamma:=gens[1];

@@ -28,12 +28,14 @@ local lvarDelta,F,OMIT,R,Rels,S,U,V,tau;
   Rels:=[];
   if n=2 then
     F:=FreeGroup("Delta","U");
+    F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
     lvarDelta:=F.1;
     U:=F.2;
     R:=[];
     Add(Rels,U^2);
   else
     F:=FreeGroup("Delta","U","V");
+    F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
     lvarDelta:=F.1;
     U:=F.2;
     V:=F.3;
@@ -68,6 +70,7 @@ end);
 BindGlobal("Thm72@",function(n,q)
 local lvarDelta,F,OMIT,R,Rels,S,U,V,delta,tau;
   F:=FreeGroup("Delta","U","V","delta");
+  F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
   lvarDelta:=F.1;
   U:=F.2;
   V:=F.3;
@@ -107,6 +110,7 @@ end);
 BindGlobal("SU_PresentationForN@",function(n,q)
 local lvarDelta,F,OMIT,R,Rels,S,U,V,varZ,delta,tau;
   F:=FreeGroup("Delta","U","V","delta","Z");
+  F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
   lvarDelta:=F.1;
   U:=F.2;
   V:=F.3;
@@ -165,6 +169,7 @@ local
       e := Size(e);
   fi;
   F:=FreeGroup("Z","V","tau","delta","U","sigma","Delta");
+  F:=Group(StraightLineProgGens(GeneratorsOfGroup(F)));
   varZ:=F.1;
   V:=F.2;
   tau:=F.3;
