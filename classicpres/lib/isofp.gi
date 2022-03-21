@@ -2,7 +2,7 @@ InstallOtherMethod(IsomorphismFpGroup,"classical simple",true,
   [IsGroup and IsFinite and IsSimpleGroup,IsString],100,
 function(g,s)
 local type,d,q,h,maz,hom,iso,fp,p;
-  if ValueOption(NO_PRECOMPUTED_DATA_OPTION)=true then
+  if IsAbelian(g) or ValueOption(NO_PRECOMPUTED_DATA_OPTION)=true then
     TryNextMethod();
   fi;
   d:=DataAboutSimpleGroup(g);
