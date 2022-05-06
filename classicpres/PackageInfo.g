@@ -8,12 +8,12 @@ Subtitle := "Classical Group Presentations",
 
 ##  See '?Extending: Version Numbers' in GAP help for an explanation
 ##  of valid version numbers.
-Version := "1.21",
+Version := "1.22",
 
 License := "GPL-2.0 OR GPL-3.0", # SPDX ID, see https://spdx.org
 
 ##  Release date of the current version in dd/mm/yyyy format.
-Date := "21/03/2022",
+Date := "06/05/2022",
 
 ##  URL of the archive(s) of the current package release, but *without*
 ##  the format extension(s), like '.zoo', which are given next.
@@ -201,7 +201,8 @@ Autoload := true,
 ##  If the default banner does not suffice then provide a string that is
 ##  printed when the package is loaded (not when it is autoloaded or if
 ##  command line options `-b' or `-q' are given).
-BannerString := "Classical Group Presentations\n",
+BannerString := Concatenation("Classical Group Presentations, v.",
+  ~.Version,"\n"),
 
 TestFile := "tst/testall.g",
 
