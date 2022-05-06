@@ -4,7 +4,8 @@
 InstallGlobalFunction(SLGenerators@,function(d,q)
 local MA,S,V,e,f,i,p;
   if d=2 then
-    p:=PrimeBase(q);
+    #p:=PrimeBase(q);
+    p:=Factors(q)[1];
     e:=LogInt(q,p);
     if q<>p^e then Error("<q> is not a prime power");fi;
     return SL2Generators@(p,e);
@@ -76,7 +77,8 @@ end);
 BindGlobal("SLPresentation@",function(d,q)
 local F,I,R1,R2,Rels,S,U,V,a,b,delta,e,f,p,phi,tau,w,wm1;
   Assert(1,d > 2);
-  p:=PrimeBase(q);
+  #p:=PrimeBase(q);
+  p:=Factors(q)[1];
   e:=LogInt(q,p);
   if q<>p^e then Error("<q> is not a prime power");fi;
   F:=FreeGroup("U","V","tau","delta");
